@@ -15,9 +15,7 @@
 
 	<footer id="colophon" class="site-footer" role="contentinfo">
 		<div class="site-info">
-			<a href="<?php echo esc_url( __( 'https://wordpress.org/', 'elevenhub' ) ); ?>"><?php printf( esc_html__( 'Proudly powered by %s', 'elevenhub' ), 'WordPress' ); ?></a>
-			<span class="sep"> | </span>
-			<?php printf( esc_html__( 'Theme: %1$s by %2$s.', 'elevenhub' ), 'elevenhub', '<a href="http://underscores.me/" rel="designer">Underscores.me</a>' ); ?>
+			<a href="<?php echo esc_url( __( 'https://wordpress.org/', 'elevenhub' ) ); ?>" target="_blank">Proudly powered by <img src="<?php echo get_template_directory_uri(); ?>/assets/images/wordpress.png" width="100px" title="Proudly powered by WordPress" alt="Proudly powered by WordPress" /></a>
 		</div><!-- .site-info -->
 	</footer><!-- #colophon -->
 </div><!-- #page -->

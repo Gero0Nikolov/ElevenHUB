@@ -22,8 +22,15 @@
 <body <?php body_class(); ?>>
 <div id="page" class="site">
 	<nav id="site-navigation" class="main-navigation" role="navigation">
-		<button class="menu-toggle" aria-controls="primary-menu" aria-expanded="false"><?php esc_html_e( 'Primary Menu', 'elevenhub' ); ?></button>
-		<?php wp_nav_menu( array( 'theme_location' => 'primary', 'menu_id' => 'primary-menu' ) ); ?>
+		<div class="left-aligned">
+			<a href="<?php echo get_site_url(); ?>" class='no-border'>
+				<img src="#" class="logo" />
+			</a>
+		</div>
+		<div class="right-aligned">
+			<?php wp_nav_menu( array( 'theme_location' => 'primary', 'menu_id' => 'primary-menu' ) ); ?>
+			<button id="login-form-controller" class="red-bold-button">Login</button>
+		</div>
 	</nav><!-- #site-navigation -->
 
 	<div id="content" class="site-content">

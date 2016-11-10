@@ -104,6 +104,7 @@ add_action( 'widgets_init', 'elevenhub_widgets_init' );
 function elevenhub_scripts() {
 	wp_enqueue_style( 'elevenhub-animations', get_template_directory_uri() . '/animate.css' );
 	wp_enqueue_style( 'elevenhub-font-awesome', get_template_directory_uri() . '/inc/font-awesome/css/font-awesome.css' );
+	wp_enqueue_style( 'the_travel_kiwi-fonts', get_template_directory_uri() . '/fonts.css' );
 	wp_enqueue_style( 'elevenhub-style', get_stylesheet_uri() );
 
 
