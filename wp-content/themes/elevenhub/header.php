@@ -9,6 +9,9 @@
  * @package elevenhub
  */
 
+$mobile_class = "";
+if ( wp_is_mobile() ) { $mobile_class = "mobile"; }
+
 ?><!DOCTYPE html>
 <html <?php language_attributes(); ?>>
 <head>
@@ -17,18 +20,21 @@
 <link rel="profile" href="http://gmpg.org/xfn/11">
 
 <?php wp_head(); ?>
+
+<script>
+	var ajax_url = '<?php echo admin_url('admin-ajax.php'); ?>';
+</script>
 </head>
 
-<body <?php body_class(); ?>>
+<body <?php body_class( $mobile_class ); ?>>
 <div id="page" class="site">
 	<nav id="site-navigation" class="main-navigation" role="navigation">
 		<div class="left-aligned">
 			<a href="<?php echo get_site_url(); ?>" class='no-border'>
-				<img src="#" class="logo" />
+				<img src="<?php echo get_template_directory_uri(); ?>/assets/images/11hub-logo.png" class="logo hvr-backward" />
 			</a>
 		</div>
 		<div class="right-aligned">
-			<?php wp_nav_menu( array( 'theme_location' => 'primary', 'menu_id' => 'primary-menu' ) ); ?>
 			<button id="login-form-controller" class="red-bold-button">Login</button>
 		</div>
 	</nav><!-- #site-navigation -->

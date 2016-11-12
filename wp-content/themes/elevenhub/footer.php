@@ -14,9 +14,15 @@
 	</div><!-- #content -->
 
 	<footer id="colophon" class="site-footer" role="contentinfo">
-		<div class="site-info">
-			<a href="<?php echo esc_url( __( 'https://wordpress.org/', 'elevenhub' ) ); ?>" target="_blank">Proudly powered by <img src="<?php echo get_template_directory_uri(); ?>/assets/images/wordpress.png" width="100px" title="Proudly powered by WordPress" alt="Proudly powered by WordPress" /></a>
-		</div><!-- .site-info -->
+		<a href="#" class="footer-link">Facebook</a>
+		<span class="footer-separator">&bull;</span>
+		<a href="#" class="footer-link">Twitter</a>
+		<span class="footer-separator">&bull;</span>
+		<a href="#" class="footer-link">Instagram</a>
+		<span class="footer-separator">&bull;</span>
+		<a href="#" class="footer-link">Google+</a>
+		<span class="footer-separator">&bull;</span>
+		<a href="<?php echo esc_url( __( 'https://wordpress.org/', 'elevenhub' ) ); ?>" target="_blank"><img src="<?php echo get_template_directory_uri(); ?>/assets/images/wordpress.png" width="100px" title="Proudly powered by WordPress" alt="Proudly powered by WordPress" /></a>		
 	</footer><!-- #colophon -->
 </div><!-- #page -->
 

@@ -25,3 +25,21 @@
 	font-family: LoraBold;
 	src: url('assets/fonts/Lora-Bold.ttf');
 }
+
+@font-face {
+	font-family: Anton;
+	src: url('assets/fonts/Anton.ttf');
+}
+
+@font-face {
+	font-family: OswaldRegular;
+	src: url('assets/fonts/Oswald-Regular.ttf');
+}
+@font-face {
+	font-family: OswaldBold;
+	src: url('assets/fonts/Oswald-Bold.ttf');
+}
+@font-face {
+	font-family: OswaldLight;
+	src: url('assets/fonts/Oswald-Light.ttf');
+}

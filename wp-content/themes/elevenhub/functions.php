@@ -109,7 +109,6 @@ function elevenhub_scripts() {
 
 
 	wp_enqueue_script( 'dloober-initial', get_template_directory_uri() . '/js/initial.js', array( 'jquery' ), '', false );
-	wp_enqueue_script( 'elevenhub-navigation', get_template_directory_uri() . '/js/navigation.js', array(), '20151215', true );
 	wp_enqueue_script( 'elevenhub-skip-link-focus-fix', get_template_directory_uri() . '/js/skip-link-focus-fix.js', array(), '20151215', true );
 
 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
@@ -142,3 +141,51 @@ require get_template_directory() . '/inc/customizer.php';
  * Load Jetpack compatibility file.
  */
 require get_template_directory() . '/inc/jetpack.php';
+
+/** IS ALPHABETICAL **/
+function is_alphabetical( $args ) {
+	foreach ( $args as $input ) {
+		if ( !( $response = ctype_alpha( $input ) ? true : false ) ) { break; }
+	}
+	return $response;
+}
+
+/** AJAX **/
+add_action( 'wp_ajax_nopriv_register_user', 'register_user' );
+add_action( 'wp_ajax_register_user', 'register_user' );
+function register_user() {
+	$first_name = $_POST[ "first_name" ];
+	$last_name = $_POST[ "last_name" ];
+	$email = $_POST[ "email" ];
+	$password = $_POST[ "password" ];
+
+	$wp_username = strtolower( $first_name ."_". $last_name );
+
+	if ( empty( $email ) ) { echo "Choose your email!"; die(); }
+	if ( empty( $password ) ) { echo "Choose your password!"; die(); }
+	if ( !is_alphabetical( array( $first_name, $last_name ) ) ) { echo "Enter your real names!"; die(); }
+
+	$wp_registration_result = wp_create_user( $wp_username, $password, $email );
+
+	if ( is_wp_error( $wp_registration_result ) || !is_alphabetical( array( $first_name, $last_name ) ) ) {
+		if ( !empty( $wp_registration_result->errors[ "existing_user_login" ] ) && !email_exists( $email ) ) {
+			while ( !empty( $wp_registration_result->errors[ "existing_user_login" ] ) ) { $wp_registration_result = wp_create_user( $wp_username . mt_rand( 100000, 999999 ), $password, $email ); }
+	 	} else {
+			echo $response = ( email_exists( $email ) ? "This email is already in use!" : ( !is_alphabetical( array( $first_name, $last_name ) ) ? "Use only alphabetical characters in your name!" : ( empty( $password ) ? "Choose your password!" : "Something wrong happens here!" ) ) );
+			die();
+		}
+	} else {
+		// Update the new user
+		$args = array(
+			"ID" => $wp_registration_result,
+			"first_name" => $first_name,
+			"last_name" => $last_name,
+			"role" => "Subscriber"
+		);
+		$wp_update_result = wp_update_user( $args );
+		wp_new_user_notification( $wp_registration_result, "", "both" );
+	}
+
+
+	die();
+}
