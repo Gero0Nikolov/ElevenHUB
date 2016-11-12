@@ -60,7 +60,7 @@ function registerUser() {
 			password : password
 		},
 		success : function( response ) {
-			console.log( response );
+			if ( response == "" ) { /** Welcome onboard message! **/ }
 		}
 	});
 }

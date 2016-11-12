@@ -183,7 +183,11 @@ function register_user() {
 			"role" => "Subscriber"
 		);
 		$wp_update_result = wp_update_user( $args );
-		wp_new_user_notification( $wp_registration_result, "", "both" );
+
+		// Prepare Hello mail
+		$subject = "Welcome to 11hub!";
+		$content = "Welcome onboard!\n\nWe hope to see you hubbing soon!\n\nCheers!";
+		wp_mail( $email, $subject, $content );
 	}
 
 
