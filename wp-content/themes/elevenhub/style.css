@@ -940,6 +940,31 @@ object {
 .green-bold-button:hover {
   background: #2ecc71; }
 
+.scelleton-bold-button {
+  display: inline-block;
+  font-family: OpenSansBold;
+  font-size: 0.8em;
+  text-transform: uppercase;
+  padding: 1em 2.5em;
+  letter-spacing: 1px;
+  background: none;
+  box-shadow: none !important;
+  text-shadow: none;
+  font-weight: normal;
+  color: #333;
+  border: 1px solid;
+  border-radius: 100px;
+  outline: 0;
+  webkit-transition: all 0.25s ease-in-out;
+  -moz-transition: all 0.25s ease-in-out;
+  -o-transition: all 0.25s ease-in-out;
+  transition: all 0.25s ease-in-out; }
+
+.scelleton-bold-button:hover {
+  background: #333;
+  color: #fff;
+  border-color: transparent; }
+
 .form-button {
   width: 80% !important;
   display: block !important;
@@ -1001,6 +1026,14 @@ object {
 .mb-1em {
   margin-bottom: 1em; }
 
+#loader {
+  display: block;
+  width: 24px;
+  height: 24px;
+  background: #1abc9c;
+  border-radius: 100%;
+  margin: 1em auto; }
+
 /* CONTENT */
 .section-header {
   font-family: OswaldRegular;
@@ -1029,6 +1062,52 @@ object {
   height: 2px;
   background: #eee;
   margin: 1em 0; }
+
+.user-type-header {
+  font-family: OswaldRegular;
+  font-size: 3rem;
+  font-weight: normal;
+  color: #e74c3c;
+  letter-spacing: 1px;
+  margin: 1em 0 0; }
+
+.user-type-container {
+  display: block;
+  width: 100%;
+  min-height: 300px;
+  border: 1px solid #ddd;
+  border-radius: 5px !important;
+  background: none;
+  box-shadow: none !important;
+  padding: 1em;
+  outline: 0 !important;
+  color: #777;
+  webkit-transition: all 0.25s ease-in-out;
+  -moz-transition: all 0.25s ease-in-out;
+  -o-transition: all 0.25s ease-in-out;
+  transition: all 0.25s ease-in-out; }
+  .user-type-container .icon {
+    display: block;
+    font-size: 4rem;
+    font-weight: normal;
+    margin: 0.5em 0; }
+  .user-type-container .text {
+    display: block;
+    font-family: OswaldRegular;
+    font-weight: normal;
+    font-size: 1.75rem;
+    letter-spacing: 1px;
+    margin: 0.5em 0 1em; }
+
+.user-type-container.orange-type:hover {
+  background: #f39c12;
+  color: #fff;
+  border-color: #f39c12; }
+
+.user-type-container.green-type:hover {
+  background-color: #2ecc71;
+  color: #fff;
+  border-color: #2ecc71; }
 
 /* MOBILE */
 .mobile .main-navigation {
@@ -1059,6 +1138,9 @@ object {
   .mobile .site-footer .footer-link, .mobile .site-footer a {
     display: block; }
 
+.page-template-employee-company.mobile .site-content {
+  padding: 0 1em !important; }
+
 /* POPUP */
 .popup-holder {
   display: flex;
@@ -1072,17 +1154,57 @@ object {
   overflow-x: hidden;
   overflow-y: auto;
   background: rgba(0, 0, 0, 0.5); }
+  .popup-holder #alert-box {
+    position: absolute;
+    background: #fff;
+    border: 1px solid #ddd;
+    width: 350px;
+    text-align: center;
+    padding: 1em;
+    border-radius: 5px;
+    font-family: OpenSansRegular;
+    font-weight: normal;
+    font-size: 1.25rem;
+    letter-spacing: 1px; }
+    .popup-holder #alert-box #close-popup-button {
+      display: block;
+      width: 80%;
+      font-family: OpenSansBold;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      padding: 1em 2.5em;
+      margin: 1em auto 0;
+      letter-spacing: 1px;
+      background: #e74c3c;
+      box-shadow: none !important;
+      text-shadow: none;
+      font-weight: normal;
+      color: #fff;
+      border: 0px solid transparent;
+      border-radius: 100px;
+      outline: 0;
+      webkit-transition: all 0.25s ease-in-out;
+      -moz-transition: all 0.25s ease-in-out;
+      -o-transition: all 0.25s ease-in-out;
+      transition: all 0.25s ease-in-out; }
+    .popup-holder #alert-box #close-popup-button:hover {
+      background: #c0392b; }
   .popup-holder .popup-inner {
     position: relative;
     top: 0;
     left: 0;
     width: 300px;
+    max-width: 95%;
     height: auto;
     background: #fff;
     display: inline-block;
     margin: 0 auto;
     border-radius: 5px;
-    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.25); }
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.25);
+    webkit-transition: all 0.25s ease-in-out;
+    -moz-transition: all 0.25s ease-in-out;
+    -o-transition: all 0.25s ease-in-out;
+    transition: all 0.25s ease-in-out; }
     .popup-holder .popup-inner .wide-fat {
       display: block;
       width: 100%;

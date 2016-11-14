@@ -150,7 +150,24 @@ function is_alphabetical( $args ) {
 	return $response;
 }
 
+/** Disable access for non site administrators **/
+function disable_access() { if ( !current_user_can('administrator') && !is_admin() ) { wp_redirect( get_site_url() ); } }
+add_action( 'wp_login', 'disable_access' );
+
+function remove_admin_bar() { if ( !current_user_can('administrator') && !is_admin() ) { show_admin_bar( false ); } }
+add_action('after_setup_theme', 'remove_admin_bar');
+
 /** AJAX **/
+
+/*
+* 	TO DO:
+*	- Allow only site admins to see the WP Dashboard
+* 	- Add user metas:
+*		- Association: Employee / Company
+* 	- On login user wp_signon() to login user
+* 	- On logout use wp_logout() to logout user
+*/
+
 add_action( 'wp_ajax_nopriv_register_user', 'register_user' );
 add_action( 'wp_ajax_register_user', 'register_user' );
 function register_user() {
@@ -161,7 +178,7 @@ function register_user() {
 
 	$wp_username = strtolower( $first_name ."_". $last_name );
 
-	if ( empty( $email ) ) { echo "Choose your email!"; die(); }
+	if ( empty( $email ) || !is_email( $email ) ) { echo "Choose your email!"; die(); }
 	if ( empty( $password ) ) { echo "Choose your password!"; die(); }
 	if ( !is_alphabetical( array( $first_name, $last_name ) ) ) { echo "Enter your real names!"; die(); }
 
@@ -186,10 +203,46 @@ function register_user() {
 
 		// Prepare Hello mail
 		$subject = "Welcome to 11hub!";
-		$content = "Welcome onboard!\n\nWe hope to see you hubbing soon!\n\nCheers!";
+		$content = "Welcome onboard!\n\nWe hope to see you <a href='". get_site_url() ."' target='_blank' style='color: #3498db; text-decoration: underline;'>hubbing soon</a>!\n\nCheers!";
 		wp_mail( $email, $subject, $content );
 	}
 
+
+	die();
+}
+
+
+add_action( 'wp_ajax_nopriv_login_user', 'login_user' );
+add_action( 'wp_ajax_login_user', 'login_user' );
+function login_user() {	
+	$email = $_POST[ "email" ];
+	$password = $_POST[ "password" ];
+
+	$creds['user_login'] = $email;
+	$creds['user_password'] = $password;
+	$creds['remember'] = false;
+
+	if ( empty( $email ) ) { echo "Enter your email!"; die(); }
+	if ( empty( $password ) ) { echo "Enter your password!"; die(); }
+
+	$user_ = wp_signon( $creds, false );
+	if ( is_wp_error( $user_ ) ) { echo "Your email or password is wrong!";	}	
+
+	die();
+}
+
+add_action( 'wp_ajax_nopriv_logout_user', 'logout_user' );
+add_action( 'wp_ajax_logout_user', 'logout_user' );
+function logout_user() {	
+	wp_logout();
+	die();
+}
+
+add_action( 'wp_ajax_nopriv_add_profile_association', 'add_profile_association' );
+add_action( 'wp_ajax_add_profile_association', 'add_profile_association' );
+function add_profile_association() {	
+	$association_type = strtolower( trim( $_POST[ "type" ] ) );
+	if ( !empty( $association_type ) ) { add_user_meta( get_current_user_id(), "account_association", $association_type, false ); }
 
 	die();
 }
