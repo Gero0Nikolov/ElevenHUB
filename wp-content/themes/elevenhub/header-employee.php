@@ -12,6 +12,8 @@
 $mobile_class = "";
 if ( wp_is_mobile() ) { $mobile_class = "mobile"; }
 
+$user_id = get_current_user_id();
+
 ?><!DOCTYPE html>
 <html <?php language_attributes(); ?>>
 <head>
@@ -30,8 +32,8 @@ if ( wp_is_mobile() ) { $mobile_class = "mobile"; }
 <div id="page" class="site">
 	<nav id="site-navigation" class="main-navigation" role="navigation">
 		<div class="left-aligned">
-			<a href="<?php echo get_site_url(); ?>" class='no-border'>
-				<img src="<?php echo get_template_directory_uri(); ?>/assets/images/11hub-logo.png" class="logo hvr-backward" />
+			<a href="<?php echo get_author_posts_url( $user_id ); ?>" class='no-border inline-block'>
+				<div id="profile-picture" class="header-avatar"></div>
 			</a>
 		</div>
 		<div class="right-aligned">

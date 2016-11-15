@@ -108,11 +108,17 @@ function elevenhub_scripts() {
 	wp_enqueue_style( 'elevenhub-style', get_stylesheet_uri() );
 
 
-	wp_enqueue_script( 'dloober-initial', get_template_directory_uri() . '/js/initial.js', array( 'jquery' ), '', false );
+	wp_enqueue_script( 'elevenhub-initial', get_template_directory_uri() . '/js/initial.js', array( 'jquery' ), '', false );
 	wp_enqueue_script( 'elevenhub-skip-link-focus-fix', get_template_directory_uri() . '/js/skip-link-focus-fix.js', array(), '20151215', true );
 
 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
 		wp_enqueue_script( 'comment-reply' );
+	}
+
+	// Add styles and scripts for logged in users
+	if ( is_user_logged_in() ) {
+		wp_enqueue_style( 'elevenhub-logged-styles', get_template_directory_uri() . '/assets/logged/style.css' );
+		wp_enqueue_script( 'elevenhub-logged-js', get_template_directory_uri() . '/assets/logged/scripts.js', array( 'jquery' ), '', false );
 	}
 }
 add_action( 'wp_enqueue_scripts', 'elevenhub_scripts' );

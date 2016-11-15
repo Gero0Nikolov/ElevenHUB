@@ -1,0 +1,14 @@
+.inline-block {
+  display: inline-block !important; }
+
+.header-avatar {
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  background-color: #eee;
+  background-size: cover;
+  background-position: center;
+  border-radius: 100%;
+  vertical-align: middle; }
+
+/*# sourceMappingURL=style.css.map */
