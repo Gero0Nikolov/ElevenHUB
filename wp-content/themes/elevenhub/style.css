@@ -492,7 +492,7 @@ a:active {
   left: -999em;
   top: 0; }
 
-.main-navigation ul ul a {
+.main-navigation ul ul {
   width: 200px; }
 
 .main-navigation ul li:hover > ul,
@@ -764,7 +764,8 @@ object {
   justify-content: center;
   box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.25);
   background: #fff;
-  padding: 1em 15%; }
+  padding: 1em 10em;
+  z-index: 9999; }
   .main-navigation .logo {
     display: inline-block;
     width: auto;
@@ -801,7 +802,7 @@ object {
   display: block;
   width: 100%;
   background: #34495e;
-  padding: 1.5em 15%;
+  padding: 1.5em 10em;
   text-align: center; }
   .site-footer .footer-link {
     display: inline-block;
@@ -851,7 +852,7 @@ object {
 /* CONTENT */
 .site-content {
   display: block;
-  padding: 0 15%;
+  padding: 0 10em;
   margin: calc(2em + 60px) 0; }
 
 /* GLOBAL CLASSES */
@@ -964,6 +965,33 @@ object {
   background: #333;
   color: #fff;
   border-color: transparent; }
+
+.scelleton-icon-button {
+  display: inline-block;
+  font-size: 1.25rem;
+  text-transform: uppercase;
+  padding: 14px;
+  letter-spacing: 1px;
+  background: none;
+  box-shadow: none !important;
+  text-shadow: none;
+  font-weight: normal;
+  color: #333;
+  border: 1px solid;
+  border-radius: 100%;
+  outline: 0;
+  width: 48px;
+  height: 48px;
+  text-align: center;
+  webkit-transition: all 0.25s ease-in-out;
+  -moz-transition: all 0.25s ease-in-out;
+  -o-transition: all 0.25s ease-in-out;
+  transition: all 0.25s ease-in-out; }
+
+.scelleton-icon-button:hover,
+.scelleton-icon-button:active,
+.scelleton-icon-button:focus {
+  background: #f9f9f9; }
 
 .form-button {
   width: 80% !important;

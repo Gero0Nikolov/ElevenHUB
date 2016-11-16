@@ -220,7 +220,7 @@ function register_user() {
 
 add_action( 'wp_ajax_nopriv_login_user', 'login_user' );
 add_action( 'wp_ajax_login_user', 'login_user' );
-function login_user() {	
+function login_user() {
 	$email = $_POST[ "email" ];
 	$password = $_POST[ "password" ];
 
@@ -232,23 +232,29 @@ function login_user() {
 	if ( empty( $password ) ) { echo "Enter your password!"; die(); }
 
 	$user_ = wp_signon( $creds, false );
-	if ( is_wp_error( $user_ ) ) { echo "Your email or password is wrong!";	}	
+	if ( is_wp_error( $user_ ) ) { echo "Your email or password is wrong!";	}
 
 	die();
 }
 
 add_action( 'wp_ajax_nopriv_logout_user', 'logout_user' );
 add_action( 'wp_ajax_logout_user', 'logout_user' );
-function logout_user() {	
+function logout_user() {
 	wp_logout();
 	die();
 }
 
 add_action( 'wp_ajax_nopriv_add_profile_association', 'add_profile_association' );
 add_action( 'wp_ajax_add_profile_association', 'add_profile_association' );
-function add_profile_association() {	
+function add_profile_association() {
 	$association_type = strtolower( trim( $_POST[ "type" ] ) );
-	if ( !empty( $association_type ) ) { add_user_meta( get_current_user_id(), "account_association", $association_type, false ); }
+	if ( !empty( $association_type ) ) {
+		if ( !get_user_meta( get_current_user_id(), "account_association", true ) ) {
+			add_user_meta( get_current_user_id(), "account_association", $association_type, false );
+		} else {
+			update_user_meta( get_current_user_id(), "account_association", $association_type, false );
+		}
+	}
 
 	die();
 }

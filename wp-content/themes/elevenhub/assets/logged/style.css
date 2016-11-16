@@ -1,14 +1,251 @@
+/* SCSS Variables set */
+/** ICONS **/
+.before-icon:before {
+  font-family: FontAwesome;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 5px; }
+
+.before-icon-user-circle:before {
+  content: "\f0ad"; }
+
+.before-icon-exit:before {
+  content: "\f08b"; }
+
 .inline-block {
   display: inline-block !important; }
 
-.header-avatar {
+.header-avatar-holder {
+  display: inline-block !important;
+  vertical-align: middle; }
+  .header-avatar-holder .avatar {
+    display: inline-block;
+    background-color: #eee;
+    background-size: cover;
+    background-position: center;
+    border-radius: 100%;
+    vertical-align: middle;
+    webkit-transition: all 0.25s ease-in-out;
+    -moz-transition: all 0.25s ease-in-out;
+    -o-transition: all 0.25s ease-in-out;
+    transition: all 0.25s ease-in-out; }
+  .header-avatar-holder .avatar:hover,
+  .header-avatar-holder .avatar:active,
+  .header-avatar-holder .avatar:focus {
+    transform: scale(1.1); }
+
+.menu-employee-header-menu-container {
   display: inline-block;
-  width: 48px;
-  height: 48px;
-  background-color: #eee;
+  vertical-align: middle; }
+  .menu-employee-header-menu-container .menu-item-has-children {
+    webkit-transition: all 0.25s ease-in-out;
+    -moz-transition: all 0.25s ease-in-out;
+    -o-transition: all 0.25s ease-in-out;
+    transition: all 0.25s ease-in-out; }
+  .menu-employee-header-menu-container .menu-item-has-children:hover {
+    background: #e74c3c;
+    color: #fff !important; }
+  .menu-employee-header-menu-container .menu-item-has-children:hover a {
+    color: #fff; }
+  .menu-employee-header-menu-container .menu-item-has-children:hover ul {
+    opacity: 1 !important;
+    pointer-events: initial !important; }
+  .menu-employee-header-menu-container ul ul {
+    text-align: left;
+    color: #fff;
+    background: #e74c3c;
+    box-shadow: none;
+    border: none;
+    left: 0 !important;
+    top: 2.25em !important;
+    opacity: 0;
+    pointer-events: none;
+    webkit-transition: all 0.25s ease-in-out;
+    -moz-transition: all 0.25s ease-in-out;
+    -o-transition: all 0.25s ease-in-out;
+    transition: all 0.25s ease-in-out; }
+    .menu-employee-header-menu-container ul ul li {
+      webkit-transition: all 0.25s ease-in-out;
+      -moz-transition: all 0.25s ease-in-out;
+      -o-transition: all 0.25s ease-in-out;
+      transition: all 0.25s ease-in-out;
+      margin: 0 !important;
+      width: 100%;
+      border-bottom: 1px solid #c0392b; }
+      .menu-employee-header-menu-container ul ul li a {
+        display: inline-block;
+        vertical-align: middle; }
+    .menu-employee-header-menu-container ul ul li:hover a,
+    .menu-employee-header-menu-container ul ul li:active a,
+    .menu-employee-header-menu-container ul ul li:focus a {
+      transform: translateX(0.25em); }
+
+#mobile-menu-holder {
+  display: block;
+  position: fixed;
+  top: calc(2em + 49px);
+  background: #fff;
+  width: 100%;
+  height: calc(100% - 2em - 49px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  text-align: left;
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.25);
+  transform: translateY(-200%);
+  z-index: 99; }
+  #mobile-menu-holder .menu-employee-header-menu-container {
+    display: block;
+    width: 100%; }
+  #mobile-menu-holder .before-icon:before {
+    display: none !important; }
+  #mobile-menu-holder .menu {
+    margin: 0;
+    padding: 0;
+    display: block;
+    width: 100%;
+    list-style: none; }
+    #mobile-menu-holder .menu li {
+      display: block; }
+      #mobile-menu-holder .menu li a {
+        display: block;
+        font-family: OpenSansBold;
+        font-weight: normal;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-decoration: none;
+        border-bottom: 1px solid #ddd;
+        padding: 0.75em 1em;
+        color: #333; }
+      #mobile-menu-holder .menu li a:hover,
+      #mobile-menu-holder .menu li a:active,
+      #mobile-menu-holder .menu li a:focus {
+        color: #e74c3c;
+        border-color: #e74c3c; }
+    #mobile-menu-holder .menu .menu-item-has-children:hover,
+    #mobile-menu-holder .menu .menu-item-has-children:active,
+    #mobile-menu-holder .menu .menu-item-has-children:focus {
+      background: none !important; }
+    #mobile-menu-holder .menu .sub-menu {
+      opacity: 1;
+      background: none;
+      margin: 0;
+      padding: 0 0 0 2em; }
+      #mobile-menu-holder .menu .sub-menu li {
+        border-color: #ddd; }
+
+.user-container-profile {
+  display: block;
+  padding: 3em 0;
+  background-color: #f9f9f9;
   background-size: cover;
   background-position: center;
-  border-radius: 100%;
-  vertical-align: middle; }
+  text-align: center;
+  position: relative; }
+  .user-container-profile .invisible-control {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: none;
+    font-size: 1.25rem;
+    box-shadow: none;
+    border: none;
+    color: #333;
+    padding: 1em;
+    opacity: 0;
+    outline: 0 !important;
+    webkit-transition: all 0.25s ease-in-out;
+    -moz-transition: all 0.25s ease-in-out;
+    -o-transition: all 0.25s ease-in-out;
+    transition: all 0.25s ease-in-out; }
+  .user-container-profile .invisible-control:hover,
+  .user-container-profile .invisible-control:active,
+  .user-container-profile .invisible-control:focus {
+    opacity: 1 !important; }
+  .user-container-profile .user-information img {
+    display: block;
+    border-radius: 100%;
+    margin: 0 auto; }
+  .user-container-profile .user-information .user-names {
+    font-family: OpenSansLight;
+    font-size: 2.5rem;
+    font-weight: normal;
+    letter-spacing: 1px;
+    color: #333;
+    margin: 0.5em 0 0; }
+  .user-container-profile .user-meta .followers {
+    font-family: OpenSansLight;
+    font-size: 1.5rem;
+    font-weight: normal;
+    letter-spacing: 1px;
+    margin: 0.5em 0; }
+  .user-container-profile .user-meta .follow-button,
+  .user-container-profile .user-meta .unfollow-button,
+  .user-container-profile .user-meta .compose-button {
+    display: block;
+    margin: 0 auto;
+    font-family: OpenSansBold;
+    font-size: 1rem;
+    font-weight: normal;
+    letter-spacing: 1px;
+    text-shadow: none;
+    box-shadow: none !important;
+    border: 1px solid;
+    border-radius: 100px;
+    padding: 0.75em 3em;
+    width: 200px;
+    text-align: center;
+    outline: 0 !important;
+    webkit-transition: all 0.25s ease-in-out;
+    -moz-transition: all 0.25s ease-in-out;
+    -o-transition: all 0.25s ease-in-out;
+    transition: all 0.25s ease-in-out; }
+  .user-container-profile .user-meta .follow-button,
+  .user-container-profile .user-meta .compose-button {
+    background: #2ecc71;
+    color: #fff;
+    border: none; }
+  .user-container-profile .user-meta .follow-button:hover,
+  .user-container-profile .user-meta .compose-button:hover,
+  .user-container-profile .user-meta .follow-button:active,
+  .user-container-profile .user-meta .compose-button:active,
+  .user-container-profile .user-meta .follow-button:focus,
+  .user-container-profile .user-meta .compose-button:focus {
+    background: #27ae60; }
+  .user-container-profile .user-meta .unfollow-button {
+    background: none;
+    color: #333; }
+  .user-container-profile .user-meta .unfollow-button:hover,
+  .user-container-profile .user-meta .unfollow-button:active,
+  .user-container-profile .user-meta .unfollow-button:focus {
+    background: #eee; }
+
+.user-container-profile:hover .invisible-control,
+.user-container-profile:active .invisible-control {
+  opacity: 0.65; }
+
+.white-box {
+  display: inline-block;
+  width: 60%;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 2em 1em;
+  border-radius: 5px; }
+
+#followers-controller {
+  cursor: pointer;
+  webkit-transition: all 0.25s ease-in-out;
+  -moz-transition: all 0.25s ease-in-out;
+  -o-transition: all 0.25s ease-in-out;
+  transition: all 0.25s ease-in-out; }
+
+#followers-controller:hover,
+#followers-controller:active {
+  color: #3498db; }
+
+/** MOBILE **/
+.mobile .white-box {
+  width: 100%; }
+.mobile .site-content {
+  margin: calc(2em + 48px) 0; }
 
 /*# sourceMappingURL=style.css.map */
