@@ -9,6 +9,8 @@
  * @package elevenhub
  */
 
+$brother_ = new BROTHER;
+
 $mobile_class = "";
 if ( wp_is_mobile() ) { $mobile_class = "mobile"; }
 
@@ -24,7 +26,9 @@ $user_id = get_current_user_id();
 <?php wp_head(); ?>
 
 <script>
-	var ajax_url = '<?php echo admin_url('admin-ajax.php'); ?>';
+	var site_url = '<?php echo get_site_url(); ?>';
+	var ajax_url = '<?php echo admin_url( 'admin-ajax.php' ); ?>';
+	var admin_post_url = '<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>';
 </script>
 </head>
 
@@ -33,13 +37,13 @@ $user_id = get_current_user_id();
 	<nav id="site-navigation" class="main-navigation" role="navigation">
 		<div class="left-aligned">
 			<a href="<?php echo get_author_posts_url( $user_id ); ?>" class='no-border header-avatar-holder'>
-				<?php echo get_avatar( $user_id, "48" ); ?>
+				<div id="user-avatar" class="avatar" style="background-image: url('<?php echo $brother_->get_user_avatar_url( $user_id ); ?>');"></div>
 			</a>
 		</div>
 		<div class="right-aligned">
 			<?php if ( !wp_is_mobile() ) { wp_nav_menu( array( 'menu_id' => '3' ) ); } else { ?>
 			<button id="menu-controller" class="scelleton-icon-button fa fa-bars"></button>
-			<?php } ?>			
+			<?php } ?>
 		</div>
 	</nav><!-- #site-navigation -->
 	<?php if ( wp_is_mobile() ) { ?>

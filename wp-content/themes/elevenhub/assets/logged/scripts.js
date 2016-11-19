@@ -6,3 +6,8 @@ jQuery( document ).ready(function(){
 		else { jQuery( "#mobile-menu-holder" ).removeClass( "slideOutUp" ).addClass( "slideInDown" ); }
 	});
 });
+
+function openProfileImages() {
+	mediaController = new UserMedia();
+	mediaController.BuildMediaView( true );
+}

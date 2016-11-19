@@ -108,6 +108,7 @@ function elevenhub_scripts() {
 	wp_enqueue_style( 'elevenhub-style', get_stylesheet_uri() );
 
 
+	wp_enqueue_script( 'elevenhub-brother-js', get_template_directory_uri() . '/assets/brother-js/brother.js', array( 'jquery' ), '', false );
 	wp_enqueue_script( 'elevenhub-initial', get_template_directory_uri() . '/js/initial.js', array( 'jquery' ), '', false );
 	wp_enqueue_script( 'elevenhub-skip-link-focus-fix', get_template_directory_uri() . '/js/skip-link-focus-fix.js', array(), '20151215', true );
 
