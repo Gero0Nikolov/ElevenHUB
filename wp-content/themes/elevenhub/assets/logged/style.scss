@@ -315,8 +315,15 @@ $asbestos: #7f8c8d;
 	.popup-inner-container {
 		display: inline-block;
 		position: relative;
-		min-width: 400px;
+		
+		width: 400px;
 		max-width: 95%;
+		max-height: 95%;
+
+		overflow-x: hidden;
+		overflow-y: auto;
+
+		-webkit-overflow-scrolling: touch;
 
 		background: #fff;
 		border-radius: 5px;
@@ -394,12 +401,143 @@ $asbestos: #7f8c8d;
 	outline: 0 !important;
 	text-shadow: none !important;
 	box-shadow: none !important;
+
+	max-width: 90%;
 }
 .file-picker:active,
 .file-picker:focus { border-color: $peter_river; }
 
+.mt-1em { margin-top: 1em !important; }
+
+.bull-separator {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0 1em;
+    color: $silver;
+}
+
+.notifications-controller {
+    display: inline-block;
+    vertical-align: middle;
+    background: none;
+    box-shadow: none !important;
+    border: none;
+    color: $wet_asphalt;
+    padding: 0;
+    font-size: 1.20rem;
+    margin: 0;
+    outline: 0 !important;
+
+    webkit-transition: all 0.25s ease-in-out;
+    -moz-transition: all 0.25s ease-in-out;
+    -o-transition: all 0.25s ease-in-out;
+    transition: all 0.25s ease-in-out;
+}
+.notifications-controller:active,
+.notifications-controller:hover { color: $alizarin; }
+
+#notifications-holder {
+    display: inline-block;
+    position: fixed;
+    top: calc(2em + 48px);
+    left: 10em;
+    background: #fff;
+    width: 20%;
+    height: 400px;
+    z-index: 99;    
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    box-shadow: 0px 5px 5px 0 rgba(0, 0, 0, 0.15);
+
+    transform: translateY(-200%);
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    .notification-anchor {
+    	display: block;
+    	outline: 0;
+    	text-decoration: none;
+	    padding: 1em;
+    	border-bottom: 1px solid #ddd;
+    	position: relative;
+
+		.notification-holder {
+			display: block;
+
+			.user-avatar {
+			    display: inline-block;
+			    width: 38px;
+			    height: 38px;
+			    background: #ddd;
+			    border-radius: 100%;
+			    vertical-align: middle;
+			}
+
+			.notification-content {
+			    display: inline-block;
+			    width: calc(100% - 60px);
+			    margin-left: 10px;
+			    font-family: OpenSansRegular;
+			    font-size: 1rem;
+			    font-weight: normal;
+			    letter-spacing: 1px;
+			    line-height: 200%;
+			    color: #333;
+			}
+
+			.notification-meta {
+				margin: 0.75em 0 0;
+			    display: flex;
+			    justify-content: space-between;
+
+			    .notification-icon {
+	    	        display: inline-block;
+				    width: 20px;
+				    height: 20px;
+				    text-align: center;
+				    padding: 3.5px;
+				    color: #fff;
+				    background: $alizarin;
+				    border-radius: 5px;
+				    font-size: 0.8rem;
+				    margin-left: 10px;
+			    }
+
+			    .notification-date {
+		    	    font-family: LoraRegular;
+				    font-size: 0.95rem;
+				    font-weight: normal;
+				    color: #999;
+				    letter-spacing: 1px;
+			    }
+			}
+		}    	
+    }
+    .notification-anchor:hover,
+    .notification-anchor:active { background: #f9f9f9; }
+}
+.unopened-notification:after {
+ 	display: inline-block;
+    content: " ";
+    position: absolute;
+    background: $alizarin;
+    width: 12px;
+    height: 12px;
+    border-radius: 100%;
+    top: 0.25em;
+    right: 0.25em;
+}
+
 /** MOBILE **/
 .mobile {
-	.white-box { width: 100%; }
+	.white-box { width: 100%; border-radius: 0 !important; }
 	.site-content { margin: calc(2em + 48px) 0; }
+
+	.user-container-profile {
+		.invisible-control {
+		    opacity: 0.85;
+    		padding: 0.5em;
+		}
+	}
 }

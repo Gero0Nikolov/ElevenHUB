@@ -66,7 +66,7 @@ function registerUser() {
 		},
 		success : function( response ) {
 			//Remove loading sign
-			jQuery( "#login-form-holder #login #register" ).remove();
+			jQuery( "#login-form-holder #register #loader" ).remove();
 
 			if ( response != "" ) {
 				alert_box = "<div id='alert-box' class='animated bounceInDown'>"+ response +"<button id='close-popup-button' onclick='removeAlertBox();'>Close</button></div>";

@@ -10,6 +10,11 @@ jQuery( document ).ready(function(){
 	});
 
 	jQuery( "#follow-controller" ).on("click", function(){ buildUserRelation( jQuery( this ) ); });
+
+	jQuery( "#notifications-controller" ).on("click", function(){
+		if ( jQuery( "#notifications-holder" ).hasClass( "fadeInDown" ) ) { jQuery( "#notifications-holder" ).css( "transform", "initial" ).removeClass( "fadeInDown" ).addClass( "fadeOutUp" ); }
+		else { jQuery( "#notifications-holder" ).removeClass( "fadeOutUp" ).addClass( "fadeInDown" ) }
+	});
 });
 
 /*

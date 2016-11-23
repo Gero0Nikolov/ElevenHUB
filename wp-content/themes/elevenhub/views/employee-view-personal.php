@@ -21,7 +21,7 @@ $user_last_name = get_user_meta( $user_id, "last_name", true );
 			<h1 class="user-names"><?php echo $user_first_name ." ". $user_last_name; ?></h1>
 		</div>
 		<div class="user-meta">
-			<button id="followers-controller" class="follow-button">
+			<button id="followers-controller" class="follow-button mt-1em">
 				<?php
 				$user_followers_num = count( $brother_->get_user_followers( $user_id ) );
 				echo $user_followers_num == 1 ? $user_followers_num ." follower" : $user_followers_num ." followers";
