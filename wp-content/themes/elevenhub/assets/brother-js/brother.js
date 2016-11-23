@@ -1,5 +1,10 @@
 var loading = "<div id='loader' class='animated rubberBand infinite'></div>";
 
+/*
+*	Class name: UserMedia
+*	Class arguments: userID [ INT ] (optional)
+*	Class purpose: This class is used to control all the media events and methods in the HUB project.
+*/
 var UserMedia = function( userID = "" ) {
 
 	/*
@@ -74,14 +79,25 @@ var UserMedia = function( userID = "" ) {
 		generateAJAX( { functionName : "get_user_banner_url", arguments : userID }, function( response ){ onSuccess( response ); } );
 	}
 
-	/*
-	*	Function name: uploadProfileMedia
-	*	Function arguments: inputIDs [ ARRAY of STRINGS ] (required), onSuccess [ FUNCTION ] (required) tells the method what to do after the response.
-	*/
-	this.uploadProfileMedia = function( inputIDs, onSuccess ) {
-		jQuery( "" )
-	}
 }
+
+/*
+*	Class name: UserRelations
+*	Class arguments: vUserID [ INT ] (required) (the user of the visited / wanted user), onSuccess [ FUNCTION ] (required) tells the method what to do after the response, userID [ INT ] (optional) (the user ID of the currently logged in user).
+*	Class purpose: This class is used to control & handle all the relations methods between the different users in the HUB.
+*/
+var UserRelations = function( vUserID, userID = "" ) {
+
+	/*
+	*	Function name: followOrUnfollowRelation
+	*	Function arguments: vUserID [ INT ] (required) (the VisitedUserID), recalculateFollower [ BOOL ] (optional) (tells the function if you need an array of the followers to be returned), onSuccess [ FUNCTION ] (required) tells the method what to do after the response, userID [ INT ] (optional) (the user ID of the currently logged in user).
+	*/
+	this.followOrUnfollowRelation = function( vUserID, recalculateFollowers = false, onSuccess, userID = "" ) {
+		generateAJAX( { functionName : "follow_or_unfollow_relation", arguments : { v_user_id: vUserID, user_id: userID, recalculate_followers: recalculateFollowers } }, function ( response ) { onSuccess( response ); } );
+	}
+
+}
+
 
 /*
 *	Function name: generateAJAX

@@ -53,6 +53,11 @@ class BROTHER {
 		wp_redirect( get_author_posts_url( get_current_user_id() ) );
 	}
 
+	/*
+	*	Function name: upload_user_file
+	*	Function arguments: $file [ $_FILES ] (required)
+	*	Function purpose: This function is used to upload media files in the HUB.
+	*/
 	function upload_user_file( $file ) {
 		if ( $file[ "size" ] > 0 ) {
 			require_once( ABSPATH . 'wp-admin/includes/admin.php' );
@@ -98,7 +103,7 @@ class BROTHER {
 
 		if ( !empty( $_DATA ) ) {
 			$result = call_user_func( array( $this, $_DATA->functionName ), $_DATA->arguments );
-			echo $result;
+			echo json_encode( $result );
 		} else { echo "Empty data"; }
 
 		die();
@@ -216,6 +221,52 @@ class BROTHER {
 		$user_followers = $wpdb->get_results( $sql_, OBJECT );
 
 		return $user_followers;
+	}
+
+	/*
+	*	Function name: is_follower
+	*	Function arguments: $v_user_id [ INT ] (required) (comes from $VISITED_user_id), $user_id [ INT ] (optional) (the ID of the current logged user)
+	*	Function purpose: This function tells if the currently logged user follows a specific user by the $v_user_id argument.
+	*/
+	function is_follower( $v_user_id, $user_id = "" ) {
+		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
+
+		global $wpdb;
+
+		$table_ = $wpdb->prefix ."user_relations";
+		$sql_ = "SELECT * FROM $table_ WHERE user_followed_id=$v_user_id AND user_follower_id=$user_id";
+
+		return !empty( $wpdb->get_results( $sql_, OBJECT ) ) ? true : false;
+	}
+
+	/*
+	*	Function name: follow_or_unfollow_relation
+	*	Function arguments: $data [ MIXED_OBJECT ] (required) (containes the $v_user_id, $user_id & $recalculate)
+	*	Function purpose: This function is used to generate user relation from TYPE: FOLLOW or UNFOLLOW
+	*/
+	function follow_or_unfollow_relation( $data ) {
+		$v_user_id = $data->v_user_id;
+		$user_id = $data->user_id;
+		$recalculate = $data->recalculate_followers;
+
+		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
+		$flag = "";
+
+		global $wpdb;
+
+		$table_ = $wpdb->prefix ."user_relations";
+
+		if ( $this->is_follower( $v_user_id ) ) {
+			$wpdb->delete( $table_, array( "user_followed_id" => $v_user_id, "user_follower_id" => $user_id ) );
+			$flag = "unfollowed";
+		} else {
+			$wpdb->insert( $table_, array( "user_followed_id" => $v_user_id, "user_follower_id" => $user_id ) );
+			$flag = "followed";
+		}
+
+		$flag = $data->recalculate_followers ? (object) array( "action_result" => $flag, "followers" => $this->get_user_followers( $v_user_id ) ) : $flag;
+
+		return $flag;
 	}
 }
 

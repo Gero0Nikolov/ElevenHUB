@@ -238,17 +238,6 @@
   padding: 2em 1em;
   border-radius: 5px; }
 
-#followers-controller {
-  cursor: pointer;
-  webkit-transition: all 0.25s ease-in-out;
-  -moz-transition: all 0.25s ease-in-out;
-  -o-transition: all 0.25s ease-in-out;
-  transition: all 0.25s ease-in-out; }
-
-#followers-controller:hover,
-#followers-controller:active {
-  color: #3498db; }
-
 /** POPUP **/
 .popup-container {
   position: fixed;

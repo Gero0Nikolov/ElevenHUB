@@ -1,1 +1,1 @@
-<?php /* The brother framework is Must Us Plugin! */ ?>
+<?php /* The brother framework is Must Use Plugin! */ ?>
