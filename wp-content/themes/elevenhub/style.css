@@ -764,7 +764,7 @@ object {
   justify-content: center;
   box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.25);
   background: #fff;
-  padding: 1em 10em;
+  padding: 1em 7em;
   z-index: 9999; }
   .main-navigation .logo {
     display: inline-block;
@@ -802,7 +802,7 @@ object {
   display: block;
   width: 100%;
   background: #34495e;
-  padding: 1.5em 10em;
+  padding: 1.5em 7em;
   text-align: center; }
   .site-footer .footer-link {
     display: inline-block;
@@ -852,7 +852,7 @@ object {
 /* CONTENT */
 .site-content {
   display: block;
-  padding: 0 10em;
+  padding: 0 7em;
   margin: calc(2em + 60px) 0; }
 
 /* GLOBAL CLASSES */
@@ -1181,7 +1181,8 @@ object {
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
-  background: rgba(0, 0, 0, 0.5); }
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999; }
   .popup-holder #alert-box {
     position: absolute;
     background: #fff;

@@ -98,6 +98,22 @@ var UserRelations = function( vUserID, userID = "" ) {
 
 }
 
+/*
+*	Class name: UserNotifications
+*	Class arguments: userID [ INT ] (otpional) (the ID of the desired user notifications)
+*/
+var UserNotifications = function( userID = "" ) {
+
+	/*
+	*	Function name: getUserNotifications
+	*	Function arguments: userID [ INT ] (optional) (the ID of the desired user notifications), onSuccess [ FUNCTION ] (required) tells the method what to do after the response, userID [ INT ] (optional) (the user ID of the currently logged in user).
+	*	Function purpose: This function returns and JSON object of the all last 100 notifications ordered by Notification_DATE
+	*/
+	this.getUserNotifications = function( userID = "", onSuccess ) {
+		generateAJAX( { functionName : "get_user_notifications", arguments : userID }, function( response ) { onSuccess( JSON.parse( JSON.parse( response ) ) ); } );
+	}
+
+}
 
 /*
 *	Function name: generateAJAX

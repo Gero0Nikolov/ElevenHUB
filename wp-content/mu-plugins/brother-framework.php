@@ -186,7 +186,7 @@ class BROTHER {
 
 		$user_relations_table = $wpdb->prefix ."user_relations";
 
-		if( $wpdb->get_var( "SHOW TABLES LIKE '$user_relations_table'" ) != $user_relations_table ) { // Create the AINOW_Users table only if it doesn't exists!
+		if( $wpdb->get_var( "SHOW TABLES LIKE '$user_relations_table'" ) != $user_relations_table ) {
 			$charset_collate = $wpdb->get_charset_collate();
 
 			$sql_ = "
@@ -194,6 +194,37 @@ class BROTHER {
 				id INT NOT NULL AUTO_INCREMENT,
 				user_followed_id INT,
 				user_follower_id INT,
+				PRIMARY KEY(id)
+			) $charset_collate;
+			";
+
+			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+
+			dbDelta( $sql_ );
+		}
+	}
+
+	/*
+	*	Function name: create_user_notifications
+	*	Function arguments: NONE
+	*	Function purpose: This function create the PREFIX_user_notifications table on the server Database.
+	*/
+	function create_user_notifications() {
+		global $wpdb;
+
+		$user_notifications_table = $wpdb->prefix ."user_notifications";
+
+		if ( $wpdb->get_var( "SHOW TABLES LIKE '$user_notifications_table'" ) != $user_notifications_table ) {
+			$charset_collate = $wpdb->get_charset_collate();
+
+			$sql_ = "
+			CREATE TABLE $user_notifications_table (
+				id INT NOT NULL AUTO_INCREMENT,
+				notification_id INT,
+				notification_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+				notification_viewed INT DEFAULT 0,
+				user_notified_id INT,
+				user_notifier_id INT,
 				PRIMARY KEY(id)
 			) $charset_collate;
 			";
@@ -262,15 +293,91 @@ class BROTHER {
 		} else {
 			$wpdb->insert( $table_, array( "user_followed_id" => $v_user_id, "user_follower_id" => $user_id ) );
 			$flag = "followed";
+			$this->generate_notification( 70, $v_user_id, $user_id );
 		}
 
 		$flag = $data->recalculate_followers ? (object) array( "action_result" => $flag, "followers" => $this->get_user_followers( $v_user_id ) ) : $flag;
 
 		return $flag;
 	}
+
+	/*
+	*	Function name: generate_notification
+	*	Function arguments: $notification_id [ INT ] (required) (the ID of the Notification post in the Notification PT), $v_user_id [ INT ] (required) (the ID of the visited user), $user_id [ INT ] (optional) (the ID of the visitor)
+	*	Function purpose: This function generates notification for specific user based on the Notification_ID.
+	*/
+	function generate_notification( $notification_id, $v_user_id, $user_id = "" ) {
+		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
+
+		global $wpdb;
+
+		$table_ = $wpdb->prefix ."user_notifications";
+		$wpdb->insert( $table_, array( "notification_id" => $notification_id, "user_notified_id" => $v_user_id, "user_notifier_id" => $user_id ) );
+	}
+
+	/*
+	*	Functin name: get_user_notifications
+	*	Function arguments: $user_id [ INT ] (optional) (the ID of the desired user notifications).
+	*	Function purpose:
+	*	This function gets the last 100 user notifications ordered by the Notification_Date and returns JSON string to the front end.
+	*	Best used with var UserNotifications.getUserNotifications() method from the brother.js framework.
+	*/
+	function get_user_notifications( $user_id = "" ) {
+		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
+
+		global $wpdb;
+
+		$table_ = $wpdb->prefix ."user_notifications";
+		$sql_ = "SELECT * FROM $table_ WHERE user_notified_id=$user_id ORDER BY notification_date DESC LIMIT 100";
+		$results_ = $wpdb->get_results( $sql_, OBJECT );
+
+		$count = 0;
+		$notifications_ = array();
+		foreach ( $results_ as $notification_ ) {
+			$notifications_[ $count ][ "row_id" ] = $notification_->id;
+			$notifications_[ $count ][ "notification_body" ][ "notifier_avatar_url" ] = $this->get_user_avatar_url( $notification_->user_notifier_id );
+			$notifications_[ $count ][ "notification_body" ][ "notification_name" ] = get_field( "notification_name", $notification_->notification_id );
+			$notifications_[ $count ][ "notification_body" ][ "notification_link" ] = $this->convert_notification_url( get_field( "notification_url", $notification_->notification_id ), $notification_->user_notifier_id );
+			$notifications_[ $count ][ "notification_body" ][ "notification_text" ] = $this->convert_notification_text( get_field( "notification_text", $notification_->notification_id ), $notification_->user_notifier_id );
+			$notifications_[ $count ][ "notification_body" ][ "notification_icon" ] = get_field( "notification_icon_code", $notification_->notification_id );
+			$notifications_[ $count ][ "notification_body" ][ "notification_icon_background" ] = get_field( "notification_icon_background_code", $notification_->notification_id );
+			$notifications_[ $count ][ "notification_date" ] = date( "d-m-Y", strtotime( $notification_->notification_date ) );
+			$notifications_[ $count ][ "notification_viewed" ] = $notification_->notification_viewed;
+			$count += 1;
+		}
+
+		$notifications_ = json_encode( (object) $notifications_ );
+
+		return $notifications_;
+	}
+
+	/*
+	*	Function name: convert_notification_url
+	*	Function arguments: $url [ STRING ] (required), $notifier_id [ INT ] (required) (the ID of the notifier)
+	*	Function purpose:
+	*	This function is used to convert generic notification URL to normal HTTP working address.
+	*/
+	function convert_notification_url( $url, $notifier_id ) {
+		$url = str_replace( "[notifier_archive_page]", get_author_posts_url( $notifier_id ), $url );
+
+		return $url;
+	}
+
+	/*
+	*	Function name: convert_notification_text
+	*	Function arguments: $text [ STRING ] (required), $notifier_id [ INT ] (required) (the ID of the notifier)
+	*	Function purpose:
+	*	This function is used to convert generic notification text to human readeble text.
+	*/
+	function convert_notification_text( $text, $notifier_id ) {
+		$text = str_replace( "[notifier_first_name]", get_user_meta( $notifier_id, "first_name", true ), $text );
+
+		return $text;
+	}
 }
 
 //Initialize the DB into the framework
 $db_brother = new BROTHER;
 if ( !$db_brother->is_table_exists( "user_relations" ) ) { $db_brother->create_user_relations(); }
+if ( !$db_brother->is_table_exists( "user_notifications" ) ) { $db_brother->create_user_notifications(); }
 ?>

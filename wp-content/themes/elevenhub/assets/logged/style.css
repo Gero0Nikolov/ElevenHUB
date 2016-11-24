@@ -215,16 +215,13 @@
   .user-container-profile .user-meta .follow-button:hover,
   .user-container-profile .user-meta .compose-button:hover,
   .user-container-profile .user-meta .follow-button:active,
-  .user-container-profile .user-meta .compose-button:active,
-  .user-container-profile .user-meta .follow-button:focus,
-  .user-container-profile .user-meta .compose-button:focus {
+  .user-container-profile .user-meta .compose-button:active {
     background: #27ae60; }
   .user-container-profile .user-meta .unfollow-button {
     background: none;
     color: #333; }
   .user-container-profile .user-meta .unfollow-button:hover,
-  .user-container-profile .user-meta .unfollow-button:active,
-  .user-container-profile .user-meta .unfollow-button:focus {
+  .user-container-profile .user-meta .unfollow-button:active {
     background: #eee; }
 
 .user-container-profile:hover .invisible-control,
@@ -359,9 +356,10 @@
   display: inline-block;
   position: fixed;
   top: calc(2em + 48px);
-  left: 10em;
+  left: 7em;
   background: #fff;
-  width: 20%;
+  width: 25%;
+  max-width: 400px;
   height: 400px;
   z-index: 99;
   border-bottom-left-radius: 5px;
@@ -383,9 +381,11 @@
         display: inline-block;
         width: 38px;
         height: 38px;
-        background: #ddd;
+        background-color: #ddd;
+        background-size: cover;
+        background-position: center;
         border-radius: 100%;
-        vertical-align: middle; }
+        vertical-align: top; }
       #notifications-holder .notification-anchor .notification-holder .notification-content {
         display: inline-block;
         width: calc(100% - 60px);
@@ -395,7 +395,8 @@
         font-weight: normal;
         letter-spacing: 1px;
         line-height: 200%;
-        color: #333; }
+        color: #333;
+        vertical-align: top; }
       #notifications-holder .notification-anchor .notification-holder .notification-meta {
         margin: 0.75em 0 0;
         display: flex;
@@ -429,8 +430,8 @@
   width: 12px;
   height: 12px;
   border-radius: 100%;
-  top: 0.25em;
-  right: 0.25em; }
+  top: 0.5em;
+  right: 0.5em; }
 
 /** MOBILE **/
 .mobile .white-box {

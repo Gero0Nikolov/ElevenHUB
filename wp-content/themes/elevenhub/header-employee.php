@@ -49,7 +49,7 @@ $user_id = get_current_user_id();
 		</div>
 	</nav><!-- #site-navigation -->
 	<div id="notifications-holder" class="animated">
-		<a href="#" class="notification-anchor">
+		<!-- <a href="#" class="notification-anchor">
 			<div class="notification-holder">
 				<div class="user-avatar"></div>
 				<div class="notification-content">
@@ -84,7 +84,7 @@ $user_id = get_current_user_id();
 					<span class="notification-date">23-11-2016</span>
 				</div>
 			</div>
-		</a>
+		</a> -->
 	</div>
 	<?php if ( wp_is_mobile() ) { ?>
 	<div id="mobile-menu-holder" class="animated"><?php wp_nav_menu( array( 'menu_id' => '3' ) ); ?></div>

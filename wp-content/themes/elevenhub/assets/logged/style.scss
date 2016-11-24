@@ -239,8 +239,7 @@ $asbestos: #7f8c8d;
 
 		.follow-button,
 		.unfollow-button,
-		.compose-button
-		 {
+		.compose-button {
 		    display: block;
 		    margin: 0 auto;
 		    font-family: OpenSansBold;
@@ -271,17 +270,14 @@ $asbestos: #7f8c8d;
 		.follow-button:hover,
 		.compose-button:hover,
 		.follow-button:active,
-		.compose-button:active,
-		.follow-button:focus,
-		.compose-button:focus { background: $nephritis; }
+		.compose-button:active { background: $nephritis; }
 
 		.unfollow-button {
 			background: none;
 			color: #333;
 		}
 		.unfollow-button:hover,
-		.unfollow-button:active,
-		.unfollow-button:focus { background: #eee; }
+		.unfollow-button:active { background: #eee; }
 	}
 }
 .user-container-profile:hover .invisible-control,
@@ -315,7 +311,7 @@ $asbestos: #7f8c8d;
 	.popup-inner-container {
 		display: inline-block;
 		position: relative;
-		
+
 		width: 400px;
 		max-width: 95%;
 		max-height: 95%;
@@ -440,11 +436,12 @@ $asbestos: #7f8c8d;
     display: inline-block;
     position: fixed;
     top: calc(2em + 48px);
-    left: 10em;
+    left: 7em;
     background: #fff;
-    width: 20%;
+    width: 25%;
+	max-width: 400px;
     height: 400px;
-    z-index: 99;    
+    z-index: 99;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
     box-shadow: 0px 5px 5px 0 rgba(0, 0, 0, 0.15);
@@ -469,9 +466,11 @@ $asbestos: #7f8c8d;
 			    display: inline-block;
 			    width: 38px;
 			    height: 38px;
-			    background: #ddd;
+			    background-color: #ddd;
+				background-size: cover;
+				background-position: center;
 			    border-radius: 100%;
-			    vertical-align: middle;
+			    vertical-align: top;
 			}
 
 			.notification-content {
@@ -484,6 +483,7 @@ $asbestos: #7f8c8d;
 			    letter-spacing: 1px;
 			    line-height: 200%;
 			    color: #333;
+				vertical-align: top;
 			}
 
 			.notification-meta {
@@ -512,7 +512,7 @@ $asbestos: #7f8c8d;
 				    letter-spacing: 1px;
 			    }
 			}
-		}    	
+		}
     }
     .notification-anchor:hover,
     .notification-anchor:active { background: #f9f9f9; }
@@ -525,8 +525,8 @@ $asbestos: #7f8c8d;
     width: 12px;
     height: 12px;
     border-radius: 100%;
-    top: 0.25em;
-    right: 0.25em;
+    top: 0.5em;
+    right: 0.5em;
 }
 
 /** MOBILE **/

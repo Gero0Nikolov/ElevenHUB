@@ -936,7 +936,7 @@ $asbestos: #7f8c8d;
 
     box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.25);
     background: #fff;
-    padding: 1em 10em;
+    padding: 1em 7em;
 
     z-index: 9999;
 
@@ -987,7 +987,7 @@ $asbestos: #7f8c8d;
 	display: block;
     width: 100%;
     background: #34495e;
-    padding: 1.5em 10em;
+    padding: 1.5em 7em;
     text-align: center;
 
     .footer-link {
@@ -1051,7 +1051,7 @@ $asbestos: #7f8c8d;
 /* CONTENT */
 .site-content {
 	display: block;
-	padding: 0 10em;
+	padding: 0 7em;
 	margin: calc(2em + 60px) 0;
 }
 
@@ -1164,7 +1164,7 @@ $asbestos: #7f8c8d;
 .scelleton-bold-button:hover { background: #333; color: #fff; border-color: transparent; }
 
 .scelleton-icon-button{
-	display: inline-block;  
+	display: inline-block;
     font-size: 1.25rem;
     text-transform: uppercase;
     padding: 14px;
@@ -1408,6 +1408,8 @@ $asbestos: #7f8c8d;
 	overflow-x: hidden;
 	overflow-y: auto;
 	background: rgba(0, 0, 0, 0.5);
+
+	z-index: 9999;
 
 	#alert-box {
         position: absolute;
