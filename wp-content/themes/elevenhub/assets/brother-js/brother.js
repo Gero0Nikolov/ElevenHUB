@@ -91,11 +91,20 @@ var UserRelations = function( vUserID, userID = "" ) {
 	/*
 	*	Function name: followOrUnfollowRelation
 	*	Function arguments: vUserID [ INT ] (required) (the VisitedUserID), recalculateFollower [ BOOL ] (optional) (tells the function if you need an array of the followers to be returned), onSuccess [ FUNCTION ] (required) tells the method what to do after the response, userID [ INT ] (optional) (the user ID of the currently logged in user).
+	*	Function purpose: This function is used to generate user relation from TYPE: Follow or Unfollow.
 	*/
 	this.followOrUnfollowRelation = function( vUserID, recalculateFollowers = false, onSuccess, userID = "" ) {
 		generateAJAX( { functionName : "follow_or_unfollow_relation", arguments : { v_user_id: vUserID, user_id: userID, recalculate_followers: recalculateFollowers } }, function ( response ) { onSuccess( response ); } );
 	}
 
+	/*
+	*	Function name: getUserRelationStatistics
+	*	Function arguments: userID [ INT ] (optional) (the ID of the current logged user), onSuccess [ FUNCTION ] (required) tells the method what to do after the response, userID [ INT ] (optional) (the user ID of the currently logged in user).
+	*	Function purpse: This function is used to return JSON objects for the user with userID with his/hers followers & follows.
+	*/
+	this.getUserRelations = function( userID = "", onSuccess ) {
+		generateAJAX( { functionName : "get_user_relations", arguments : userID }, function ( response ) { onSuccess( JSON.parse( JSON.parse( response ) ) ); } );
+	}
 }
 
 /*

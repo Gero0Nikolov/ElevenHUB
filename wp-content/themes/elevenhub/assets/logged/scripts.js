@@ -11,6 +11,7 @@ jQuery( document ).ready(function(){
 		});
 	}
 
+	if ( jQuery( "#followers-controller" ).length ) { jQuery( "#followers-controller" ).on("click", function(){ openUserRelationStatistics(); }); }
 	if ( jQuery( "#follow-controller" ).length ) { jQuery( "#follow-controller" ).on("click", function(){ buildUserRelation( jQuery( this ) ); }); }
 
 	/*** HEADER CONTROLLERS ***/
@@ -52,6 +53,104 @@ function buildUserRelation( container ) {
 		else if ( actionResult == "unfollowed" ) {
 			container.removeClass( "unfollow-button" ).addClass( "follow-button" ).html( "Follow" );
 		}
+	} );
+}
+
+/*
+*	Method used to show user relation statistics
+*/
+function openUserRelationStatistics() {
+	view_ = "\
+	<div id='media-popup-container' class='popup-container animated fadeIn'>\
+		<div id='media-popup-fields' class='popup-inner-container'>\
+			<button id='close-button' class='close-button fa fa-close'></button>\
+			"+ loading +"\
+		</div>\
+	</div>\
+	";
+
+	jQuery( "body" ).append( view_ );
+	jQuery( "#media-popup-container" ).on("click", function( e ){ if( e.target == this ){ controller = new UserMedia(); controller.destroyMediaPopup(); } });
+	jQuery( "#media-popup-container #media-popup-fields #close-button" ).on("click", function(){ controller = new UserMedia(); controller.destroyMediaPopup(); });
+
+	relationsController = new UserRelations( -1 );
+	relationsController.getUserRelations( "", function( response ){
+		var followers = response.followers;
+		var follows = response.follows;
+
+		console.log( followers );
+		console.log( follows );
+
+		var count_followers = 0;
+		var count_follows = 0;
+
+		var followers_container = "";
+		for ( follower_key in followers ) {
+			var follower = followers[ follower_key ];
+
+			count_followers += 1;
+
+			followers_container += "\
+			<a href="+ follower.user_follower_body.user_url +" id='follower-anchor-"+ follower.row_id +"' class='relation-anchor'>\
+				<div class='relation-container'>\
+					<div class='user-avatar' style='background-image: url(\""+ follower.user_follower_body.user_avatar_url +"\");'></div>\
+					<h1 class='user-names'>"+ follower.user_follower_body.user_first_name +" "+ follower.user_follower_body.user_last_name +"</h1>\
+				</div>\
+			</a>\
+			";
+		}
+
+		var follows_container = "";
+		for ( follow_key in follows ) {
+			var follow = follows[ follow_key ];
+
+			count_follows += 1;
+
+			follows_container += "\
+			<a href="+ follow.user_followed_body.user_url +" id='follow-anchor-"+ follow.row_id +"' class='relation-anchor'>\
+				<div class='relation-container'>\
+					<div class='user-avatar' style='background-image: url(\""+ follow.user_followed_body.user_avatar_url +"\");'></div>\
+					<h1 class='user-names'>"+ follow.user_followed_body.user_first_name +" "+ follow.user_followed_body.user_last_name +"</h1>\
+				</div>\
+			</a>\
+			";
+		}
+
+		followers_button_text = count_followers != 1 ? count_followers +" followers" : count_followers +" follower";
+		follows_button_text = count_follows != 1 ? count_follows +" follows" : count_follows +" followed";
+
+		view_header = "\
+		<div id='user-relations-header' class='user-relations-header'>\
+			<button id='followers-anchor-controller' class='active relation-anchor-controller peter-river'>"+ followers_button_text +"</button>\
+			<span class='bull-separator'>&bull;</span>\
+			<button id='follows-anchor-controller' class='relation-anchor-controller turquoise'>"+ follows_button_text +"</button>\
+		</div>\
+		";
+
+		view_body = "\
+		<div id='user-relations-body' class='user-relations-body'>\
+			<div id='user-followers-container' class='active user-list'>"+ followers_container +"</div>\
+			<div id='user-follows-container' class='user-list'>"+ follows_container +"</div>\
+		</div>\
+		";
+
+		jQuery( "#media-popup-container #media-popup-fields #loader" ).remove();
+		jQuery( "#media-popup-container #media-popup-fields" ).append( view_header ).append( view_body );
+
+		// Add controlls
+		jQuery( "#followers-anchor-controller" ).on("click", function(){
+			if ( !jQuery( "#user-relations-body #user-followers-container" ).hasClass( "active" ) ) {
+				jQuery( "#user-relations-header .active" ).removeClass( "active" ); jQuery( "#user-relations-header #followers-anchor-controller" ).addClass( "active" );
+				jQuery( "#user-relations-body .active" ).removeClass( "active" ); jQuery( "#user-relations-body #user-followers-container" ).addClass( "active" );
+			}
+		});
+
+		jQuery( "#follows-anchor-controller" ).on("click", function(){
+			if ( !jQuery( "#user-relations-body #user-follows-container" ).hasClass( "active" ) ) {
+				jQuery( "#user-relations-header .active" ).removeClass( "active" ); jQuery( "#user-relations-header #follows-anchor-controller" ).addClass( "active" );
+				jQuery( "#user-relations-body .active" ).removeClass( "active" ); jQuery( "#user-relations-body #user-follows-container" ).addClass( "active" );
+			}
+		});
 	} );
 }
 

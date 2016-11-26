@@ -302,6 +302,52 @@ class BROTHER {
 	}
 
 	/*
+	*
+	*/
+	function get_user_relations( $user_id = "" ) {
+		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
+
+		global $wpdb;
+
+		$table_ = $wpdb->prefix ."user_relations";
+		$sql_ = "SELECT * FROM $table_ WHERE user_followed_id=$user_id OR user_follower_id=$user_id";
+		$results_ = $wpdb->get_results( $sql_, OBJECT );
+
+		$count_followers = 0;
+		$count_follows = 0;
+
+		$followers_ = array();
+		$follows_ = array();
+
+		foreach ( $results_ as $result_ ) {
+			if ( $result_->user_followed_id == $user_id ) { // Followers array
+				$followers_[ $count_followers ][ "row_id" ] = $result_->id;
+				$followers_[ $count_followers ][ "user_follower_body" ][ "user_id" ] = $result_->user_follower_id;
+				$followers_[ $count_followers ][ "user_follower_body" ][ "user_url" ] = get_author_posts_url( $result_->user_follower_id );
+				$followers_[ $count_followers ][ "user_follower_body" ][ "user_avatar_url" ] = $this->get_user_avatar_url( $result_->user_follower_id );
+				$followers_[ $count_followers ][ "user_follower_body" ][ "user_first_name" ] = get_user_meta( $result_->user_follower_id, "first_name", true );
+				$followers_[ $count_followers ][ "user_follower_body" ][ "user_last_name" ] = get_user_meta( $result_->user_follower_id, "last_name", true );
+
+				$count_followers += 1;
+			} else { // Follows array
+				$follows_[ $count_follows ][ "row_id" ] = $result_->id;
+				$follows_[ $count_follows ][ "user_followed_body" ][ "user_id" ] = $result_->user_followed_id;
+				$follows_[ $count_follows ][ "user_followed_body" ][ "user_url" ] = get_author_posts_url( $result_->user_followed_id );
+				$follows_[ $count_follows ][ "user_followed_body" ][ "user_avatar_url" ] = $this->get_user_avatar_url( $result_->user_followed_id );
+				$follows_[ $count_follows ][ "user_followed_body" ][ "user_first_name" ] = get_user_meta( $result_->user_followed_id, "first_name", true );
+				$follows_[ $count_follows ][ "user_followed_body" ][ "user_last_name" ] = get_user_meta( $result_->user_followed_id, "last_name", true );
+
+				$count_follows += 1;
+			}
+		}
+
+		$relations_ = json_encode( array( "followers" => (object) $followers_, "follows" => (object) $follows_ ) );
+
+		return $relations_;
+	}
+
+
+	/*
 	*	Function name: generate_notification
 	*	Function arguments: $notification_id [ INT ] (required) (the ID of the Notification post in the Notification PT), $v_user_id [ INT ] (required) (the ID of the visited user), $user_id [ INT ] (optional) (the ID of the visitor)
 	*	Function purpose: This function generates notification for specific user based on the Notification_ID.

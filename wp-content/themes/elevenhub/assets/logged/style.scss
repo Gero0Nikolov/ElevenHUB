@@ -380,6 +380,113 @@ $asbestos: #7f8c8d;
 			    max-width: 90%;
 			}
 		}
+
+		.user-relations-header {
+			display: flex;
+			text-align: left;
+			flex-direction: row;
+			align-items: center;
+			justify-content: flex-start;
+			border-bottom: 1px solid #ddd;
+			padding: 0.5em;
+
+			.relation-anchor-controller {
+				display: inline-block;
+				font-family: OpenSansLight;
+				font-weight: normal;
+				font-size: 0.8rem;
+				text-shadow: none;
+				letter-spacing: 1.5px;
+				border: 1px solid #fff;
+				border-radius: 100px;
+				box-shadow: none !important;
+				vertical-align: middle;
+				padding: 0.75em 1.25em;
+				outline: 0 !important;
+				color: #fff;
+
+				webkit-transition: all 0.25s ease-in-out;
+			    -moz-transition: all 0.25s ease-in-out;
+			    -o-transition: all 0.25s ease-in-out;
+			    transition: all 0.25s ease-in-out;
+			}
+
+			.peter-river { background: $peter_river; }
+			.peter-river:hover,
+			.peter-river:active { background: $belize_hole; }
+			.active.peter-river { border: 1px solid $belize_hole; }
+
+			.turquoise { background: $turquoise; }
+			.turquoise:hover,
+			.turquoise:active { background: $green_sea; }
+			.active.turquoise { border: 1px solid $green_sea; }
+		}
+	}
+
+	.user-relations-body {
+		display: block;
+		position: relative;
+
+		#user-followers-container { transform: translateX(-100%); }
+		#user-follows-container { transform: translateX(100%); }
+
+		.user-list {
+			display: block;
+			width: 100%;
+			position: absolute;
+			top: 0;
+
+			webkit-transition: all 0.25s ease-in-out;
+		    -moz-transition: all 0.25s ease-in-out;
+		    -o-transition: all 0.25s ease-in-out;
+		    transition: all 0.25s ease-in-out;
+
+			.relation-anchor {
+				display: block;
+				text-decoration: none;
+				text-shadow: none;
+				outline: 0 !important;
+				color: #333 !important;
+
+				.relation-container {
+					display: block;
+					border-bottom: 1px solid #ddd;
+					padding: 1em;
+
+					webkit-transition: all 0.25s ease-in-out;
+				    -moz-transition: all 0.25s ease-in-out;
+				    -o-transition: all 0.25s ease-in-out;
+				    transition: all 0.25s ease-in-out;
+
+					.user-avatar {
+						display: inline-block;
+						width: 48px;
+						height: 48px;
+
+						border-radius: 100%;
+						background-color: #ddd;
+						background-size: cover;
+						background-position: center;
+
+						vertical-align: middle;
+					}
+
+					.user-names {
+						display: inline-block;
+					    vertical-align: middle;
+					    margin: 0;
+					    font-family: OpenSansRegular;
+					    font-weight: normal;
+					    font-size: 1.25rem;
+					    letter-spacing: 1px;
+					    color: #333;
+					}
+				}
+				.relation-container:hover,
+				.relation-container:active { background: #f9f9f9; }
+			}
+		}
+		.active.user-list { transform: translateX(0) !important; position: relative !important; }
 	}
 }
 
