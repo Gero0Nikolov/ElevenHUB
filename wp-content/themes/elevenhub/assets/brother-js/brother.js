@@ -101,16 +101,26 @@ var UserRelations = function( vUserID, userID = "" ) {
 /*
 *	Class name: UserNotifications
 *	Class arguments: userID [ INT ] (otpional) (the ID of the desired user notifications)
+*	Class purpose: This class is used to control & handle all the methods for the user notifications.
 */
 var UserNotifications = function( userID = "" ) {
 
 	/*
 	*	Function name: getUserNotifications
 	*	Function arguments: userID [ INT ] (optional) (the ID of the desired user notifications), onSuccess [ FUNCTION ] (required) tells the method what to do after the response, userID [ INT ] (optional) (the user ID of the currently logged in user).
-	*	Function purpose: This function returns and JSON object of the all last 100 notifications ordered by Notification_DATE
+	*	Function purpose: This function returns and JSON object of the all last 100 notifications ordered by Notifications_ID
 	*/
 	this.getUserNotifications = function( userID = "", onSuccess ) {
 		generateAJAX( { functionName : "get_user_notifications", arguments : userID }, function( response ) { onSuccess( JSON.parse( JSON.parse( response ) ) ); } );
+	}
+
+	/*
+	*	Function name: getUserUnseenNotifications
+	*	Function arguments: userID [ INT ] (optional) (the ID of the desired user notifications), listedNotificationsIDs [ INT_ARRAY ] (optional) (used to tell the back-end algorithm which notifications to skip), onSuccess [ FUNCTION ] (required) tells the method what to do after the response.
+	*	Function purpose: This function returns only the latest unseen notifications of the desired user.
+	*/
+	this.getUserUnseenNotifications = function( userID = "", listedNotificationsIDs = [], onSuccess ) {
+		generateAJAX( { functionName : "get_user_unseen_notifications", arguments : { user_id: userID, listed_notifications: listedNotificationsIDs } }, function ( response ) { onSuccess( JSON.parse( JSON.parse( response ) ) ); } )
 	}
 
 }

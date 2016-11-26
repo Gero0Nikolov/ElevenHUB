@@ -221,7 +221,7 @@ class BROTHER {
 			CREATE TABLE $user_notifications_table (
 				id INT NOT NULL AUTO_INCREMENT,
 				notification_id INT,
-				notification_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+				notification_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 				notification_viewed INT DEFAULT 0,
 				user_notified_id INT,
 				user_notifier_id INT,
@@ -328,7 +328,45 @@ class BROTHER {
 		global $wpdb;
 
 		$table_ = $wpdb->prefix ."user_notifications";
-		$sql_ = "SELECT * FROM $table_ WHERE user_notified_id=$user_id ORDER BY notification_date DESC LIMIT 100";
+		$sql_ = "SELECT * FROM $table_ WHERE user_notified_id=$user_id ORDER BY id ASC LIMIT 100";
+		$results_ = $wpdb->get_results( $sql_, OBJECT );
+
+		$count = 0;
+		$notifications_ = array();
+		foreach ( $results_ as $notification_ ) {
+			$notifications_[ $count ][ "row_id" ] = $notification_->id;
+			$notifications_[ $count ][ "notification_body" ][ "notifier_avatar_url" ] = $this->get_user_avatar_url( $notification_->user_notifier_id );
+			$notifications_[ $count ][ "notification_body" ][ "notification_name" ] = get_field( "notification_name", $notification_->notification_id );
+			$notifications_[ $count ][ "notification_body" ][ "notification_link" ] = $this->convert_notification_url( get_field( "notification_url", $notification_->notification_id ), $notification_->user_notifier_id );
+			$notifications_[ $count ][ "notification_body" ][ "notification_text" ] = $this->convert_notification_text( get_field( "notification_text", $notification_->notification_id ), $notification_->user_notifier_id );
+			$notifications_[ $count ][ "notification_body" ][ "notification_icon" ] = get_field( "notification_icon_code", $notification_->notification_id );
+			$notifications_[ $count ][ "notification_body" ][ "notification_icon_background" ] = get_field( "notification_icon_background_code", $notification_->notification_id );
+			$notifications_[ $count ][ "notification_date" ] = date( "d-m-Y", strtotime( $notification_->notification_date ) );
+			$notifications_[ $count ][ "notification_viewed" ] = $notification_->notification_viewed;
+			$count += 1;
+		}
+
+		$notifications_ = json_encode( (object) $notifications_ );
+
+		return $notifications_;
+	}
+
+	/*
+	*	Function name: get_user_unseen_notifications
+	*	Function arguments: $data [ MIXED_OBJECT ] (required) (contains the $user_id & the already $listed_notifications IDs).
+	*	Function purpose:
+	*	This function is used to filter & return only the latest unseen notificaitons to the Front-end.
+	*	Best used with var UserNotifications.getUserUnseenNotifications() method from the brother.js framework.
+	*	Good usage example can be found in the scripts.js file at the buildAndPullUserNotifications() method which includes the listenForNewUserNotifications() method.
+	*/
+	function get_user_unseen_notifications( $data ) {
+		$user_id = !empty( $data->user_id ) ? $data->user_id : get_current_user_id();
+		$listed_notifications = "'". implode( "','", $data->listed_notifications ) ."'";
+
+		global $wpdb;
+
+		$table_ = $wpdb->prefix ."user_notifications";
+		$sql_ = "SELECT * FROM $table_ WHERE user_notified_id=$user_id AND id NOT IN ($listed_notifications) ORDER BY id ASC";
 		$results_ = $wpdb->get_results( $sql_, OBJECT );
 
 		$count = 0;
@@ -373,6 +411,42 @@ class BROTHER {
 		$text = str_replace( "[notifier_first_name]", get_user_meta( $notifier_id, "first_name", true ), $text );
 
 		return $text;
+	}
+
+	/*
+	*	Function name: read_notification
+	*	Function arguments: $notification_row_id [ INT ] (required) (the ID of the row where the notification is stored)
+	*	Function purpose: This function is used to mark notification as viewed in the DB.
+	*/
+	function read_notification( $notification_row_id ) {
+		global $wpdb;
+		$table_ = $wpdb->prefix ."user_notifications";
+		$wpdb->update( $table_, array( "notification_viewed" => 1 ), array( "id" => $notification_row_id ) );
+	}
+
+	/*
+	*	Function name: catch_url_arguments
+	*	Function arguments: NONE
+	*	Function purpose:
+	*	This function is used to keep track on the all URLS in the HUB project.
+	*	It allows you to check which arguments with what keys and values are sent to the SERVER via $_GET requests.
+	*	For future updates just add your cases in the switch(){} bellow.
+	*/
+	function catch_url_arguments() {
+		$arguments = explode( "&", $_SERVER[ "QUERY_STRING" ] );
+		foreach ( $arguments as $argument ) {
+			$arg_key = explode( "=", $argument )[0];
+			$arg_val = explode( "=", $argument )[1];
+
+			switch ( $arg_key ) {
+				case "read_notification":
+					$this->read_notification( $arg_val );
+					break;
+
+				default:
+					break;
+			}
+		}
 	}
 }
 
