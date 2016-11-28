@@ -109,7 +109,7 @@ var UserRelations = function( vUserID, userID = "" ) {
 
 /*
 *	Class name: UserNotifications
-*	Class arguments: userID [ INT ] (otpional) (the ID of the desired user notifications)
+*	Class arguments: userID [ INT ] (optional) (the ID of the desired user notifications)
 *	Class purpose: This class is used to control & handle all the methods for the user notifications.
 */
 var UserNotifications = function( userID = "" ) {
@@ -134,9 +134,18 @@ var UserNotifications = function( userID = "" ) {
 
 }
 
-
+/*
+*	Class name: UserMeta
+*	Class arguments: userID [ INT ] (optional) (the ID of the desired user)
+*	Class purpose: Used to controll all methods bind with the meta information of the user.
+*/
 var UserMeta = function( userID = "" ) {
 
+	/*
+	*	Function name: updateUserMeta
+	*	Function arguments: userID [ INT ] (optional) (the ID of the desired user), formID [ STRING ] (the selector to the form which contains First / Last name, Password & Biography), passwordPromptID [ STRING ] (the selector to the popup form which prompts the user to insert their current password), onSuccess [ FUNCTION ] (required) (tells the method what to do after the response)
+	*	Function purpose: This function is used to generate AJAX request to the back-end Brother.PHP update_user_meta( $data ) and update the user meta information from there.
+	*/
 	this.updateUserMeta = function( userID = "", formID, passwordPromptID, onSuccess ) {
 		first_name = jQuery( formID ).find( "#first-name" ).val().trim();
 		last_name = jQuery( formID ).find( "#last-name" ).val().trim();

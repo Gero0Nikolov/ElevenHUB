@@ -496,7 +496,9 @@ class BROTHER {
 	}
 
 	/*
-	*	TO DO: Add exception for empty names & password; Add popup views on the front end for those exceptions;
+	*	Function name: update_user_meta
+	*	Function arguments: $data [ MIXED_OBJECT ] (object) (used to provide information about the $user_id, $data->first_name, $data->last_name, $data->new_password)
+	*	Function purpose: This function is used to update the user meta information via passed by the front-end brother.js method var UserMeta.updateUserMeta MIXED_OBJECT.
 	*/
 	function update_user_meta( $data ) {
 		$user_id = !empty( $data->user_id ) ? $data->user_id : get_current_user_id();
