@@ -308,6 +308,45 @@ $asbestos: #7f8c8d;
 
 	background: rgba(0, 0, 0, 0.5);
 
+	#alert-box {
+		position: absolute;
+		background: #fff;
+		border: 1px solid #ddd;
+		width: 350px;
+		text-align: center;
+		padding: 1em;
+		border-radius: 5px;
+		font-family: OpenSansRegular;
+		font-weight: normal;
+		font-size: 1.25rem;
+		letter-spacing: 1px;
+
+		#close-popup-button {
+			display: block;
+			width: 80%;
+			font-family: OpenSansBold;
+			font-size: 0.8rem;
+			text-transform: uppercase;
+			padding: 1em 2.5em;
+			margin: 1em auto 0;
+			letter-spacing: 1px;
+			background: $alizarin;
+			box-shadow: none !important;
+			text-shadow: none;
+			font-weight: normal;
+			color: #fff;
+			border: 0px solid transparent;
+			border-radius: 100px;
+			outline: 0;
+
+			webkit-transition: all 0.25s ease-in-out;
+			-moz-transition: all 0.25s ease-in-out;
+			-o-transition: all 0.25s ease-in-out;
+			transition: all 0.25s ease-in-out;
+		}
+		#close-popup-button:hover { background: $pomegranate; }
+	}
+
 	.popup-inner-container {
 		display: inline-block;
 		position: relative;
@@ -349,6 +388,46 @@ $asbestos: #7f8c8d;
 		    transition: all 0.25s ease-in-out;
 		}
 		.close-button:hover { color: $pomegranate; }
+
+		label {
+			display: block;
+			margin: 1em 1em 0.25em;
+
+			font-family: OpenSansRegular;
+			font-size: 1rem;
+			font-weight: normal;
+
+			letter-spacing: 1px;
+			color: #333;
+		}
+
+		input {
+			display: block;
+
+			margin: 0 1em;
+			padding: 0.25em;
+
+			width: 92%;
+			border: 1px solid #ddd;
+			border-radius: 5px;
+
+			font-family: OpenSansRegular;
+			font-size: 1rem;
+			font-weight: normal;
+
+			color: #333;
+			outline: 0;
+			letter-spacing: 1px;
+
+			box-shadow: none;
+			text-shadow: none;
+		}
+
+		#submit-button {
+			display: block;
+			width: 50%;
+			margin: 1em auto;
+		}
 
 		#profile-images-holder {
 			.avatar {
@@ -436,10 +515,10 @@ $asbestos: #7f8c8d;
 			position: absolute;
 			top: 0;
 
-			webkit-transition: all 0.25s ease-in-out;
-		    -moz-transition: all 0.25s ease-in-out;
-		    -o-transition: all 0.25s ease-in-out;
-		    transition: all 0.25s ease-in-out;
+			webkit-transition: all 0.75s ease-in-out;
+		    -moz-transition: all 0.75s ease-in-out;
+		    -o-transition: all 0.75s ease-in-out;
+		    transition: all 0.75s ease-in-out;
 
 			.relation-anchor {
 				display: block;
@@ -660,6 +739,106 @@ $asbestos: #7f8c8d;
     right: 0.5em;
 }
 
+#user-meta-container {
+	.user-meta-container {
+		display: block;
+		width: 500px;
+		max-width: 95%;
+		margin: 0 auto;
+
+		label {
+			display: block;
+
+			font-family: OpenSansRegular;
+			font-size: 1.25rem;
+			font-weight: normal;
+
+			color: #333;
+			letter-spacing: 1px;
+
+			margin-bottom: 0.15em;
+		}
+
+		input {
+			display: block;
+
+			font-family: OpenSansRegular;
+			font-size: 1rem;
+			font-weight: normal;
+
+			color: #333;
+			width: 100%;
+
+			border: 1px solid #ddd;
+			border-radius: 5px !important;
+
+			letter-spacing: 1px;
+
+			text-shadow: none;
+			box-shadow: none;
+			outline: 0 !important;
+
+			margin-bottom: 1em;
+			padding: 0.5em;
+		}
+		input:focus { border-color: $peter_river }
+
+		button {
+			width: 50%;
+		    display: block;
+		    margin: 2em auto;
+		}
+	}
+}
+
+.richtext {
+	display: block;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    resize: vertical;
+    font-family: OpenSansregular;
+    font-size: 1rem;
+    font-weight: normal;
+    color: #333;
+    letter-spacing: 1px;
+    padding: 0.5em;
+	text-shadow: none;
+	box-shadow: none;
+
+	outline: 0 !important;
+
+	min-height: 250px;
+}
+.richtext:focus { border-color: $peter_river; }
+
+.user-bio-container {
+	display: block;
+    width: 100%;
+    margin: 2.5em 0;
+    border-top: 1px solid #ddd;
+    padding: 1em 1em 2em;
+    border-bottom: 1px solid #ddd;
+
+	.meta-header {
+		h1 {
+			display: block;
+		    margin: 0 0 0.5em;
+		    font-family: OpenSansLight;
+		    font-size: 2.25rem;
+		    font-weight: normal;
+		    letter-spacing: 1px;
+			color: $alizarin;
+		}
+	}
+
+	.meta-content {
+		font-family: OpenSansRegular;
+	    font-weight: normal;
+	    font-size: 1.15rem;
+	    color: #333;
+	}
+}
+
 /** MOBILE **/
 .mobile {
 	#notifications-holder {
@@ -675,6 +854,12 @@ $asbestos: #7f8c8d;
 		.invisible-control {
 		    opacity: 0.85;
     		padding: 0.5em;
+		}
+	}
+
+	#user-meta-container {
+		.user-meta-container {
+			button { width: 100% !important; }
 		}
 	}
 }

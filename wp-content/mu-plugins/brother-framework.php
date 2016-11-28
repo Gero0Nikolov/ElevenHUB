@@ -19,12 +19,12 @@ class BROTHER {
 
 	/*
 	*	Function name: upload_profile_media
-	*	Function arguments: NONE
+	*	Function arguments: $only_img [ BOOLEAN ] (optional) (used to tell if the uploaded file should be only from TYPE: Image)
 	*	Function purpose:
 	*	This function is used to upload the media to the user profile via AJAX request.
 	*/
-	function upload_profile_media() {
-		if ( $_FILES[ "avatar-picker" ][ "size" ] > 0 ) {
+	function upload_profile_media( $only_img = true ) {
+		if ( $_FILES[ "avatar-picker" ][ "size" ] > 0 && getimagesize( $_FILES[ "avatar-picker" ] ) != 0 ) {
 			$avatar_id = $this->upload_user_file( $_FILES[ "avatar-picker" ] );
 			$avatar_ = $this->get_user_avatar();
 			if ( empty( $avatar_->avatar_id ) ) {
@@ -37,7 +37,7 @@ class BROTHER {
 			}
 		}
 
-		if ( $_FILES[ "banner-picker" ][ "size" ] > 0 ) {
+		if ( $_FILES[ "banner-picker" ][ "size" ] > 0 && getimagesize( $_FILES[ "banner-picker" ] ) != 0 ) {
 			$banner_id = $this->upload_user_file( $_FILES[ "banner-picker" ] );
 			$banner_ = $this->get_user_banner();
 			if ( empty( $banner_->banner_id ) ) {
@@ -493,6 +493,37 @@ class BROTHER {
 					break;
 			}
 		}
+	}
+
+	/*
+	*	TO DO: Add exception for empty names & password; Add popup views on the front end for those exceptions;
+	*/
+	function update_user_meta( $data ) {
+		$user_id = !empty( $data->user_id ) ? $data->user_id : get_current_user_id();
+		$user_ = get_user_by( "ID", $user_id );
+
+		if ( $user_ && wp_check_password( $data->current_password, $user_->data->user_pass, $user_id ) ) {
+			if ( !empty( $data->first_name ) && isset( $data->first_name ) ) { update_user_meta( $user_id, "first_name", $data->first_name ); }
+			if ( !empty( $data->last_name ) && isset( $data->last_name ) ) { update_user_meta( $user_id, "last_name", $data->last_name ); }
+			if ( !empty( $data->new_password ) && isset( $data->new_password ) ) { wp_set_password( $data->new_password, $user_id ); }
+
+			if ( !get_user_meta( $user_id, "user_biography", false ) ) {
+				add_user_meta( $user_id, "user_biography", $data->biography, false );
+			} else {
+				update_user_meta( $user_id, "user_biography", $data->biography, false );
+			}
+
+			// Logout user
+			wp_logout();
+
+			// Login user
+			$res_ = wp_signon( array(
+				"user_login" => $user_->data->user_login,
+				"user_password" => !empty( $data->new_password ) ? $data->new_password : $data->current_password
+			), false );
+
+			return "updated";
+		} else { return "Wrong password!"; }
 	}
 }
 

@@ -134,6 +134,33 @@ var UserNotifications = function( userID = "" ) {
 
 }
 
+
+var UserMeta = function( userID = "" ) {
+
+	this.updateUserMeta = function( userID = "", formID, passwordPromptID, onSuccess ) {
+		first_name = jQuery( formID ).find( "#first-name" ).val().trim();
+		last_name = jQuery( formID ).find( "#last-name" ).val().trim();
+		new_password = jQuery( formID ).find( "#user-password" ).val().trim();
+		biography = jQuery( formID ).find( "#biography" ).val().trim();
+
+		current_password = jQuery( passwordPromptID ).find( "#current-password" ).val().trim();
+
+		generateAJAX({
+			functionName : "update_user_meta",
+			arguments : {
+				user_id: userID,
+				first_name: first_name,
+				last_name: last_name,
+				new_password: new_password,
+				biography: biography,
+				current_password: current_password
+			}
+		}, function( response ) { onSuccess( JSON.parse( response ) ); } );
+	}
+
+}
+
+
 /*
 *	Function name: generateAJAX
 *	Function arguments: args [ JSON object ] (required), onSuccess [ FUNCTION ] (required) tells the function what to do after the response.

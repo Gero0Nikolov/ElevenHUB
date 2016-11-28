@@ -12,6 +12,7 @@ $brother_ = new BROTHER;
 $user_id = get_current_user_id();
 $user_first_name = get_user_meta( $user_id, "first_name", true );
 $user_last_name = get_user_meta( $user_id, "last_name", true );
+$user_biography = get_user_meta( $user_id, "user_biography", true );
 ?>
 <div id="user-container" class="user-container-profile" style="background-image: url(<?php echo $brother_->get_user_banner_url( $user_id ); ?>);">
 	<button class="fa fa-cog invisible-control" onclick="openProfileImages();" title="Change your banner or profile picture"></button>
@@ -30,5 +31,17 @@ $user_last_name = get_user_meta( $user_id, "last_name", true );
 		</div>
 	</div>
 </div>
+
+<?php if ( !empty( $user_biography ) ) { ?>
+<div id="user-bio-container" class='user-bio-container'>
+	<div id="meta-header" class="meta-header">
+		<h1>About me:</h1>
+	</div>
+	<div id="meta-content" class="meta-content">
+		<?php echo $user_biography; ?>
+	</div>
+</div>
+<?php } ?>
+
 <div id="stories-container" class="posts-container">
 </div>

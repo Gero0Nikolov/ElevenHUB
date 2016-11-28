@@ -22,6 +22,29 @@ jQuery( document ).ready(function(){
 
 	/** BUILD NOTIFICATIONS & START TO LIVE PULL NOTIFICATIONS **/
 	buildAndPullUserNotifications( jQuery( "#notifications-holder" ) );
+
+	/* BODY CONTROLLERS */
+	if ( jQuery( "#user-meta-container" ).length ) {
+		jQuery( "#user-meta-container #save-user-meta" ).on("click", function(){
+			password_promt_view = "\
+			<div id='media-popup-container' class='popup-container animated fadeIn'>\
+				<div id='media-popup-fields' class='popup-inner-container'>\
+					<button id='close-button' class='close-button fa fa-close'></button>\
+					<label for='password'>Enter your current password</label>\
+					<input id='current-password' type='password' onkeydown='keyPressedForms(event, 2);'>\
+					<button id='submit-button' class='green-bold-button'>Save</button>\
+				</div>\
+			</div>\
+			";
+
+			jQuery( "body" ).append( password_promt_view );
+
+			jQuery( "#media-popup-container" ).on("click", function( e ){ if( e.target == this ){ controller = new UserMedia(); controller.destroyMediaPopup(); } });
+			jQuery( "#media-popup-container #media-popup-fields #close-button" ).on("click", function(){ controller = new UserMedia(); controller.destroyMediaPopup(); });
+
+			jQuery( "#media-popup-container #media-popup-fields #submit-button" ).on("click", function(){ updateUserMetaSubmit(); });
+		});
+	}
 });
 
 /*
@@ -77,9 +100,6 @@ function openUserRelationStatistics() {
 	relationsController.getUserRelations( "", function( response ){
 		var followers = response.followers;
 		var follows = response.follows;
-
-		console.log( followers );
-		console.log( follows );
 
 		var count_followers = 0;
 		var count_follows = 0;
@@ -238,4 +258,35 @@ function listenForNewUserNotifications( userID = "", listed_notifications_ids = 
 
 		setTimeout(function(){ listenForNewUserNotifications( userID, listed_notifications_ids, container ); }, 10000);
 	} );
+}
+
+/*
+*	THIS METHOD IS USED TO SUBMIT USER META DATA FROM THE USER SETTINGS PAGE
+*/
+function updateUserMetaSubmit() {
+	jQuery( "#media-popup-fields" ).append( loading );
+
+	userProfileController = new UserMeta();
+	userProfileController.updateUserMeta(
+		"",
+		"#user-meta-container",
+		"#media-popup-container #media-popup-fields",
+		function( response ) {
+			console.log( response );
+			if ( response == "updated" ) { window.location.reload( true ); }
+			else {
+				jQuery( "#media-popup-fields #loader" ).remove();
+
+				alert_box = "<div id='alert-box' class='animated bounceInDown'>"+ response +"<button id='close-popup-button' onclick='removeAlertBox();'>Close</button></div>";
+				jQuery( "#media-popup-container" ).append( alert_box );
+			}
+		}
+	);
+}
+
+function keyPressedForms( e, form ) {
+	if ( e.keyCode == 13 ) {
+		if ( form == 2 ) { updateUserMetaSubmit(); }
+	}
+	else if ( e.keyCode == 27 ) { controller = new UserMedia(); controller.destroyMediaPopup(); }
 }
