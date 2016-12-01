@@ -24,7 +24,7 @@ class BROTHER {
 	*	This function is used to upload the media to the user profile via AJAX request.
 	*/
 	function upload_profile_media( $only_img = true ) {
-		if ( $_FILES[ "avatar-picker" ][ "size" ] > 0 && getimagesize( $_FILES[ "avatar-picker" ] ) != 0 ) {
+		if ( $_FILES[ "avatar-picker" ][ "size" ] > 0 && getimagesize( $_FILES[ "avatar-picker" ][ "tmp_name" ] ) != 0 ) {
 			$avatar_id = $this->upload_user_file( $_FILES[ "avatar-picker" ] );
 			$avatar_ = $this->get_user_avatar();
 			if ( empty( $avatar_->avatar_id ) ) {
@@ -37,7 +37,7 @@ class BROTHER {
 			}
 		}
 
-		if ( $_FILES[ "banner-picker" ][ "size" ] > 0 && getimagesize( $_FILES[ "banner-picker" ] ) != 0 ) {
+		if ( $_FILES[ "banner-picker" ][ "size" ] > 0 && getimagesize( $_FILES[ "banner-picker" ][ "tmp_name" ] ) != 0 ) {
 			$banner_id = $this->upload_user_file( $_FILES[ "banner-picker" ] );
 			$banner_ = $this->get_user_banner();
 			if ( empty( $banner_->banner_id ) ) {
@@ -194,6 +194,7 @@ class BROTHER {
 				id INT NOT NULL AUTO_INCREMENT,
 				user_followed_id INT,
 				user_follower_id INT,
+				user_employer_id INT,
 				PRIMARY KEY(id)
 			) $charset_collate;
 			";
@@ -254,6 +255,18 @@ class BROTHER {
 		return $user_followers;
 	}
 
+	function get_user_employees( $user_id = "" ) {
+		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
+
+		global $wpdb;
+
+		$table_ = $wpdb->prefix ."user_relations";
+		$sql_ = "SELECT user_followed_id FROM $table_ WHERE user_employer_id=$user_id";
+		$user_followers = $wpdb->get_results( $sql_, OBJECT );
+
+		return $user_followers;
+	}
+
 	/*
 	*	Function name: is_follower
 	*	Function arguments: $v_user_id [ INT ] (required) (comes from $VISITED_user_id), $user_id [ INT ] (optional) (the ID of the current logged user)
@@ -302,22 +315,26 @@ class BROTHER {
 	}
 
 	/*
-	*
+	*	Function name: get_user_relations
+	*	Function arguments: $user_id [ INT ] (optional), $is_company [ BOOLEAN ] (optional) (specifies if the needed relations are for company profile)
+	*	Function purpose:
+	*	This function is used to return the relations of the specified by $user_id User.
+	*	The function returns JSON array to the front end which contains two Objects (followers && followed || employees) in it.
 	*/
-	function get_user_relations( $user_id = "" ) {
+	function get_user_relations( $user_id = "", $is_company = false ) {
 		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
 
 		global $wpdb;
 
 		$table_ = $wpdb->prefix ."user_relations";
-		$sql_ = "SELECT * FROM $table_ WHERE user_followed_id=$user_id OR user_follower_id=$user_id";
+		$sql_ = !$is_company ? "SELECT * FROM $table_ WHERE user_followed_id=$user_id OR user_follower_id=$user_id" : "SELECT * FROM $table_ WHERE user_followed_id=$user_id OR user_employer_id=$user_id";
 		$results_ = $wpdb->get_results( $sql_, OBJECT );
 
 		$count_followers = 0;
-		$count_follows = 0;
+		if ( !$is_company ) { $count_follows = 0; } else { $count_employees = 0; }
 
 		$followers_ = array();
-		$follows_ = array();
+		if ( !$is_company ) { $follows_ = array(); } else { $employees_ = array(); }
 
 		foreach ( $results_ as $result_ ) {
 			if ( $result_->user_followed_id == $user_id ) { // Followers array
@@ -329,23 +346,37 @@ class BROTHER {
 				$followers_[ $count_followers ][ "user_follower_body" ][ "user_last_name" ] = get_user_meta( $result_->user_follower_id, "last_name", true );
 
 				$count_followers += 1;
-			} else { // Follows array
-				$follows_[ $count_follows ][ "row_id" ] = $result_->id;
-				$follows_[ $count_follows ][ "user_followed_body" ][ "user_id" ] = $result_->user_followed_id;
-				$follows_[ $count_follows ][ "user_followed_body" ][ "user_url" ] = get_author_posts_url( $result_->user_followed_id );
-				$follows_[ $count_follows ][ "user_followed_body" ][ "user_avatar_url" ] = $this->get_user_avatar_url( $result_->user_followed_id );
-				$follows_[ $count_follows ][ "user_followed_body" ][ "user_first_name" ] = get_user_meta( $result_->user_followed_id, "first_name", true );
-				$follows_[ $count_follows ][ "user_followed_body" ][ "user_last_name" ] = get_user_meta( $result_->user_followed_id, "last_name", true );
+			} else { // Follows or Employees array
+				if ( !$is_company ) {
+					$follows_[ $count_follows ][ "row_id" ] = $result_->id;
+					$follows_[ $count_follows ][ "user_followed_body" ][ "user_id" ] = $result_->user_followed_id;
+					$follows_[ $count_follows ][ "user_followed_body" ][ "user_url" ] = get_author_posts_url( $result_->user_followed_id );
+					$follows_[ $count_follows ][ "user_followed_body" ][ "user_avatar_url" ] = $this->get_user_avatar_url( $result_->user_followed_id );
+					$follows_[ $count_follows ][ "user_followed_body" ][ "user_first_name" ] = get_user_meta( $result_->user_followed_id, "first_name", true );
+					$follows_[ $count_follows ][ "user_followed_body" ][ "user_last_name" ] = get_user_meta( $result_->user_followed_id, "last_name", true );
 
-				$count_follows += 1;
+					$count_follows += 1;
+				} else {
+					$employees_[ $count_employees ][ "row_id" ] = $result_->id;
+					$employees_[ $count_employees ][ "user_employee_body" ][ "user_id" ] = $result_->user_followed_id;
+					$employees_[ $count_employees ][ "user_employee_body" ][ "user_url" ] = get_author_posts_url( $result_->user_followed_id );
+					$employees_[ $count_employees ][ "user_employee_body" ][ "user_avatar_url" ] = $this->get_user_avatar_url( $result_->user_followed_id );
+					$employees_[ $count_employees ][ "user_employee_body" ][ "user_first_name" ] = get_user_meta( $result_->user_followed_id, "first_name", true );
+					$employees_[ $count_employees ][ "user_employee_body" ][ "user_last_name" ] = get_user_meta( $result_->user_followed_id, "last_name", true );
+
+					$count_employees += 1;
+				}
 			}
 		}
 
-		$relations_ = json_encode( array( "followers" => (object) $followers_, "follows" => (object) $follows_ ) );
+		$relations_ = array( "followers" => (object) $followers_ );
+		if ( !$is_company ) { $relations_ = array_merge( $relations_, array( "follows" => (object) $follows_ ) ); }
+		else { $relations_ = array_merge( $relations_, array( "employees" => (object) $employees_ ) ); }
+
+		$relations_ = json_encode( $relations_ );
 
 		return $relations_;
 	}
-
 
 	/*
 	*	Function name: generate_notification

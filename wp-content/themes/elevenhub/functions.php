@@ -208,6 +208,10 @@ function register_user() {
 		);
 		$wp_update_result = wp_update_user( $args );
 
+		// Add needed user meta
+		add_user_meta( get_current_user_id(), "account_premium", "-1", false );
+		add_user_meta( get_current_user_id(), "account_tutorial", "0", false );
+
 		// Prepare Hello mail
 		$subject = "Welcome to 11hub!";
 		$content = "Welcome onboard!\n\nWe hope to see you <a href='". get_site_url() ."' target='_blank' style='color: #3498db; text-decoration: underline;'>hubbing soon</a>!\n\nCheers!";

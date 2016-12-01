@@ -1140,6 +1140,52 @@ $asbestos: #7f8c8d;
 }
 .green-bold-button:hover { background: $emerald; }
 
+.orange-bold-button {
+	display: inline-block;
+    font-family: OpenSansBold;
+    font-size: 0.8em;
+    text-transform: uppercase;
+    padding: 1em 2.5em;
+    letter-spacing: 1px;
+    background: $pumpkin;
+    box-shadow: none !important;
+    text-shadow: none;
+    font-weight: normal;
+    color: #fff;
+    border: 0px solid transparent;
+    border-radius: 100px;
+    outline: 0;
+
+    webkit-transition: all 0.25s ease-in-out;
+	-moz-transition: all 0.25s ease-in-out;
+	-o-transition: all 0.25s ease-in-out;
+	transition: all 0.25s ease-in-out;
+}
+.orange-bold-button:hover { background: $carrot; }
+
+.banana-bold-button {
+	display: inline-block;
+    font-family: OpenSansBold;
+    font-size: 0.8em;
+    text-transform: uppercase;
+    padding: 1em 2.5em;
+    letter-spacing: 1px;
+    background: $orange;
+    box-shadow: none !important;
+    text-shadow: none;
+    font-weight: normal;
+    color: #fff;
+    border: 0px solid transparent;
+    border-radius: 100px;
+    outline: 0;
+
+    webkit-transition: all 0.25s ease-in-out;
+	-moz-transition: all 0.25s ease-in-out;
+	-o-transition: all 0.25s ease-in-out;
+	transition: all 0.25s ease-in-out;
+}
+.banana-bold-button:hover { background: $sun_flower; }
+
 .scelleton-bold-button {
 	display: inline-block;
     font-family: OpenSansBold;

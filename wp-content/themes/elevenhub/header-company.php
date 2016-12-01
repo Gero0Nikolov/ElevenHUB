@@ -1,6 +1,6 @@
 <?php
 /**
- * The header for Employee view.
+ * The header for Company view.
  *
  * This is the template that displays all of the <head> section and everything up until <div id="content">
  *
@@ -49,7 +49,7 @@ $user_id = get_current_user_id();
 			</button>
 		</div>
 		<div class="right-aligned width-80p">
-			<?php if ( !wp_is_mobile() ) { wp_nav_menu( array( 'menu' => '3', 'menu_id' => '3' ) ); } else { ?>
+			<?php if ( !wp_is_mobile() ) { wp_nav_menu( array( 'menu' => '4', 'menu_id' => '4' ) ); } else { ?>
 			<button id="menu-controller" class="scelleton-icon-button fa fa-bars"></button>
 			<?php } ?>
 		</div>
@@ -57,7 +57,7 @@ $user_id = get_current_user_id();
 	<div id="notifications-holder" class="animated">
 	</div>
 	<?php if ( wp_is_mobile() ) { ?>
-	<div id="mobile-menu-holder" class="animated"><?php wp_nav_menu( array( 'menu' => '3', 'menu_id' => '3' ) ); ?></div>
+	<div id="mobile-menu-holder" class="animated"><?php wp_nav_menu( array( 'menu' => '4', 'menu_id' => '4' ) ); ?></div>
 	<?php } ?>
 
 	<div id="content" class="site-content">

@@ -68,10 +68,9 @@ function registerUser() {
 			//Remove loading sign
 			jQuery( "#login-form-holder #register #loader" ).remove();
 
-			if ( response != "" ) {
-				alert_box = "<div id='alert-box' class='animated bounceInDown'>"+ response +"<button id='close-popup-button' onclick='removeAlertBox();'>Close</button></div>";
-				jQuery( "#login-form-holder" ).append( alert_box );
-			}
+			response = response == "" ? "Welcome to the <span style='color: #e74c3c;'>hub</span>!<br/>You can now login :-)" : response;
+			alert_box = "<div id='alert-box' class='animated bounceInDown'>"+ response +"<button id='close-popup-button' onclick='removeAlertBox();'>Close</button></div>";
+			jQuery( "#login-form-holder" ).append( alert_box );
 		}
 	});
 }

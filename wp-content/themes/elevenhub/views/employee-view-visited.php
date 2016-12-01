@@ -31,15 +31,17 @@ $v_user_biography = get_user_meta( $v_user_id, "user_biography", true );
 			echo $v_user_followers_num == 1 ? $v_user_followers_num ." follower" : $v_user_followers_num ." followers";
 			?>
 			</h2>
-			<?php
-			if ( $brother_->is_follower( $v_user_id ) ) {
-				?>
-				<button id="follow-controller" class="unfollow-button">Unfollow</button>
-				<?php
-			} else {
-				?>
-				<button id="follow-controller" class="follow-button">Follow</button>
-				<?php
+			<?php			
+			if ( get_user_meta( get_current_user_id(), "account_association", true ) != "company" ) {
+				if ( $brother_->is_follower( $v_user_id ) ) {
+					?>
+					<button id="follow-controller" class="unfollow-button">Unfollow</button>
+					<?php
+				} else {
+					?>
+					<button id="follow-controller" class="follow-button">Follow</button>
+					<?php
+				}
 			}
 			?>
 		</div>
