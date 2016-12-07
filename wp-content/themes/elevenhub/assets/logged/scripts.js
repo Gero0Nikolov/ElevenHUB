@@ -45,6 +45,16 @@ jQuery( document ).ready(function(){
 			jQuery( "#media-popup-container #media-popup-fields #submit-button" ).on("click", function(){ updateUserMetaSubmit(); });
 		});
 	}
+
+	if ( jQuery( "body" ).hasClass( "author" ) ) {
+		if ( jQuery( "#company-container" ).length ) {
+			if ( jQuery( "#company-controls" ).length ) {
+				jQuery( "#composer-controller" ).on("click", function(){ openComposer(); });
+				jQuery( "#events-controller" ).on("click", function(){});
+				jQuery( "#requests-controller" ).on("click", function(){});
+			}
+		}
+	}
 });
 
 /*
@@ -289,4 +299,9 @@ function keyPressedForms( e, form ) {
 		if ( form == 2 ) { updateUserMetaSubmit(); }
 	}
 	else if ( e.keyCode == 27 ) { controller = new UserMedia(); controller.destroyMediaPopup(); }
+}
+
+function openComposer() {	
+	userComposerController = new UserStory();
+	userComposerController.buildComposer();
 }

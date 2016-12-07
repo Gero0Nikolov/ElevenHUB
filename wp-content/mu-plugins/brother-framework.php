@@ -240,7 +240,7 @@ class BROTHER {
 	*	Function name: get_user_followers
 	*	Function arguments: $user_id [ INT ] (optional)
 	*	Function purpose:
-	*	This function return the followers (as a list of user IDs) of specific user provided by his ID.
+	*	This function return the followers (as a list of user IDs) for the specific user provided by his ID.
 	*	Or if the $user_id is empty, the function will get the current logged user id.
 	*/
 	function get_user_followers( $user_id = "" ) {
@@ -255,6 +255,12 @@ class BROTHER {
 		return $user_followers;
 	}
 
+	/*
+	*	Function name: get_user_employees
+	*	Function argumnets: $user_id [ INT ] (optional)
+	*	Function purpose:
+	*	This function return the employees (as a list of user IDs) for the specific user provided by his ID.
+	*/
 	function get_user_employees( $user_id = "" ) {
 		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
 
@@ -557,6 +563,39 @@ class BROTHER {
 
 			return "updated";
 		} else { return "Wrong password!"; }
+	}
+
+	function update_post_featured_image( $data ) {
+		return $data;
+	}
+
+	function draft_user_post( $data ) {
+		return $data;
+	}
+
+	/*
+	*	Function name: get_available_media_space
+	*	Function arguments: $user_id [ INT ] (optional) (the ID of the user which media space should be returned)
+	*	Function purpose: This function returns the available media space for specified user (company) by the $user_id argument.
+	*/
+	function get_available_media_space( $user_id = "" ) {
+		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
+
+		$media_space = get_user_meta( $user_id, "media_space", true );
+		if ( empty( $media_space ) || !isset( $media_space ) ) {
+			add_user_meta( $user_id, "media_space", "1000000000", false ); // Set 1GB free disk space
+		}
+
+		return $media_space;
+	}
+
+	/*
+	*	Function name: convert_bytes
+	*	Function arguments: $bytes [ INT ] (required) (the bytes which should be converted to MBs)
+	*	Function purpose: This function converts $bytes to MBs.
+	*/
+	function convert_bytes( $bytes ) {
+	    return number_format( $bytes * 0.000001, $precision = ($bytes * 0.000001) < 0 ? $precision = 2 : 0 );
 	}
 }
 

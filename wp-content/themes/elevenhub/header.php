@@ -54,7 +54,7 @@ if ( wp_is_mobile() ) { $mobile_class = "mobile"; }
 			</a>
 		</div>
 		<div class="right-aligned">
-			<button class='logout-button scelleton-bold-button' onclick="logOutUser();">Logout</button>
+			<button class='logout-button skeleton-bold-button' onclick="logOutUser();">Logout</button>
 		</div>
 		<?php } ?>
 	</nav><!-- #site-navigation -->

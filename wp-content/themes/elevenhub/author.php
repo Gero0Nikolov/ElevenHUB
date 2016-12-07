@@ -25,13 +25,7 @@ if ( is_user_logged_in() ) {
 	}
 	else if ( $association_type == "company" ) {
 		get_header( "company" );
-		if ( is_author( $user_id ) ) {
-			require_once get_template_directory() ."/views/company-view-personal.php";
-
-			// Check if company passes the tutorial
-			$company_tutorial = get_user_meta( $user_id, "account_tutorial", true );
-			if ( $company_tutorial == 0 ) {}
-		}
+		if ( is_author( $user_id ) ) { require_once get_template_directory() ."/views/company-view-personal.php"; }
 		else {
 			$v_user = get_queried_object();
 			$v_user_id = $v_user->ID;

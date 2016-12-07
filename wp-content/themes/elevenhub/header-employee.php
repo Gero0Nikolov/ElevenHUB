@@ -50,7 +50,7 @@ $user_id = get_current_user_id();
 		</div>
 		<div class="right-aligned width-80p">
 			<?php if ( !wp_is_mobile() ) { wp_nav_menu( array( 'menu' => '3', 'menu_id' => '3' ) ); } else { ?>
-			<button id="menu-controller" class="scelleton-icon-button fa fa-bars"></button>
+			<button id="menu-controller" class="skeleton-icon-button fa fa-bars"></button>
 			<?php } ?>
 		</div>
 	</nav><!-- #site-navigation -->

@@ -41,7 +41,9 @@ $user_last_name = get_user_meta( $user_id, "last_name", true );
 		<span class="bull-separator">&bull;</span>
 		<button id="events-controller" class="orange-bold-button">Events</button>
 		<span class="bull-separator">&bull;</span>
-		<button id="requers-controller" class="banana-bold-button">Requests</button>
+		<button id="requests-controller" class="banana-bold-button">Requests</button>
+		<span class="bull-separator">&bull;</span>
+		<a href="<?php echo get_permalink( 98 ) ."?company_id=". $user_id; ?>" id="media-conroller" class="grape-bold-button">Media</a>
 	</div>
 </div>
 

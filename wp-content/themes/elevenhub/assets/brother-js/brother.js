@@ -6,6 +6,7 @@ var loading = "<div id='loader' class='animated rubberBand infinite'></div>";
 *	Class purpose: This class is used to control all the media events and methods in the HUB project.
 */
 var UserMedia = function( userID = "" ) {
+	var classHolder = this;
 
 	/*
 	*	Function name: BuildMediaView
@@ -26,8 +27,8 @@ var UserMedia = function( userID = "" ) {
 		";
 
 		jQuery( "body" ).append( view_ );
-		jQuery( "#media-popup-container" ).on("click", function( e ){ if( e.target == this ){ controller = new UserMedia(); controller.destroyMediaPopup(); } });
-		jQuery( "#media-popup-container #media-popup-fields #close-button" ).on("click", function(){ controller = new UserMedia(); controller.destroyMediaPopup(); });
+		jQuery( "#media-popup-container" ).on("click", function( e ){ if( e.target == this ){ classHolder.destroyMediaPopup(); } });
+		jQuery( "#media-popup-container #media-popup-fields #close-button" ).on("click", function(){ classHolder.destroyMediaPopup(); });
 
 		//Load images if needed
 		if ( loadProfilePictures == true ) {
@@ -169,6 +170,220 @@ var UserMeta = function( userID = "" ) {
 
 }
 
+/*
+*	Class name: UserStory
+*	Class arguments: userID [ INT ] (optional) (the ID of the desired user)
+*	Class purpose: This class is used as a controller for all Company & User stories over the HUB.
+*/
+var UserStory = function( userID = "" ) {
+	var classHolder = this;
+
+	/*
+	*	Function name: buildComposer
+	*	Function argumnets: NONE
+	*	Function purpose: This function builds & opens the story composer.
+	*/
+	this.buildComposer = function() {
+		var composer_controls = "";
+		if ( !isMobile() ) {
+			composer_controls = "\
+			<div id='story-controls'>\
+				<button id='publish-controller' class='blue-bold-button'>Publish</button>\
+				<span class='bull-separator'>&bull;</span>\
+				<button id='drafts-controller' class='skeleton-bold-button'>Drafts</button>\
+				<span class='bull-separator'>&bull;</span>\
+				<button id='close-controller' class='skeleton-bold-button'>Close</button>\
+			</div>\
+			";
+		} else {
+			composer_controls = "\
+			<div id='story-controls'>\
+				<button id='publish-controller' class='blue-bold-button'><span class='fa fa-pencil'></span></button>\
+				<span class='bull-separator'>&bull;</span>\
+				<button id='drafts-controller' class='skeleton-bold-button'><span class='fa fa-archive'></span></button>\
+				<span class='bull-separator'>&bull;</span>\
+				<button id='close-controller' class='skeleton-bold-button'><span class='fa fa-close'></span></button>\
+			</div>\
+			";
+		}
+
+		composer = "\
+		<div id='story-composer' class='animated slideInUp'>\
+			"+ composer_controls +"\
+			<div id='story-featured-image' class='story-banner'><button id='featured-image-controller' class='fa fa-pencil'></button></div>\
+			<h1 id='story-header' class='story-header' contenteditable='true' placeholder='Story title'></h1>\
+			<div id='story-content' class='story-content' contenteditable='true'></div>\
+		</div>\
+		";
+
+		jQuery( "body" ).append( composer );
+
+		//Initialize Tiny-MCE
+		tinymce.init({
+    		selector: '#story-content',
+			theme: "inlite",
+			inline: true,
+			browser_spellcheck: true,
+			selection_toolbar: 'bold italic quicklink h2 blockquote',
+			insert_toolbar: '',
+			file_picker_types: 'image',
+		  	plugins: 'wordcount',
+			setup:
+			function(editor) {
+				editor.on('change', function(e) {
+					classHolder.convertLinksToImageVideo( tinyMCE.activeEditor.getContent({ format: "text" }) )
+				});
+			}
+  		});
+
+		//Set autosave
+		autoSaveInterval = classHolder.autoSave();
+
+		//Composer controlls
+		jQuery( "#story-header" ).on("keydown", function(){
+			window.clearInterval( autoSaveInterval );
+			autoSaveInterval = classHolder.autoSave();
+		});
+		jQuery( "#story-content" ).on("keydown", function(){
+			window.clearInterval( autoSaveInterval );
+			autoSaveInterval = classHolder.autoSave();
+		});
+
+		jQuery( "#featured-image-controller" ).on("click", function(){
+			build = "\
+			<div id='media-popup-container' class='popup-container animated fadeIn'>\
+				<div id='media-popup-fields' class='popup-inner-container'>\
+					<button id='close-button' class='close-button fa fa-close'></button>\
+					<div id='story-images-holder'>\
+						<div id='banner' class='banner'></div>\
+						<form method='POST' enctype='multipart/form-data' id='story-media-uploader'><input type='file' id='banner-picker' class='file-picker' name='banner-picker'></form>\
+						<button id='save-user-pictures-button' class='green-bold-button'>Save</button>\
+					</div>\
+				</div>\
+			</div>\
+			";
+
+			jQuery( "body" ).append( build );
+			jQuery( "#media-popup-container" ).on("click", function( e ){ if( e.target == this ){ jQuery( "#media-popup-container" ).removeClass( "fadeIn" ).addClass( "fadeOut" ); setTimeout(function(){ jQuery( "#media-popup-container" ).remove(); }, 750); } });
+			jQuery( "#media-popup-container #media-popup-fields #close-button" ).on("click", function(){ jQuery( "#media-popup-container" ).removeClass( "fadeIn" ).addClass( "fadeOut" ); setTimeout(function(){ jQuery( "#media-popup-container" ).remove(); }, 750); });
+
+			jQuery( "#media-popup-container #media-popup-fields #save-user-pictures-button" ).on("click", function(){
+				jQuery( "#story-images-holder" ).append( loading );
+
+				file_ = jQuery( "#banner-picker" )[0].files[0];
+
+				console.log( file_ );
+
+				var fd = new FormData();
+				fd.append( "action", "upload-story-banner" );
+				fd.append( "async-upload", jQuery( "#banner-picker" )[0].files[0] );
+				fd.append( "name", jQuery( "#banner-picker" )[0].files[0].name );
+
+				console.log( fd );
+
+				// generateAJAX({
+				// 	functionName : "update_post_featured_image",
+				// 	arguments : form_data
+				// }, function( response ) { console.log( response ); } );
+			});
+
+			//this.getStoryBannerURL( "", function( response ){ jQuery( "#media-popup-fields #story-images-holder #banner" ).attr( "style", "background-image: url("+ response +")" ) } );
+		});
+
+		jQuery( "#close-controller" ).on( "click", function(){ classHolder.destroyComposer(); } );
+	}
+
+	/*
+	*	Function name: destroyComposer
+	*	Function arguments: NONE
+	*	Function purpose: This function destroys the story composer which was created by this.buildComposer method.
+	*/
+	this.destroyComposer = function() {
+		window.clearInterval( autoSaveInterval )
+		jQuery( "#story-composer" ).removeClass( "slideInUp" ).addClass( "slideOutDown" );
+		setTimeout(function(){ jQuery( "#story-composer" ).remove(); }, 750);
+	}
+
+	/*
+	*	Function name: autoSave
+	*	Function arguments: NONE
+	*	Function purpose:
+	*	This function makes sends the latest drafts over the user story to the back-end.
+	*	After 3 seconds without beign edited.
+	*/
+	this.autoSave = function() {
+		return setInterval(function(){ classHolder.draftPost(); }, 3000);
+	}
+
+	/*
+	*	Function name: draftPost
+	*	Function arguments: NONE
+	*	Function purpose:
+	*	This function sends the post info to the back-end to draft them on the server.
+	*/
+	this.draftPost = function() {
+		title = jQuery( "#story-header" ).html().trim();
+		content = tinyMCE.activeEditor.getContent();
+		postID = jQuery( "#story-composer" ).attr( "post-id" );
+
+		if ( title != "" && title !== undefined ) {
+			generateAJAX({
+				functionName : "draft_user_post",
+				arguments : {
+					post_id: postID,
+					post_title: title,
+					post_content: content
+				}
+			}, function( response ) { console.log( response ); } );
+		}
+	}
+
+	/*
+	*	Function name: convertLinksToImageVideo
+	*	Function arguments: content [ STRING ] (required)
+	*	Function purpose:
+	*	This function is used to dinamicaly convert URLs to live Images or videos from supported players.
+	*	List of supported players: { YouTube, Vimeo }
+	*/
+	this.convertLinksToImageVideo = function( content ) {
+		var urlRegex = /(https?:\/\/[^\s]+)/g;
+
+	   urls_ = content.match( urlRegex );
+	   console.log( urls_ );
+	   if ( urls_ !== "undefined" && urls_ != null ) {
+		   for ( count = 0; count < urls_.length; count++ ) {
+		   		url_ = urls_[ count ];
+		   		if ( url_.indexOf( "?marked" ) < 0 ) {
+		   			var markup_ = "";
+
+		   			if ( url_.indexOf( "youtube" ) >= 0 ) {
+		   				videoID = url_.split( "v=" )[1].split( "&" )[0];
+		   				markup_ = "<iframe class='content-video' src='https://www.youtube.com/embed/"+ videoID +"?marked' frameborder='0' allowfullscreen></iframe>";
+		   				tinyMCE.activeEditor.setContent( tinyMCE.activeEditor.getContent().replace( url_, markup_ ) );
+		   			}
+		   			else if ( url_.indexOf( "vimeo" ) >= 0 ) {
+		   				videoID = url_.split( "vimeo.com/" )[1];
+		   				markup_ = "<iframe src='https://player.vimeo.com/video/"+ videoID +"?marked' frameborder='0' webkitallowfullscreen mozallowfullscreen allowfullscreen class='content-video'></iframe>";
+		   				tinyMCE.activeEditor.setContent( tinyMCE.activeEditor.getContent().replace( url_, markup_ ) );
+		   			}
+		   			else {
+		   				jQuery( "<img>", {
+					        src: url_,
+					        error: function() {},
+					        load: function() {
+					        	markup_ = "<img src='"+ url_ +"?marked' class='content-image' />";
+					        	tinyMCE.activeEditor.setContent( tinyMCE.activeEditor.getContent().replace( url_, markup_ ) );
+					        }
+					    });
+		   			}
+		   		}
+		   }
+	   }
+
+	   return content;
+	}
+}
+
 
 /*
 *	Function name: generateAJAX
@@ -186,4 +401,19 @@ function generateAJAX( args, onSuccess ) {
 		},
 		success : function( response ) { onSuccess( response ); }
 	});
+}
+
+function isMobile() {
+	if( navigator.userAgent.match(/Android/i)
+	|| navigator.userAgent.match(/webOS/i)
+	|| navigator.userAgent.match(/iPhone/i)
+	|| navigator.userAgent.match(/iPad/i)
+	|| navigator.userAgent.match(/iPod/i)
+	|| navigator.userAgent.match(/BlackBerry/i)
+	|| navigator.userAgent.match(/Windows Phone/i)
+ 	){
+		return true;
+  	} else {
+    	return false;
+  	}
 }
