@@ -1089,5 +1089,18 @@
     padding: 0 0.25em; }
   .mobile #story-composer .story-content {
     padding: 0 0.75em; }
+.mobile .simple-controls {
+  display: block;
+  padding: 0 1em; }
+  .mobile .simple-controls .normal-bold-button {
+    display: block;
+    text-align: center; }
+  .mobile .simple-controls .blue-bold-button {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin-top: 1em; }
+.mobile #medias-container .media-container {
+  margin: 0.2em; }
 
 /*# sourceMappingURL=style.css.map */
