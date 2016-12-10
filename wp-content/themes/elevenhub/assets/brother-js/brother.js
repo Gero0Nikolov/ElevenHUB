@@ -73,13 +73,72 @@ var UserMedia = function( userID = "" ) {
 
 	/*
 	*	Function name: getUserBannerURL
-	*	Function arguments: userID [ INT ] (option), onSuccess [ FUNCTION ] (required) tells the method what to do after the response.
+	*	Function arguments: userID [ INT ] (optional), onSuccess [ FUNCTION ] (required) tells the method what to do after the response.
 	*	Function purpose: This function is used to retrieve and handle the user banner url via custom functions provided by the onSuccess argument.
 	*/
 	this.getUserBannerURL = function( userID = "", onSuccess ) {
 		generateAJAX( { functionName : "get_user_banner_url", arguments : userID }, function( response ){ onSuccess( response ); } );
 	}
 
+	/*
+	*	Function name: buildAttachmentController
+	*	Function arguments: attachmentID [ INT ] (required) (the ID of the file in the HUB DB), attachmentTYPE [ STRING ] (required) (the TYPE of the file)
+	*	Function purpose: This function is used to build the Front-end controls attached with the specific media attachment.
+	*/
+	this.buildAttachmentController = function( attachmentID, attachmentTYPE ) {
+		buttons_ = "<button id='delete' class='media-button red'>Delete</button>";
+
+		if ( attachmentTYPE.split( "/" )[0] == "image" ) { buttons_ = "<button id='open' class='media-button'>Open</button>"+ buttons_; }
+
+		view_ = "\
+		<div id='media-popup-container' class='popup-container animated fadeIn'>\
+			<div id='media-popup-fields' class='popup-inner-container'>\
+				<button id='close-button' class='close-button fa fa-close'></button>\
+				<div id='media-controls'>"+ buttons_ +"</div>\
+			</div>\
+		</div>\
+		";
+
+		jQuery( "body" ).append( view_ );
+		jQuery( "#media-popup-container" ).on("click", function( e ){ if( e.target == this ){ classHolder.destroyMediaPopup(); } });
+		jQuery( "#media-popup-container #media-popup-fields #close-button" ).on("click", function(){ classHolder.destroyMediaPopup(); });
+
+		// Set media controls
+		if ( jQuery( "#media-popup-container #media-controls #open" ).length ) { jQuery( "#media-popup-container #media-controls #open" ).on("click", function(){}); }
+		if ( jQuery( "#media-popup-container #media-controls #delete" ).length ) {
+			jQuery( "#media-popup-container #media-controls #delete" ).on("click", function(){
+				jQuery( "#media-popup-container #media-controls" ).append( loading );
+				classHolder.deleteAttachment( attachmentID.split( "-" )[1], function( response ){
+					jQuery( "#media-popup-container #media-controls #loader" ).remove();
+
+					if ( response == "true" ) {
+						classHolder.destroyMediaPopup();
+						jQuery( "#"+ attachmentID ).addClass( "fadeOutUp" );
+						setTimeout( function(){ jQuery( "#"+ attachmentID ).remove(); }, 750 );						
+					} else { console.log( response ); }
+				} );
+			});
+		}
+	}
+
+	/*
+	*	Function name: daleteAttachment
+	*	Function arguments: attachmentID [ INT ] (required) (the ID of the file in the HUB DB), onSuccess [ FUNCTION ] (required) tells the method what to do after the response.
+	*	Function purpose: This function is used to delete file & its meta from the HUB DB and HDD (Hard Drive Disk).
+	*/
+	this.deleteAttachment = function( attachmentID, onSuccess ) {
+		generateAJAX({
+				functionName : "delete_user_media",
+				arguments : {
+					user_id: companyID,
+					attachment_id: attachmentID
+				}
+			},
+			function ( response ) {
+				onSuccess( response );
+			}
+		);
+	}
 }
 
 /*
@@ -349,7 +408,6 @@ var UserStory = function( userID = "" ) {
 		var urlRegex = /(https?:\/\/[^\s]+)/g;
 
 	   urls_ = content.match( urlRegex );
-	   console.log( urls_ );
 	   if ( urls_ !== "undefined" && urls_ != null ) {
 		   for ( count = 0; count < urls_.length; count++ ) {
 		   		url_ = urls_[ count ];

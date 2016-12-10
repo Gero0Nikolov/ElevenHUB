@@ -444,7 +444,7 @@ a {
   color: royalblue; }
 
 a:visited {
-  color: purple; }
+  color: initial; }
 
 a:hover,
 a:focus,

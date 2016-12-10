@@ -55,6 +55,20 @@ jQuery( document ).ready(function(){
 			}
 		}
 	}
+
+	/* MEDIA CONTROLLERS */
+	if ( jQuery( "#media-uploader-opener" ).length ) {
+		jQuery( "#media-uploader-opener" ).on("click", function(){
+			jQuery( "#media-uploader #file-holder" ).trigger( "click" );
+		});
+		jQuery( "#media-uploader #file-holder" ).on("change", function(){ jQuery( "#media-uploader" ).submit(); });
+	}
+
+	if ( jQuery( "#medias-container" ).length ) {
+		jQuery( "#medias-container .media-container" ).each(function(){
+			jQuery( this ).on("click", function(){ openMediaHandler( jQuery( this ) ); });
+		});
+	}
 });
 
 /*
@@ -294,6 +308,12 @@ function updateUserMetaSubmit() {
 	);
 }
 
+function openMediaHandler( controller ) {
+	mediaController = new UserMedia;
+	mediaController.buildAttachmentController( controller.attr( "id" ), controller.attr( "media-type" ) );
+}
+
+
 function keyPressedForms( e, form ) {
 	if ( e.keyCode == 13 ) {
 		if ( form == 2 ) { updateUserMetaSubmit(); }
@@ -301,7 +321,7 @@ function keyPressedForms( e, form ) {
 	else if ( e.keyCode == 27 ) { controller = new UserMedia(); controller.destroyMediaPopup(); }
 }
 
-function openComposer() {	
+function openComposer() {
 	userComposerController = new UserStory();
 	userComposerController.buildComposer();
 }

@@ -12,9 +12,13 @@ class BROTHER {
 		add_action( 'wp_ajax_generate_ajax_call', array( $this, 'generate_ajax_call' ) );
 		add_action( 'wp_ajax_nopriv_generate_ajax_call', array( $this, 'generate_ajax_call' ) );
 
-		//Register AJAX call for the upload_profile_media method
+		//Register call for the upload_profile_media method
 		add_action( 'admin_post_upload_profile_media', array( $this, 'upload_profile_media' ) );
 		add_action( 'admin_post_nopriv_upload_profile_media', array( $this, 'upload_profile_media' ) );
+
+		//Register call for the upload_user_media_files method
+		add_action( 'admin_post_upload_user_media_files', array( $this, 'upload_user_media_files' ) );
+		add_action( 'admin_post_nopriv_upload_user_media_files', array( $this, 'upload_user_media_files' ) );
 	}
 
 	/*
@@ -53,19 +57,53 @@ class BROTHER {
 		wp_redirect( get_author_posts_url( get_current_user_id() ) );
 	}
 
+	function upload_user_media_files() {
+		$uploader_id = get_current_user_id();
+		$company_id = $_POST[ "company_id" ];
+		$total = count( $_FILES[ "upload" ] );
+
+		if (
+			( isset( $company_id ) && !empty( $company_id ) ) &&
+			( isset( $_FILES[ "upload" ] ) && !empty( $_FILES[ "upload" ] ) && $total > 0 )
+	 	) {
+			for ( $count = 0; $count < $total; $count++ ) {
+				if ( !empty( $_FILES[ "upload" ][ "name" ][ $count ] ) && isset( $_FILES[ "upload" ][ "name" ][ $count ] ) ) {
+					$_FILE =  array();
+					$_FILE[ "name" ] = $_FILES[ "upload" ][ "name" ][ $count ];
+					$_FILE[ "type" ] = $_FILES[ "upload" ][ "type" ][ $count ];
+					$_FILE[ "tmp_name" ] = $_FILES[ "upload" ][ "tmp_name" ][ $count ];
+					$_FILE[ "error" ] = $_FILES[ "upload" ][ "error" ][ $count ];
+					$_FILE[ "size" ] = $_FILES[ "upload" ][ "size" ][ $count ];
+
+					$upload_result = $this->upload_user_file( $_FILE, array( "owner_id" => $company_id, "uploader_id" => $uploader_id ) );
+					$upload_result = !$upload_result ? "&upload_result=false" : ( $upload_result == "Not enough space" ? "&upload_result=nes" : "" );
+				}
+			}
+		}
+
+		wp_redirect( get_permalink( 98 ) ."?company_id=". $company_id . $upload_result );
+	}
+
 	/*
 	*	Function name: upload_user_file
 	*	Function arguments: $file [ $_FILES ] (required)
 	*	Function purpose: This function is used to upload media files in the HUB.
 	*/
-	function upload_user_file( $file ) {
+	function upload_user_file( $file, $atts = array() ) {
 		if ( $file[ "size" ] > 0 ) {
+			// Check if user had enough space
+			$user_available_space = $this->get_available_media_space( $atts[ "owner_id" ] );
+			$updated_available_space = $user_available_space - $file[ "size" ];
+
+			// Upload file
 			require_once( ABSPATH . 'wp-admin/includes/admin.php' );
 
 			$file_return = wp_handle_upload( $file, array('test_form' => false ) );
 
 			if( isset( $file_return['error'] ) || isset( $file_return['upload_error_handler'] ) ) {
 				return false;
+			} else if ( $updated_available_space < 0 ) {
+				return "Not enough space";
 			} else {
 				$filename = $file_return['file'];
 				$attachment = array(
@@ -83,6 +121,15 @@ class BROTHER {
 				wp_update_attachment_metadata( $attachment_id, $attachment_data );
 
 				if( 0 < intval( $attachment_id ) ) {
+					if ( !empty( $atts[ "owner_id" ] ) ) {
+						if ( empty( get_post_meta( $attachment_id, "owner_id", false ) ) ) {
+							add_post_meta( $attachment_id, "owner_id", $atts[ "owner_id" ] );
+							add_post_meta( $attachment_id, "uploader_id", $atts[ "uploader_id" ] );
+
+							update_user_meta( $atts[ "owner_id" ], "media_space", $updated_available_space );
+						}
+					}
+
 					return $attachment_id;
 				}
 			}
@@ -517,17 +564,21 @@ class BROTHER {
 	*/
 	function catch_url_arguments() {
 		$arguments = explode( "&", $_SERVER[ "QUERY_STRING" ] );
-		foreach ( $arguments as $argument ) {
-			$arg_key = explode( "=", $argument )[0];
-			$arg_val = explode( "=", $argument )[1];
+		if ( !empty( $arguments ) ) {
+			foreach ( $arguments as $argument ) {
+				if ( !empty( $argument ) && isset( $argument ) ) {
+					$arg_key = explode( "=", $argument )[0];
+					$arg_val = explode( "=", $argument )[1];
 
-			switch ( $arg_key ) {
-				case "read_notification":
-					$this->read_notification( $arg_val );
-					break;
+					switch ( $arg_key ) {
+						case "read_notification":
+							$this->read_notification( $arg_val );
+							break;
 
-				default:
-					break;
+						default:
+							break;
+					}
+				}
 			}
 		}
 	}
@@ -584,6 +635,7 @@ class BROTHER {
 		$media_space = get_user_meta( $user_id, "media_space", true );
 		if ( empty( $media_space ) || !isset( $media_space ) ) {
 			add_user_meta( $user_id, "media_space", "1000000000", false ); // Set 1GB free disk space
+			$media_space = 1000000000;
 		}
 
 		return $media_space;
@@ -596,6 +648,98 @@ class BROTHER {
 	*/
 	function convert_bytes( $bytes ) {
 	    return number_format( $bytes * 0.000001, $precision = ($bytes * 0.000001) < 0 ? $precision = 2 : 0 );
+	}
+
+	/*
+	*	Function name: get_user_media
+	*	Function arguments: $data [ MIXED_OBJECT ] (required) (this OBJECT mainly contains the $user_id ($company_id) and the request type AJAX or NOT)
+	*	Function purpose: This function is used to generate containers with the MEDIA_FILES of the specific user.
+	*/
+	function get_user_media( $data ) {
+		$user_id = $data->user_id;
+		$is_ajax = $data->is_ajax;
+
+		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
+
+		$args = array(
+			"posts_per_page" => 20,
+			"post_type" => "attachment",
+			"orderby" => "ID",
+			"order" => "DESC",
+			"meta_key" => "owner_id",
+			"meta_value" => $user_id
+		);
+		$medias_ = get_posts( $args );
+
+		if ( $is_ajax ) { $medias_holder = array(); }
+
+		if ( count( $medias_ ) > 0 ) {
+			foreach ( $medias_ as $media_ ) {
+				$background_url = explode( "/", $media_->post_mime_type )[1] == "zip" ? get_template_directory_uri() ."/assets/images/zip-icon.png" : ( explode( "/", $media_->post_mime_type )[0] == "image" ? wp_get_attachment_url( $media_->ID ) : get_template_directory_uri() ."assets/images/file-icon.png" );
+
+				if ( !$is_ajax ) {
+				?>
+					<div id='media-<?php echo $media_->ID; ?>' class='media-container animated fadeInDown' style='background-image: url(<?php echo $background_url; ?>);' media-type='<?php echo $media_->post_mime_type; ?>'></div>
+				<?php
+				} elseif ( $is_ajax ) {
+					$media_holder = array();
+					$media_holder[ "ID" ] = $media_->ID;
+					$media_holder[ "URL" ] = $background_url;
+					$media_holder[ "TYPE" ] = $media_->post_mime_type;
+					array_push( $medias_holder, (object)$media_holder );
+				}
+			}
+
+			if ( $is_ajax ) { return $medias_holder; }
+		} else {
+			if ( !$is_ajax ) { echo "<h1 class='no-information-message'>You don't have any media.</h1>"; }
+		 	else { return "You don't have any media."; }
+		}
+	}
+
+	/*
+	*	Function name: delete_user_media
+	*	Function arguments: $data [ MIXED_OBJECT ] (required) (this OBJECT mainly contains the $user_id ($company_id) and the $attachment_id)
+	*	Function purpose: This function is used to delete MEDIA_FILE from the HUB DB & HDD.
+	*/
+	function delete_user_media( $data ) {
+		$user_id = !empty( $data->user_id ) ? $data->user_id : get_current_user_id();
+		$attachment_id = $data->attachment_id;
+		$result = false;
+
+		if ( !empty( $attachment_id ) && isset( $attachment_id ) ) {
+			$file_size = filesize( $this->get_attachment_path( $attachment_id ) );
+			$current_available_space = $this->get_available_media_space( $user_id );
+			$updated_available_space = $current_available_space + $file_size;
+
+			if ( wp_delete_attachment( $attachment_id, true ) ) { update_user_meta( $user_id, "media_space", $updated_available_space ); $result = true; }
+		}
+
+		return $result;
+	}
+
+	/*
+	*	Function name: get_attachment_path
+	*	Function arguments: $attachment_id [ INT ] (required) (the ID of the desired ATTACHEMNT)
+	*	Function purpose:
+	*	This function is used as a replacement of get_attached_file() build in WordPress function.
+	*	Reason for this is because somethimes the get_attached_file() function sometimes returns mixed PATHs: SERVER_PATH & URL;
+	*	This function checks and clears the path IF NEEDED.
+	*/
+	function get_attachment_path( $attachment_id ) {
+		$path_ = get_attached_file( $attachment_id );
+
+		if ( strpos( $path_, "http" ) || strpos( $path_, "https" ) ) {
+			$extract_url = explode( "/", explode( "://", $path_ )[1] );
+
+			$year_path = $extract_url[ 3 ];
+			$month_path = $extract_url[ 4 ];
+			$file_name = $extract_url[ 5 ];
+
+			$path_ = get_home_path() ."wp-content/uploads/". $year_path ."/". $month_path ."/". $file_name;
+		}
+
+		return $path_;
 	}
 }
 
