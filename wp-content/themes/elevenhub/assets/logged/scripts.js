@@ -44,6 +44,26 @@ jQuery( document ).ready(function(){
 
 			jQuery( "#media-popup-container #media-popup-fields #submit-button" ).on("click", function(){ updateUserMetaSubmit(); });
 		});
+
+		jQuery( "#user-meta-container #save-company-meta" ).on("click", function(){
+			password_promt_view = "\
+			<div id='media-popup-container' class='popup-container animated fadeIn'>\
+				<div id='media-popup-fields' class='popup-inner-container'>\
+					<button id='close-button' class='close-button fa fa-close'></button>\
+					<label for='password'>Enter your current password</label>\
+					<input id='current-password' type='password' onkeydown='keyPressedForms(event, 3);'>\
+					<button id='submit-button' class='green-bold-button'>Save</button>\
+				</div>\
+			</div>\
+			";
+
+			jQuery( "body" ).append( password_promt_view );
+
+			jQuery( "#media-popup-container" ).on("click", function( e ){ if( e.target == this ){ controller = new UserMedia(); controller.destroyMediaPopup(); } });
+			jQuery( "#media-popup-container #media-popup-fields #close-button" ).on("click", function(){ controller = new UserMedia(); controller.destroyMediaPopup(); });
+
+			jQuery( "#media-popup-container #media-popup-fields #submit-button" ).on("click", function(){ updateCompanyMetaSubmit(); });
+		});
 	}
 
 	if ( jQuery( "body" ).hasClass( "author" ) ) {
@@ -66,7 +86,64 @@ jQuery( document ).ready(function(){
 
 	if ( jQuery( "#medias-container" ).length ) {
 		jQuery( "#medias-container .media-container" ).each(function(){
-			jQuery( this ).on("click", function(){ openMediaHandler( jQuery( this ) ); });
+			jQuery( this ).on("click", function( e ){
+				if( e.target == this ) { openMediaHandler( jQuery( this ) ); }
+			});
+
+			jQuery( this ).children( "#marker" ).on("click", function( e ){
+				if ( e.target == this ) {
+					if ( jQuery( this ).hasClass( "marked" ) ) {
+						selectedElements.splice( selectedElements.indexOf( jQuery( this ).parent().attr( "id" ) ), 1 );
+						jQuery( this ).removeClass( "marked" );
+					} else {
+						selectedElements.push( jQuery( this ).parent().attr( "id" ) );
+						jQuery( this ).addClass( "marked" );
+					}
+				}
+			});
+		});
+	}
+
+	if ( jQuery( "#load-more-controller" ).length ) {
+		jQuery( "#load-more-controller" ).on("click", function(){
+			jQuery( "#medias-container" ).append( loading );
+
+			mediaController = new UserMedia();
+			mediaController.getUserMedia( companyID, mediaOffset, function( response ){
+				jQuery( "#medias-container #loader" ).remove();
+
+				response = JSON.parse( JSON.parse( response ) );
+
+				if ( response != "You don't have any media." ) {
+					mediaOffset += 20;
+					for ( count = 0; count < response.length; count++ ) {
+						view_ = "<div id='media-"+ response[ count ].ID +"' class='media-container animated bounceIn new' style='background-image: url("+ response[ count ].URL +");' media-type='"+ response[ count ].TYPE +"'><button id='marker'></button></div>";
+						jQuery( "#medias-container" ).append( view_ );
+					}
+
+					jQuery( "#medias-container .new" ).each(function(){
+						jQuery( this ).on("click", function( e ){
+							if( e.target == this ) { openMediaHandler( jQuery( this ) ); }
+						});
+
+						jQuery( this ).children( "#marker" ).on("click", function( e ){
+							if ( e.target == this ) {
+								if ( jQuery( this ).hasClass( "marked" ) ) {
+									selectedElements.splice( selectedElements.indexOf( jQuery( this ).parent().attr( "id" ) ), 1 );
+									jQuery( this ).removeClass( "marked" );
+								} else {
+									selectedElements.push( jQuery( this ).parent().attr( "id" ) );
+									jQuery( this ).addClass( "marked" );
+								}
+							}
+						});
+
+						jQuery( this ).removeClass( "new" );
+					});
+				} else {
+					jQuery( "#load-more-controller" ).remove();
+				}
+			} );
 		});
 	}
 });
@@ -308,6 +385,30 @@ function updateUserMetaSubmit() {
 	);
 }
 
+/*
+*	Method used to update the Company meta information
+*/
+function updateCompanyMetaSubmit() {
+	jQuery( "#media-popup-fields" ).append( loading );
+
+	userProfileController = new UserMeta();
+	userProfileController.updateCompanyMeta(
+		"",
+		"#user-meta-container",
+		"#media-popup-container #media-popup-fields",
+		function( response ) {
+			console.log( response );
+			if ( response == "updated" ) { window.location.reload( true ); }
+			else {
+				jQuery( "#media-popup-fields #loader" ).remove();
+
+				alert_box = "<div id='alert-box' class='animated bounceInDown'>"+ response +"<button id='close-popup-button' onclick='removeAlertBox();'>Close</button></div>";
+				jQuery( "#media-popup-container" ).append( alert_box );
+			}
+		}
+	);
+}
+
 function openMediaHandler( controller ) {
 	mediaController = new UserMedia;
 	mediaController.buildAttachmentController( controller.attr( "id" ), controller.attr( "media-type" ) );
@@ -317,6 +418,7 @@ function openMediaHandler( controller ) {
 function keyPressedForms( e, form ) {
 	if ( e.keyCode == 13 ) {
 		if ( form == 2 ) { updateUserMetaSubmit(); }
+		else if ( form == 3 ) { updateCompanyMetaSubmit(); }
 	}
 	else if ( e.keyCode == 27 ) { controller = new UserMedia(); controller.destroyMediaPopup(); }
 }

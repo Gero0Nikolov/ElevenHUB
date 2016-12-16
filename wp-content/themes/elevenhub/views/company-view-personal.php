@@ -9,8 +9,11 @@
 
 $brother_ = new BROTHER;
 $user_id = get_current_user_id();
-$user_first_name = get_user_meta( $user_id, "first_name", true );
-$user_last_name = get_user_meta( $user_id, "last_name", true );
+$user_shortname = get_user_meta( $user_id, "user_shortname", true );
+if ( empty( $user_shortname ) || !isset( $user_shortname ) ) {
+	$user_first_name = get_user_meta( $user_id, "first_name", true );
+	$user_last_name = get_user_meta( $user_id, "last_name", true );
+}
 ?>
 
 <div id="company-container" class="company-container">
@@ -18,7 +21,7 @@ $user_last_name = get_user_meta( $user_id, "last_name", true );
 		<div class="overlay">
 			<button class="fa fa-cog invisible-control" onclick="openProfileImages();" title="Change your banner or profile picture"></button>
 			<div id="company-logo" class="logo" style="background-image: url('<?php echo $brother_->get_user_avatar_url( $user_id ); ?>');"></div>
-			<h1 id="company-brand" class="brand"><?php echo $user_first_name ." ". $user_last_name; ?></h1>
+			<h1 id="company-brand" class="brand"><?php echo empty( $user_shortname ) || !isset( $user_shortname ) ? $user_first_name ." ". $user_last_name : $user_shortname; ?></h1>
 			<div id="company-meta" class="company-meta-container">
 				<button id="company-followers-controller" class="meta-button hvr-underline-from-center">
 					<?php

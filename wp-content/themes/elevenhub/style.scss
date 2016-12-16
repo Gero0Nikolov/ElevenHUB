@@ -1244,6 +1244,29 @@ a.skeleton-bold-button {
 }
 .skeleton-bold-button:hover { background: #333; color: #fff; border-color: transparent; }
 
+.blue-skeleton-bold-button {
+	display: inline-block;
+    font-family: OpenSansBold;
+    font-size: 0.8em;
+    text-transform: uppercase;
+    padding: 1em 2.5em;
+    letter-spacing: 1px;
+    background: none;
+    box-shadow: none !important;
+    text-shadow: none;
+    font-weight: normal;
+    color: $belize_hole;
+    border: 1px solid $belize_hole !important;
+    border-radius: 100px;
+    outline: 0;
+
+    webkit-transition: all 0.25s ease-in-out;
+	-moz-transition: all 0.25s ease-in-out;
+	-o-transition: all 0.25s ease-in-out;
+	transition: all 0.25s ease-in-out;
+}
+.blue-skeleton-bold-button:hover { color: $peter_river !important; border-color: $peter_river !important; }
+
 .gray-skeleton-bold-button {
 	display: inline-block;
     font-family: OpenSansBold;
@@ -1358,6 +1381,7 @@ a.skeleton-bold-button {
 .mt-8em { margin-top: 8em; }
 
 .mb-1em { margin-bottom: 1em; }
+.mb-2em { margin-bottom: 2em; }
 
 #loader {
 	display: block;

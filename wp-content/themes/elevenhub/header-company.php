@@ -33,6 +33,7 @@ $user_id = get_current_user_id();
 	var site_url = '<?php echo get_site_url(); ?>';
 	var ajax_url = '<?php echo admin_url( 'admin-ajax.php' ); ?>';
 	var admin_post_url = '<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>';
+	var companyID = "<?php $v_user = get_queried_object(); echo $v_user->ID; ?>";
 </script>
 </head>
 

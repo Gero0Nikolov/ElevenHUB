@@ -15,10 +15,12 @@ $user_id = get_current_user_id();
 $available_space = $brother_->convert_bytes( $brother_->get_available_media_space( $company_id ) );
 ?>
 <script type="text/javascript">
-	var companyID = "<?php echo !empty( $company_id ) ? $company_id : ""; ?>";
+	var selectedElements = [];
+	var mediaOffset = 20;
+	companyID = "<?php echo $company_id; ?>";
 </script>
 <div id='media-controls' class='simple-controls mt-1em mb-1em'>
-	<a href="#" class="normal-bold-button green"><span class="tiny-text">Available Space:</span><?php echo $available_space; ?>MB</a>
+	<a href="#" id="space-pointer" class="normal-bold-button green"><span class="tiny-text">Available Space:</span><span id="space"><?php echo $available_space; ?></space>MB</a>
 	<button id="media-uploader-opener" class="blue-bold-button">Upload</button>
 	<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" id="media-uploader" class="hidden" method='POST' enctype='multipart/form-data'>
 		<input type="file" name="upload[]" id="file-holder" multiple="multiple">
@@ -29,3 +31,4 @@ $available_space = $brother_->convert_bytes( $brother_->get_available_media_spac
 <div id="medias-container">
 	<?php echo $brother_->get_user_media( (object)array( "user_id" => $company_id, "is_ajax" => false ) ); ?>
 </div>
+<button id="load-more-controller" class="blue-skeleton-bold-button display-block mh-auto mt-1em">Load more</button>

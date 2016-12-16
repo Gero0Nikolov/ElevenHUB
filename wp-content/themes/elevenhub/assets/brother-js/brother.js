@@ -86,9 +86,15 @@ var UserMedia = function( userID = "" ) {
 	*	Function purpose: This function is used to build the Front-end controls attached with the specific media attachment.
 	*/
 	this.buildAttachmentController = function( attachmentID, attachmentTYPE ) {
-		buttons_ = "<button id='delete' class='media-button red'>Delete</button>";
+		buttons_ = "\
+			<button id='get-link' class='media-button'>Get link</button>\
+			<button id='delete' class='media-button red'>Delete</button>\
+		";
 
-		if ( attachmentTYPE.split( "/" )[0] == "image" ) { buttons_ = "<button id='open' class='media-button'>Open</button>"+ buttons_; }
+		if (
+			attachmentTYPE.split( "/" )[0] == "image" ||
+			attachmentTYPE.split( "/" )[0] == "video"
+		) { buttons_ = "<button id='open' class='media-button'>Open</button>"+ buttons_; }
 
 		view_ = "\
 		<div id='media-popup-container' class='popup-container animated fadeIn'>\
@@ -104,19 +110,91 @@ var UserMedia = function( userID = "" ) {
 		jQuery( "#media-popup-container #media-popup-fields #close-button" ).on("click", function(){ classHolder.destroyMediaPopup(); });
 
 		// Set media controls
-		if ( jQuery( "#media-popup-container #media-controls #open" ).length ) { jQuery( "#media-popup-container #media-controls #open" ).on("click", function(){}); }
+		if ( jQuery( "#media-popup-container #media-controls #open" ).length ) {
+			jQuery( "#media-popup-container #media-controls #open" ).on("click", function(){
+				view_ = "<div id='media-preview' class='preview-popup animated fadeIn'>"+ loading +"</div>";
+				jQuery( "body" ).append( view_ );
+
+				generateAJAX({
+						functionName : "get_attachment_url",
+						arguments : attachmentID.split( "-" )[1]
+					}, function ( response ) {
+						response = JSON.parse( response );
+						if ( response != "false" ) {
+							jQuery( "#media-preview #loader" ).remove();
+
+							view_ = "";
+							switch ( attachmentTYPE.split( "/" )[0] ) {
+								case "image":
+									view_ = "<img src='"+ response +"' id='"+ attachmentID +"' class='picture-preview animated flipInX'/>";
+									break;
+								case "video":
+									view_ = "<video id='"+ attachmentID +"' class='video-preview animated flipInX' controls loop autoplay><source src='"+ response +"' type='video/"+ response.split( "." )[ response.split( "." ).length - 1 ] +"'></video>";
+									break;
+
+								default:
+
+							}
+
+
+							jQuery( "#media-preview" ).append( view_ );
+
+							// Add close event
+							jQuery( "#media-preview" ).on("click", function(){
+								jQuery( "#media-preview" ).removeClass( "fadeIn" ).addClass( "fadeOut" );
+								setTimeout(function(){ jQuery( "#media-preview" ).remove(); }, 750);
+							});
+						}
+					}
+				);
+			});
+		}
+
+		if ( jQuery( "#media-popup-container #media-controls #get-link" ).length ) {
+			jQuery( "#media-popup-container #media-controls #get-link" ).on("click", function(){
+				view_ = "<div id='attachment-url-holder' class='inline-popup-holder animated bounceInDown'>"+ loading +"</div>";
+				jQuery( "#media-popup-container #media-controls" ).append( view_ );
+
+				generateAJAX({
+						functionName : "get_attachment_url",
+						arguments : attachmentID.split( "-" )[1]
+					}, function ( response ) {
+						response = JSON.parse( response );
+						if ( response != "false" ) {
+							jQuery( "#media-popup-container #media-controls #attachment-url-holder" ).html( "<input type='text' placeholder='Attachment link...' id='copy-text-holder' value='"+ response +"'>" );
+							jQuery( "#media-popup-container #media-controls #attachment-url-holder #copy-text-holder" ).on("blur", function(){
+								jQuery( "#media-popup-container #media-controls #attachment-url-holder" ).removeClass( "bounceInDown" ).addClass( "bounceOutUp" );
+								setTimeout(function(){ jQuery( "#media-popup-container #media-controls #attachment-url-holder" ).remove(); }, 750);
+							});
+						}
+					}
+				);
+			});
+		}
+
 		if ( jQuery( "#media-popup-container #media-controls #delete" ).length ) {
 			jQuery( "#media-popup-container #media-controls #delete" ).on("click", function(){
 				jQuery( "#media-popup-container #media-controls" ).append( loading );
-				classHolder.deleteAttachment( attachmentID.split( "-" )[1], function( response ){
-					jQuery( "#media-popup-container #media-controls #loader" ).remove();
 
-					if ( response == "true" ) {
-						classHolder.destroyMediaPopup();
-						jQuery( "#"+ attachmentID ).addClass( "fadeOutUp" );
-						setTimeout( function(){ jQuery( "#"+ attachmentID ).remove(); }, 750 );						
-					} else { console.log( response ); }
-				} );
+				if ( selectedElements.length <= 0 ) {
+					classHolder.deleteAttachment( attachmentID.split( "-" )[1], function( response ){
+						jQuery( "#media-popup-container #media-controls #loader" ).remove();
+
+						if ( response == "true" ) {
+							classHolder.destroyMediaPopup();
+							jQuery( "#"+ attachmentID ).addClass( "fadeOutUp" );
+							setTimeout( function(){ jQuery( "#"+ attachmentID ).remove(); }, 750 );
+						} else { console.log( response ); }
+					} );
+				} else {
+					for ( var i = 0; i < selectedElements.length; i++ ) {
+						classHolder.deleteAttachment( selectedElements[i].split( '-' )[1], function( response ){
+							if ( response == "true" ) {
+								window.location.reload( true );
+							} else { console.console.log( response ); }
+						} );
+					}
+				}
 			});
 		}
 	}
@@ -135,6 +213,25 @@ var UserMedia = function( userID = "" ) {
 				}
 			},
 			function ( response ) {
+				onSuccess( response );
+			}
+		);
+	}
+
+	/*
+	*	Function name: getUserMedia
+	*	Function arguments: userID [ INT ] (required) (the ID of the user which media should be revealed), offset [ INT ] (optional) (the number of elements which should be skipped on the request), onSuccess [ FUNCTION ] (required) tells the method what to do after the response.
+	*	Function purpose: This function is used to get media files associated with the userID.
+	*/
+	this.getUserMedia = function( userID, offset = 0, onSuccess ) {
+		generateAJAX({
+				functionName : "get_user_media",
+				arguments : {
+					user_id: companyID,
+					is_ajax: true,
+					offset: offset
+				}
+			}, function( response ) {
 				onSuccess( response );
 			}
 		);
@@ -215,18 +312,49 @@ var UserMeta = function( userID = "" ) {
 		current_password = jQuery( passwordPromptID ).find( "#current-password" ).val().trim();
 
 		generateAJAX({
-			functionName : "update_user_meta",
-			arguments : {
-				user_id: userID,
-				first_name: first_name,
-				last_name: last_name,
-				new_password: new_password,
-				biography: biography,
-				current_password: current_password
-			}
-		}, function( response ) { onSuccess( JSON.parse( response ) ); } );
+				functionName : "update_user_meta",
+				arguments : {
+					user_id: userID,
+					first_name: first_name,
+					last_name: last_name,
+					new_password: new_password,
+					biography: biography,
+					current_password: current_password
+				}
+			}, function( response ) { onSuccess( JSON.parse( response ) ); }
+		);
 	}
 
+	this.updateCompanyMeta = function( userID = "", formID, passwordPromptID, onSuccess ) {
+		first_name = jQuery( formID ).find( "#first-name" ).val().trim();
+		last_name = jQuery( formID ).find( "#last-name" ).val().trim();
+		short_name = jQuery( formID ).find( "#short-name" ).val().trim();
+		new_password = jQuery( formID ).find( "#user-password" ).val().trim();
+
+		company_type = jQuery( formID ).find( "#company-type option:selected" ).val().trim();
+		company_writing_permissions = jQuery( formID ).find( "#company-writing-permissions option:selected" ).val().trim();
+		company_publications_communication_permissions = jQuery( formID ).find( "#company-publications-communication-permissions option:selected" ).val().trim();
+		company_media_uploads_permissions = jQuery( formID ).find( "#company-media-uploads-permissions option:selected" ).val().trim();
+
+		current_password = jQuery( passwordPromptID ).find( "#current-password" ).val().trim();
+
+		generateAJAX({
+				functionName : "update_company_meta",
+				arguments : {
+					user_id: userID,
+					first_name: first_name,
+					last_name: last_name,
+					short_name: short_name,
+					new_password: new_password,
+					company_type: company_type,
+					company_writing_permissions: company_writing_permissions,
+					company_publications_communication_permissions: company_publications_communication_permissions,
+					company_media_uploads_permissions: company_media_uploads_permissions,
+					current_password: current_password
+				}
+			}, function( response ) { onSuccess( JSON.parse( response ) ); }
+		);
+	}
 }
 
 /*
@@ -266,12 +394,21 @@ var UserStory = function( userID = "" ) {
 			";
 		}
 
+		floating_controls = "\
+		<div id='story-floating-controls'>\
+			<button id='add-media-controller' class='hvr-underline-from-center'>Add media</button>\
+			<span class='bull-separator'>&bull;</span>\
+			<button id='add-mention-controller' class='hvr-underline-from-center'>Mention</button>\
+		</div>\
+		";
+
 		composer = "\
 		<div id='story-composer' class='animated slideInUp'>\
 			"+ composer_controls +"\
 			<div id='story-featured-image' class='story-banner'><button id='featured-image-controller' class='fa fa-pencil'></button></div>\
 			<h1 id='story-header' class='story-header' contenteditable='true' placeholder='Story title'></h1>\
 			<div id='story-content' class='story-content' contenteditable='true'></div>\
+			"+ floating_controls +"\
 		</div>\
 		";
 
@@ -313,11 +450,7 @@ var UserStory = function( userID = "" ) {
 			<div id='media-popup-container' class='popup-container animated fadeIn'>\
 				<div id='media-popup-fields' class='popup-inner-container'>\
 					<button id='close-button' class='close-button fa fa-close'></button>\
-					<div id='story-images-holder'>\
-						<div id='banner' class='banner'></div>\
-						<form method='POST' enctype='multipart/form-data' id='story-media-uploader'><input type='file' id='banner-picker' class='file-picker' name='banner-picker'></form>\
-						<button id='save-user-pictures-button' class='green-bold-button'>Save</button>\
-					</div>\
+					<div id='media-list' class='mt-2em mb-2em mh-auto text-align-center line-height-zero'>"+ loading +"</div>\
 				</div>\
 			</div>\
 			";
@@ -326,27 +459,152 @@ var UserStory = function( userID = "" ) {
 			jQuery( "#media-popup-container" ).on("click", function( e ){ if( e.target == this ){ jQuery( "#media-popup-container" ).removeClass( "fadeIn" ).addClass( "fadeOut" ); setTimeout(function(){ jQuery( "#media-popup-container" ).remove(); }, 750); } });
 			jQuery( "#media-popup-container #media-popup-fields #close-button" ).on("click", function(){ jQuery( "#media-popup-container" ).removeClass( "fadeIn" ).addClass( "fadeOut" ); setTimeout(function(){ jQuery( "#media-popup-container" ).remove(); }, 750); });
 
-			jQuery( "#media-popup-container #media-popup-fields #save-user-pictures-button" ).on("click", function(){
-				jQuery( "#story-images-holder" ).append( loading );
+			generateAJAX({
+					functionName : "get_user_media",
+					arguments : {
+						user_id: companyID,
+						is_ajax: true
+					}
+				}, function( response ) {
+					jQuery( "#media-popup-container #media-popup-fields #media-list #loader" ).remove();
 
-				file_ = jQuery( "#banner-picker" )[0].files[0];
+					medias = JSON.parse( JSON.parse( response ) );
+					for ( count = 0; count < medias.length; count++ ) {
+						if ( medias[ count ].TYPE.split( "/" )[0] == "image" ) {
+							view_ = "<div id='attachment-"+ medias[ count ].ID +"' class='inline-media animated fadeIn' attachment_src='"+ medias[ count ].URL +"' attachment_type='"+ medias[ count ].TYPE +"' style='background-image: url("+ medias[ count ].URL +");'><div>";
+							jQuery( "#media-popup-container #media-popup-fields #media-list" ).append( view_ );
+						}
+					}
 
-				console.log( file_ );
+					// Set controls
+					jQuery( "#media-popup-container #media-popup-fields #media-list .inline-media" ).each(function(){
+						jQuery( this ).on("click", function(){
+							jQuery( "#story-featured-image" ).css( "background-image", "url("+ jQuery( this ).attr( "attachment_src" ) +")" );
+						});
+					});
 
-				var fd = new FormData();
-				fd.append( "action", "upload-story-banner" );
-				fd.append( "async-upload", jQuery( "#banner-picker" )[0].files[0] );
-				fd.append( "name", jQuery( "#banner-picker" )[0].files[0].name );
+					var mediaOffset = 20;
 
-				console.log( fd );
+					// Load more view
+					view_ = "<div id='load-more-controller' class='inline-media animated fadeIn'><span>More</span></div>";
+					jQuery( "#media-popup-container #media-popup-fields #media-list" ).append( view_ );
+					jQuery( "#media-popup-container #media-popup-fields #media-list #load-more-controller" ).on("click", function(){
+						generateAJAX({
+								functionName : "get_user_media",
+								arguments : {
+									user_id: companyID,
+									is_ajax: true,
+									offset: mediaOffset
+								}
+							}, function( response ) {
+								response = JSON.parse( JSON.parse( response ) );
 
-				// generateAJAX({
-				// 	functionName : "update_post_featured_image",
-				// 	arguments : form_data
-				// }, function( response ) { console.log( response ); } );
-			});
+								if ( response != "You don't have any media." ) {
+									mediaOffset += 20;
+									for ( count = 0; count < response.length; count++ ) {
+										if ( response[ count ].TYPE.split( "/" )[0] == "image" ) {
+											view_ = "<div id='attachment-"+ response[ count ].ID +"' class='inline-media new animated fadeIn' attachment_src='"+ response[ count ].URL +"' attachment_type='"+ response[ count ].TYPE +"' style='background-image: url("+ response[ count ].URL +");'><div>";
+											jQuery( view_ ).insertBefore( "#media-popup-container #media-popup-fields #media-list #load-more-controller" );
+										}
+									}
 
-			//this.getStoryBannerURL( "", function( response ){ jQuery( "#media-popup-fields #story-images-holder #banner" ).attr( "style", "background-image: url("+ response +")" ) } );
+									// Set controls
+									jQuery( "#media-popup-container #media-popup-fields #media-list .new" ).each(function(){
+										jQuery( this ).on("click", function(){
+											jQuery( "#story-featured-image" ).css( "background-image", "url("+ jQuery( this ).attr( "attachment_src" ) +")" );
+										});
+
+										jQuery( this ).removeClass( "new" );
+									});
+								} else {
+									jQuery( "#media-popup-container #media-popup-fields #media-list #load-more-controller" ).remove();
+								}
+							}
+						);
+					});
+				}
+			);
+		});
+
+		jQuery( "#add-media-controller" ).on("click", function(){
+			build = "\
+			<div id='media-popup-container' class='popup-container animated fadeIn'>\
+				<div id='media-popup-fields' class='popup-inner-container'>\
+					<button id='close-button' class='close-button fa fa-close'></button>\
+					<div id='media-list' class='mt-2em mb-2em mh-auto text-align-center line-height-zero'>"+ loading +"</div>\
+				</div>\
+			</div>\
+			";
+
+			jQuery( "body" ).append( build );
+			jQuery( "#media-popup-container" ).on("click", function( e ){ if( e.target == this ){ jQuery( "#media-popup-container" ).removeClass( "fadeIn" ).addClass( "fadeOut" ); setTimeout(function(){ jQuery( "#media-popup-container" ).remove(); }, 750); } });
+			jQuery( "#media-popup-container #media-popup-fields #close-button" ).on("click", function(){ jQuery( "#media-popup-container" ).removeClass( "fadeIn" ).addClass( "fadeOut" ); setTimeout(function(){ jQuery( "#media-popup-container" ).remove(); }, 750); });
+
+			generateAJAX({
+					functionName : "get_user_media",
+					arguments : {
+						user_id: companyID,
+						is_ajax: true
+					}
+				}, function( response ) {
+					jQuery( "#media-popup-container #media-popup-fields #media-list #loader" ).remove();
+
+					medias = JSON.parse( JSON.parse( response ) );
+					for ( count = 0; count < medias.length; count++ ) {
+						if ( medias[ count ].TYPE.split( "/" )[0] == "image" ) {
+							view_ = "<div id='attachment-"+ medias[ count ].ID +"' class='inline-media animated fadeIn' attachment_src='"+ medias[ count ].URL +"' attachment_type='"+ medias[ count ].TYPE +"' style='background-image: url("+ medias[ count ].URL +");'><div>";
+							jQuery( "#media-popup-container #media-popup-fields #media-list" ).append( view_ );
+						}
+					}
+
+					// Set controls
+					jQuery( "#media-popup-container #media-popup-fields #media-list .inline-media" ).each(function(){
+						jQuery( this ).on("click", function(){
+							tinymce.activeEditor.execCommand( 'mceInsertContent', false, jQuery( this ).attr( "attachment_src" ) );
+						});
+					});
+
+					var mediaOffset = 20;
+
+					// Load more view
+					view_ = "<div id='load-more-controller' class='inline-media animated fadeIn'><span>More</span></div>";
+					jQuery( "#media-popup-container #media-popup-fields #media-list" ).append( view_ );
+					jQuery( "#media-popup-container #media-popup-fields #media-list #load-more-controller" ).on("click", function(){
+						generateAJAX({
+								functionName : "get_user_media",
+								arguments : {
+									user_id: companyID,
+									is_ajax: true,
+									offset: mediaOffset
+								}
+							}, function( response ) {
+								response = JSON.parse( JSON.parse( response ) );
+
+								if ( response != "You don't have any media." ) {
+									mediaOffset += 20;
+									for ( count = 0; count < response.length; count++ ) {
+										if ( response[ count ].TYPE.split( "/" )[0] == "image" ) {
+											view_ = "<div id='attachment-"+ response[ count ].ID +"' class='inline-media new animated fadeIn' attachment_src='"+ response[ count ].URL +"' attachment_type='"+ response[ count ].TYPE +"' style='background-image: url("+ response[ count ].URL +");'><div>";
+											jQuery( view_ ).insertBefore( "#media-popup-container #media-popup-fields #media-list #load-more-controller" );
+										}
+									}
+
+									// Set controls
+									jQuery( "#media-popup-container #media-popup-fields #media-list .new" ).each(function(){
+										jQuery( this ).on("click", function(){
+											tinymce.activeEditor.execCommand( 'mceInsertContent', false, jQuery( this ).attr( "attachment_src" ) );
+										});
+
+										jQuery( this ).removeClass( "new" );
+									});
+								} else {
+									jQuery( "#media-popup-container #media-popup-fields #media-list #load-more-controller" ).remove();
+								}
+							}
+						);
+					});
+				}
+			);
 		});
 
 		jQuery( "#close-controller" ).on( "click", function(){ classHolder.destroyComposer(); } );
@@ -425,14 +683,22 @@ var UserStory = function( userID = "" ) {
 		   				tinyMCE.activeEditor.setContent( tinyMCE.activeEditor.getContent().replace( url_, markup_ ) );
 		   			}
 		   			else {
-		   				jQuery( "<img>", {
-					        src: url_,
-					        error: function() {},
-					        load: function() {
-					        	markup_ = "<img src='"+ url_ +"?marked' class='content-image' />";
-					        	tinyMCE.activeEditor.setContent( tinyMCE.activeEditor.getContent().replace( url_, markup_ ) );
-					        }
-					    });
+						switch ( url_.split( "." )[ url_.split( "." ).length - 1 ] ) {
+							case "mp4":
+									markup_ = "<video class='video-player' controls loop><source src='"+ url_ +"' type='video/"+ url_.split( "." )[ url_.split( "." ).length - 1 ] +"'></video>";
+									tinyMCE.activeEditor.setContent( tinyMCE.activeEditor.getContent().replace( url_, markup_ ) );
+								break;
+
+							default:
+								jQuery( "<img>", {
+									src: url_,
+									error: function() {},
+									load: function() {
+										markup_ = "<img src='"+ url_ +"?marked' class='content-image' />";
+										tinyMCE.activeEditor.setContent( tinyMCE.activeEditor.getContent().replace( url_, markup_ ) );
+									}
+								});
+						}
 		   			}
 		   		}
 		   }
@@ -461,6 +727,11 @@ function generateAJAX( args, onSuccess ) {
 	});
 }
 
+/*
+*	Function name: isMobile
+*	Function arguments: none
+*	Function purpose: This function is used to check if the user is viewing the HUB from a Mobile device or no.
+*/
 function isMobile() {
 	if( navigator.userAgent.match(/Android/i)
 	|| navigator.userAgent.match(/webOS/i)

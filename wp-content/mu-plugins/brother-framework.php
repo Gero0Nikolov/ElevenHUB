@@ -57,6 +57,12 @@ class BROTHER {
 		wp_redirect( get_author_posts_url( get_current_user_id() ) );
 	}
 
+	/*
+	*	Function name: upload_user_media_files
+	*	Function arguments: NONE
+	*	Function purpose:
+	*	This function is used to upload all TYPES of files on server & link them in the HUB DB.
+	*/
 	function upload_user_media_files() {
 		$uploader_id = get_current_user_id();
 		$company_id = $_POST[ "company_id" ];
@@ -593,8 +599,8 @@ class BROTHER {
 		$user_ = get_user_by( "ID", $user_id );
 
 		if ( $user_ && wp_check_password( $data->current_password, $user_->data->user_pass, $user_id ) ) {
-			if ( !empty( $data->first_name ) && isset( $data->first_name ) ) { update_user_meta( $user_id, "first_name", $data->first_name ); }
-			if ( !empty( $data->last_name ) && isset( $data->last_name ) ) { update_user_meta( $user_id, "last_name", $data->last_name ); }
+			if ( !empty( $data->first_name ) && isset( $data->first_name ) && $this->is_alphabetical( $data->first_name ) ) { update_user_meta( $user_id, "first_name", ucfirst( strtolower( $data->first_name ) ) ); }
+			if ( !empty( $data->last_name ) && isset( $data->last_name ) && $this->is_alphabetical( $data->last_name ) ) { update_user_meta( $user_id, "last_name", ucfirst( strtolower( $data->last_name ) ) ); }
 			if ( !empty( $data->new_password ) && isset( $data->new_password ) ) { wp_set_password( $data->new_password, $user_id ); }
 
 			if ( !get_user_meta( $user_id, "user_biography", false ) ) {
@@ -602,6 +608,48 @@ class BROTHER {
 			} else {
 				update_user_meta( $user_id, "user_biography", $data->biography, false );
 			}
+
+			// Logout user
+			wp_logout();
+
+			// Login user
+			$res_ = wp_signon( array(
+				"user_login" => $user_->data->user_login,
+				"user_password" => !empty( $data->new_password ) ? $data->new_password : $data->current_password
+			), false );
+
+			return "updated";
+		} else { return "Wrong password!"; }
+	}
+
+	/*
+	*	Function name: update_company_meta
+	*	Function arguments: $data [ MIXED_OBJECT ] (required) (used to provide the META information about the Company profile)
+	*	Function purpose: This function is used to update the company meta information.
+	*/
+	function update_company_meta( $data ) {
+		$user_id = !empty( $data->user_id ) ? $data->user_id : get_current_user_id();
+		$user_ = get_user_by( "ID", $user_id );
+
+		if ( $user_ && wp_check_password( $data->current_password, $user_->data->user_pass, $user_id ) ) {
+			if ( !empty( $data->first_name ) && isset( $data->first_name ) && $this->is_alphabetical( $data->first_name ) ) { update_user_meta( $user_id, "first_name", ucfirst( strtolower( $data->first_name ) ) ); }
+			if ( !empty( $data->last_name ) && isset( $data->last_nae ) && $this->is_alphabetical( $data->last_name ) ) { update_user_meta( $user_id, "last_name", ucfirst( strtolower( $data->last_name ) ) ); }
+			if ( !empty( $data->new_password ) && isset( $data->new_password ) ) { wp_set_password( $data->new_password, $user_id ); }
+			if ( empty( get_user_meta( $user_id, "user_shortname", false ) ) ) { add_user_meta( $user_id, "user_shortname", $data->short_name ); }
+			else { update_user_meta( $user_id, "user_shortname", $data->short_name ); }
+
+			// Company meta data
+			if ( empty( get_user_meta( $user_id, "company_type", false ) ) ) { add_user_meta( $user_id, "company_type", $data->company_type ); }
+			else { update_user_meta( $user_id, "company_type", $data->company_type ); }
+
+			if ( empty( get_user_meta( $user_id, "company_writing_permissions", false ) ) ) { add_user_meta( $user_id, "company_writing_permissions", $data->company_writing_permissions ); }
+			else { update_user_meta( $user_id, "company_writing_permissions", $data->company_writing_permissions ); }
+
+			if ( empty( get_user_meta( $user_id, "company_publications_communication_permissions", false ) ) ) { add_user_meta( $user_id, "company_publications_communication_permissions", $data->company_publications_communication_permissions ); }
+			else { update_user_meta( $user_id, "company_publications_communication_permissions", $data->company_publications_communication_permissions ); }
+
+			if ( empty( get_user_meta( $user_id, "company_media_uploads_permissions", false ) ) ) { add_user_meta( $user_id, "company_media_uploads_permissions", $data->company_media_uploads_permissions ); }
+			else { update_user_meta( $user_id, "company_media_uploads_permissions", $data->company_media_uploads_permissions ); }
 
 			// Logout user
 			wp_logout();
@@ -651,6 +699,15 @@ class BROTHER {
 	}
 
 	/*
+	*	Function name: is_alphabetical
+	*	Function arguments: $input [ STRING ] (required) (the string which shoud be checked)
+	*	Function purpose: This function checks if the $input is created only from ALPHABETICAL CHARs.
+	*/
+	function is_alphabetical( $input ) {
+		return ctype_alpha( $input ) ? true : false;
+	}
+
+	/*
 	*	Function name: get_user_media
 	*	Function arguments: $data [ MIXED_OBJECT ] (required) (this OBJECT mainly contains the $user_id ($company_id) and the request type AJAX or NOT)
 	*	Function purpose: This function is used to generate containers with the MEDIA_FILES of the specific user.
@@ -658,11 +715,13 @@ class BROTHER {
 	function get_user_media( $data ) {
 		$user_id = $data->user_id;
 		$is_ajax = $data->is_ajax;
+		$offset = !empty( $data->offset ) && isset( $data->offset ) ? $data->offset : 0;
 
 		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
 
 		$args = array(
 			"posts_per_page" => 20,
+			"offset" => $offset,
 			"post_type" => "attachment",
 			"orderby" => "ID",
 			"order" => "DESC",
@@ -675,11 +734,16 @@ class BROTHER {
 
 		if ( count( $medias_ ) > 0 ) {
 			foreach ( $medias_ as $media_ ) {
-				$background_url = explode( "/", $media_->post_mime_type )[1] == "zip" ? get_template_directory_uri() ."/assets/images/zip-icon.png" : ( explode( "/", $media_->post_mime_type )[0] == "image" ? wp_get_attachment_url( $media_->ID ) : get_template_directory_uri() ."assets/images/file-icon.png" );
+				$background_url =
+					explode( "/", $media_->post_mime_type )[1] == "zip" ? get_template_directory_uri() ."/assets/images/zip-icon.png" :
+						( explode( "/", $media_->post_mime_type )[0] == "image" ? wp_get_attachment_url( $media_->ID ) :
+							( explode ( "/", $media_->post_mime_type)[0] == "video" ? get_template_directory_uri() ."/assets/images/video-icon.png" : get_template_directory_uri() ."/assets/images/file-icon.png" ) );
 
 				if ( !$is_ajax ) {
 				?>
-					<div id='media-<?php echo $media_->ID; ?>' class='media-container animated fadeInDown' style='background-image: url(<?php echo $background_url; ?>);' media-type='<?php echo $media_->post_mime_type; ?>'></div>
+					<div id='media-<?php echo $media_->ID; ?>' class='media-container animated bounceIn' style='background-image: url(<?php echo $background_url; ?>);' media-type='<?php echo $media_->post_mime_type; ?>'>
+						<button id='marker'></button>
+					</div>
 				<?php
 				} elseif ( $is_ajax ) {
 					$media_holder = array();
@@ -690,10 +754,10 @@ class BROTHER {
 				}
 			}
 
-			if ( $is_ajax ) { return $medias_holder; }
+			if ( $is_ajax ) { return json_encode( $medias_holder ); }
 		} else {
 			if ( !$is_ajax ) { echo "<h1 class='no-information-message'>You don't have any media.</h1>"; }
-		 	else { return "You don't have any media."; }
+		 	else { return json_encode( "You don't have any media." ); }
 		}
 	}
 
@@ -740,6 +804,16 @@ class BROTHER {
 		}
 
 		return $path_;
+	}
+
+	/*
+	*	Function name: get_attachment_url
+	*	Function arguments: $attachment_id [ INT ] (required) (the ID of the desired ATTACHMENT)
+	*	Function purpose:
+	*	This function is used to return the URL to the Attachment pointed by the $attachment_id parameter.
+	*/
+	function get_attachment_url( $attachment_id ) {
+		return wp_get_attachment_url( $attachment_id );
 	}
 }
 
