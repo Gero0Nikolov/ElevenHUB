@@ -886,7 +886,7 @@ a.skeleton-bold-button {
 .red-bold-button {
   display: inline-block;
   font-family: OpenSansBold;
-  font-size: 0.8em;
+  font-size: 0.8rem;
   text-transform: uppercase;
   padding: 1em 2.5em;
   letter-spacing: 1px;
@@ -909,7 +909,7 @@ a.skeleton-bold-button {
 .blue-bold-button {
   display: inline-block;
   font-family: OpenSansBold;
-  font-size: 0.8em;
+  font-size: 0.8rem;
   text-transform: uppercase;
   padding: 1em 2.5em;
   letter-spacing: 1px;
@@ -932,7 +932,7 @@ a.skeleton-bold-button {
 .green-bold-button {
   display: inline-block;
   font-family: OpenSansBold;
-  font-size: 0.8em;
+  font-size: 0.8rem;
   text-transform: uppercase;
   padding: 1em 2.5em;
   letter-spacing: 1px;
@@ -955,7 +955,7 @@ a.skeleton-bold-button {
 .orange-bold-button {
   display: inline-block;
   font-family: OpenSansBold;
-  font-size: 0.8em;
+  font-size: 0.8rem;
   text-transform: uppercase;
   padding: 1em 2.5em;
   letter-spacing: 1px;
@@ -978,7 +978,7 @@ a.skeleton-bold-button {
 .banana-bold-button {
   display: inline-block;
   font-family: OpenSansBold;
-  font-size: 0.8em;
+  font-size: 0.8rem;
   text-transform: uppercase;
   padding: 1em 2.5em;
   letter-spacing: 1px;
@@ -1001,7 +1001,7 @@ a.skeleton-bold-button {
 .grape-bold-button {
   display: inline-block;
   font-family: OpenSansBold;
-  font-size: 0.8em;
+  font-size: 0.8rem;
   text-transform: uppercase;
   padding: 1em 2.5em;
   letter-spacing: 1px;
@@ -1024,7 +1024,7 @@ a.skeleton-bold-button {
 .skeleton-bold-button {
   display: inline-block;
   font-family: OpenSansBold;
-  font-size: 0.8em;
+  font-size: 0.8rem;
   text-transform: uppercase;
   padding: 1em 2.5em;
   letter-spacing: 1px;
@@ -1049,7 +1049,7 @@ a.skeleton-bold-button {
 .blue-skeleton-bold-button {
   display: inline-block;
   font-family: OpenSansBold;
-  font-size: 0.8em;
+  font-size: 0.8rem;
   text-transform: uppercase;
   padding: 1em 2.5em;
   letter-spacing: 1px;
@@ -1073,7 +1073,7 @@ a.skeleton-bold-button {
 .gray-skeleton-bold-button {
   display: inline-block;
   font-family: OpenSansBold;
-  font-size: 0.8em;
+  font-size: 0.8rem;
   text-transform: uppercase;
   padding: 1em 2.5em;
   letter-spacing: 1px;
@@ -1125,6 +1125,50 @@ a.skeleton-bold-button {
   width: 80% !important;
   display: block !important;
   margin: 1em auto 0 !important; }
+
+.simple-button {
+  border: none;
+  background: none;
+  box-shadow: none !important;
+  text-shadow: none;
+  outline: 0 !important;
+  font-family: OpenSansRegular;
+  font-weight: normal;
+  font-size: 0.85rem;
+  color: #bdc3c7;
+  letter-spacing: 1px;
+  display: block;
+  width: 80%;
+  margin: 0.25em auto !important;
+  webkit-transition: all 0.25s ease-in-out;
+  -moz-transition: all 0.25s ease-in-out;
+  -o-transition: all 0.25s ease-in-out;
+  transition: all 0.25s ease-in-out; }
+
+.simple-button:hover,
+.simple-button:active {
+  color: #3498db; }
+
+.close-button {
+  background: none;
+  border: none;
+  box-shadow: none;
+  outline: 0;
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 1rem;
+  font-weight: normal;
+  text-shadow: none;
+  padding: 0.5em;
+  color: #e74c3c;
+  webkit-transition: all 0.25s ease-in-out;
+  -moz-transition: all 0.25s ease-in-out;
+  -o-transition: all 0.25s ease-in-out;
+  transition: all 0.25s ease-in-out; }
+
+.close-button:hover {
+  color: #c0392b; }
 
 .big-banner {
   display: block;
@@ -1212,7 +1256,7 @@ a.skeleton-bold-button {
   color: #333; }
 
 .quote {
-  font-family: LoraRegular;
+  font-family: PlayFairRegular;
   font-style: italic; }
 
 .separator {
@@ -1326,6 +1370,33 @@ a.skeleton-bold-button {
     font-weight: normal;
     font-size: 1.25rem;
     letter-spacing: 1px; }
+    .popup-holder #alert-box label {
+      display: block;
+      margin: 1em 1em 0.25em;
+      font-family: OpenSansRegular;
+      font-size: 1rem;
+      font-weight: normal;
+      letter-spacing: 1px;
+      color: #333; }
+    .popup-holder #alert-box input {
+      display: block;
+      margin: 0 1em;
+      padding: 0.25em;
+      width: 92%;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-family: OpenSansRegular;
+      font-size: 1rem;
+      font-weight: normal;
+      color: #333;
+      outline: 0;
+      letter-spacing: 1px;
+      box-shadow: none;
+      text-shadow: none; }
+    .popup-holder #alert-box #submit-button {
+      display: block;
+      width: 80%;
+      margin: 1em auto; }
     .popup-holder #alert-box #close-popup-button {
       display: block;
       width: 80%;

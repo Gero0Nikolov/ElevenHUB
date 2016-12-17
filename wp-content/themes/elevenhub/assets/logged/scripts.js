@@ -117,7 +117,9 @@ jQuery( document ).ready(function(){
 				if ( response != "You don't have any media." ) {
 					mediaOffset += 20;
 					for ( count = 0; count < response.length; count++ ) {
-						view_ = "<div id='media-"+ response[ count ].ID +"' class='media-container animated bounceIn new' style='background-image: url("+ response[ count ].URL +");' media-type='"+ response[ count ].TYPE +"'><button id='marker'></button></div>";
+						if ( response[ count ].TYPE.split( "/" )[0] == "image" ) { view_ = "<div id='media-"+ response[ count ].ID +"' class='media-container animated bounceIn new' style='background-image: url("+ response[ count ].URL +");' media-type='"+ response[ count ].TYPE +"'><button id='marker'></button></div>"; }
+						else if ( response[ count ].TYPE.split( "/" )[0] == "video" ) { view_ = "<div id='media-"+ response[ count ].ID +"' class='media-container animated bounceIn new' media-type='"+ response[ count ].TYPE +"'><button id='marker'></button><video autoplay='true' muted='true' loop='true'><source src='"+ response[ count ].URL +"' type='"+ response[ count ].TYPE +"'></video><div class='overlay'></div></div>"; }
+
 						jQuery( "#medias-container" ).append( view_ );
 					}
 
@@ -385,9 +387,6 @@ function updateUserMetaSubmit() {
 	);
 }
 
-/*
-*	Method used to update the Company meta information
-*/
 function updateCompanyMetaSubmit() {
 	jQuery( "#media-popup-fields" ).append( loading );
 

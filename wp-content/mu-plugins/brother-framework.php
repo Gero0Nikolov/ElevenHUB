@@ -97,9 +97,12 @@ class BROTHER {
 	*/
 	function upload_user_file( $file, $atts = array() ) {
 		if ( $file[ "size" ] > 0 ) {
-			// Check if user had enough space
-			$user_available_space = $this->get_available_media_space( $atts[ "owner_id" ] );
-			$updated_available_space = $user_available_space - $file[ "size" ];
+			$updated_available_space = 0;
+			if ( !empty( $atts[ "owner_id" ] ) ) {
+				// Check if user had enough space
+				$user_available_space = $this->get_available_media_space( $atts[ "owner_id" ] );
+				$updated_available_space = $user_available_space - $file[ "size" ];
+			}
 
 			// Upload file
 			require_once( ABSPATH . 'wp-admin/includes/admin.php' );
@@ -736,15 +739,26 @@ class BROTHER {
 			foreach ( $medias_ as $media_ ) {
 				$background_url =
 					explode( "/", $media_->post_mime_type )[1] == "zip" ? get_template_directory_uri() ."/assets/images/zip-icon.png" :
-						( explode( "/", $media_->post_mime_type )[0] == "image" ? wp_get_attachment_url( $media_->ID ) :
-							( explode ( "/", $media_->post_mime_type)[0] == "video" ? get_template_directory_uri() ."/assets/images/video-icon.png" : get_template_directory_uri() ."/assets/images/file-icon.png" ) );
+						( explode( "/", $media_->post_mime_type )[0] == "image" || explode( "/", $media_->post_mime_type )[0] == "video" ? wp_get_attachment_url( $media_->ID ) : get_template_directory_uri() ."/assets/images/file-icon.png" );
 
 				if ( !$is_ajax ) {
+					if ( explode( "/", $media_->post_mime_type )[0] == "image" ) {
 				?>
 					<div id='media-<?php echo $media_->ID; ?>' class='media-container animated bounceIn' style='background-image: url(<?php echo $background_url; ?>);' media-type='<?php echo $media_->post_mime_type; ?>'>
 						<button id='marker'></button>
 					</div>
 				<?php
+					} elseif ( explode( "/", $media_->post_mime_type )[0] == "video" ) {
+					?>
+					<div id='media-<?php echo $media_->ID; ?>' class='media-container animated bounceIn' media-type='<?php echo $media_->post_mime_type; ?>'>
+						<button id='marker'></button>
+						<video autoplay="true" muted="true" loop="true">
+							<source src="<?php echo $background_url; ?>" type="<?php echo $media_->post_mime_type; ?>">
+						</video>
+						<div class="overlay"></div>
+					</div>
+					<?php
+					}
 				} elseif ( $is_ajax ) {
 					$media_holder = array();
 					$media_holder[ "ID" ] = $media_->ID;

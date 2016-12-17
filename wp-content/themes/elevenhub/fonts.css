@@ -43,3 +43,28 @@
 	font-family: OswaldLight;
 	src: url('assets/fonts/Oswald-Light.ttf');
 }
+
+@font-face {
+	font-family: PlayFairRegular;
+	src: url('assets/fonts/PlayfairDisplay-Regular.ttf');
+}
+@font-face {
+	font-family: PlayFairItalic;
+	src: url('assets/fonts/PlayfairDisplay-Italic.ttf');
+}
+@font-face {
+	font-family: PlayFairBold;
+	src: url('assets/fonts/PlayfairDisplay-Bold.ttf');
+}
+@font-face {
+	font-family: PlayFairBoldItalic;
+	src: url('assets/fonts/PlayfairDisplay-BoldItalic.ttf');
+}
+@font-face {
+	font-family: PlayFairBlack;
+	src: url('assets/fonts/PlayfairDisplay-Black.ttf');
+}
+@font-face {
+	font-family: PlayFairBlackItalic;
+	src: url('assets/fonts/PlayfairDisplay-BlackItalic.ttf');
+}

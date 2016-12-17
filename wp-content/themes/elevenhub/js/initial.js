@@ -16,6 +16,7 @@ function buildLoginForm() {
 				<input type='email' placeholder='Email' id='email-login' class='wide-fat' onkeydown='keyPressedForms(event, 0);'>\
 				<input type='password' placeholder='Password' id='password-login' class='wide-fat' onkeydown='keyPressedForms(event, 0);'>\
 				<button id='login-controller' class='red-bold-button form-button' onclick='signOnUser();' onkeydown='keyPressedForms(event, 0);'>Login</button>\
+				<button id='forgotten-password-controller' class='simple-button' onclick='askForEmail();'>Forgotten password?</button>\
 			</div>\
 			<div class='popup-separator'>\
 				or register\
@@ -44,6 +45,45 @@ function destroyLoginForm() {
 
 function buildElement( markup ) { jQuery( "body" ).append( markup ); }
 
+function askForEmail() {
+	alert_box = "\
+	<div id='alert-box' class='animated bounceInDown'>\
+		<button id='close-button' class='close-button fa fa-close' onclick='emoveAlertBox();'></button>\
+		<label for='email'>Enter your email</label>\
+		<input id='email' type='email' onkeydown='keyPressedForms(event, 2);'>\
+		<button id='submit-button' class='green-bold-button'>Save</button>\
+	</div>";
+	jQuery( "#login-form-holder" ).append( alert_box );
+	jQuery( "#login-form-holder #alert-box #submit-button" ).on("click", function(){ resetUserPassword(); });
+}
+
+function resetUserPassword() {
+	jQuery( "#login-form-holder #alert-box" ).append( loading );
+
+	email = jQuery( "#login-form-holder #alert-box #email" ).val().trim();
+
+	jQuery.ajax({
+		url : ajax_url,
+		type : 'post',
+		data : {
+			action : "reset_user_password",
+			email : email
+		},
+		success : function ( response ) {
+			jQuery( "#login-form-holder #alert-box #loader" ).remove();
+
+			if ( response == "READY" ) {
+				alert_box = "<div id='alert-box' class='animated bounceInDown'>Check your email!<button id='close-popup-button' onclick='removeAlertBox();'>Close</button></div>";
+				jQuery( "#login-form-holder" ).append( alert_box );
+			}
+			else if ( response == "There aren't users with that email." ) {
+				alert_box = "<div id='alert-box' class='animated bounceInDown'>"+ response +"<button id='close-popup-button' onclick='removeAlertBox();'>Close</button></div>";
+				jQuery( "#login-form-holder" ).append( alert_box );
+			}
+			else { console.log( response ); }
+		}
+	});
+}
 
 function registerUser() {
 	//Add loading sign
@@ -124,6 +164,7 @@ function keyPressedForms( e, form ) {
 	if ( e.keyCode == 13 ) {
 		if ( form == 0 ) { signOnUser(); }
 		else if ( form == 1 ) { registerUser(); }
+		else if ( form == 2 ) { resetUserPassword(); }
 	}
 	else if ( e.keyCode == 27 ) { destroyLoginForm(); }
 }

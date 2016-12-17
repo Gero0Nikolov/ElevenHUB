@@ -215,8 +215,8 @@ function register_user() {
 
 		// Prepare Hello mail
 		$subject = "Welcome to 11hub!";
-		$content = "Welcome onboard!\n\nWe hope to see you <a href='". get_site_url() ."' target='_blank' style='color: #3498db; text-decoration: underline;'>hubbing soon</a>!\n\nCheers!";
-		wp_mail( $email, $subject, $content );
+		$content = "Welcome onboard!<br/><br/>We hope to see you <a href='". get_site_url() ."' target='_blank' style='color: #3498db; text-decoration: underline;'>hubbing soon</a>!<br/><br/>Cheers!";
+		wp_mail( $email, $subject, $content, array( "From: Gero Nikolov <vtm.sunrise@gmail.com>", "Content-type: text/html" ) );
 	}
 
 
@@ -261,6 +261,27 @@ function add_profile_association() {
 			update_user_meta( get_current_user_id(), "account_association", $association_type, false );
 		}
 	}
+
+	die();
+}
+
+add_action( 'wp_ajax_nopriv_reset_user_password', 'reset_user_password' );
+add_action( 'wp_ajax_reset_user_password', 'reset_user_password' );
+function reset_user_password() {
+	$email = $_POST[ "email" ];
+	$user_id = email_exists( $email );
+
+	if ( $user_id !== false ) {
+		$new_password = mt_rand( 100000, 999999 );
+		wp_set_password( $new_password, $user_id );
+
+		// Prepare new password email
+		$subject = "Your password in 11hub was changed!";
+		$content = "Hello there!<br/><br/>Your password was changed via request for forgotten password.<br/><br/>Your new password is: $new_password<br/>(You can reset this password later)<br/><br/><a href='". get_site_url() ."' target='_blank' style='color: #3498db; text-decoration: underline;'>Go hubbing!</a>";
+		wp_mail( $email, $subject, $content, array( "From: Gero Nikolov <vtm.sunrise@gmail.com>", "Content-type: text/html" ) );
+
+		echo "READY";
+	} else { echo "There aren't users with that email."; }
 
 	die();
 }

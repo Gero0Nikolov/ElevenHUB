@@ -129,7 +129,7 @@ var UserMedia = function( userID = "" ) {
 									view_ = "<img src='"+ response +"' id='"+ attachmentID +"' class='picture-preview animated flipInX'/>";
 									break;
 								case "video":
-									view_ = "<video id='"+ attachmentID +"' class='video-preview animated flipInX' controls loop autoplay><source src='"+ response +"' type='video/"+ response.split( "." )[ response.split( "." ).length - 1 ] +"'></video>";
+									view_ = "<video id='"+ attachmentID +"' class='video-preview animated flipInX' controls loop autoplay><source src='"+ response +"' type='"+ attachmentTYPE +"'></video>";
 									break;
 
 								default:
@@ -583,10 +583,10 @@ var UserStory = function( userID = "" ) {
 								if ( response != "You don't have any media." ) {
 									mediaOffset += 20;
 									for ( count = 0; count < response.length; count++ ) {
-										if ( response[ count ].TYPE.split( "/" )[0] == "image" ) {
-											view_ = "<div id='attachment-"+ response[ count ].ID +"' class='inline-media new animated fadeIn' attachment_src='"+ response[ count ].URL +"' attachment_type='"+ response[ count ].TYPE +"' style='background-image: url("+ response[ count ].URL +");'><div>";
-											jQuery( view_ ).insertBefore( "#media-popup-container #media-popup-fields #media-list #load-more-controller" );
-										}
+										if ( response[ count ].TYPE.split( "/" )[0] == "image" ) { view_ = "<div id='attachment-"+ response[ count ].ID +"' class='inline-media new animated fadeIn' attachment_src='"+ response[ count ].URL +"' attachment_type='"+ response[ count ].TYPE +"' style='background-image: url("+ response[ count ].URL +");'><div>"; }
+										else if ( response[ count ].TYPE.split( "/" )[0] == "video" ) { view_ = "<div id='attachment-"+ response[ count ].ID +"' class='inline-media new animated fadeIn' attachment_src='"+ response[ count ].URL +"' attachment_type='"+ response[ count ].TYPE +"'><video autoplay='true' muted='true' loop='true'><source src='"+ response[ count ].URL +"' type='"+ response[ count ].TYPE +"'></video><div class='overlay'></div><div>"; }
+
+										jQuery( view_ ).insertBefore( "#media-popup-container #media-popup-fields #media-list #load-more-controller" );
 									}
 
 									// Set controls
