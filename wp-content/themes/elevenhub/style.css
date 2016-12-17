@@ -1152,7 +1152,7 @@ a.skeleton-bold-button {
 .close-button {
   background: none;
   border: none;
-  box-shadow: none;
+  box-shadow: none !important;
   outline: 0;
   position: absolute;
   top: 0;
@@ -1478,7 +1478,7 @@ a.skeleton-bold-button {
     .popup-holder .popup-inner .close-button {
       background: none;
       border: none;
-      box-shadow: none;
+      box-shadow: none !important;
       outline: 0;
       position: absolute;
       top: 0;

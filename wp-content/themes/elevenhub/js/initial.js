@@ -48,7 +48,7 @@ function buildElement( markup ) { jQuery( "body" ).append( markup ); }
 function askForEmail() {
 	alert_box = "\
 	<div id='alert-box' class='animated bounceInDown'>\
-		<button id='close-button' class='close-button fa fa-close' onclick='emoveAlertBox();'></button>\
+		<button id='close-button' class='close-button fa fa-close' onclick='removeAlertBox();'></button>\
 		<label for='email'>Enter your email</label>\
 		<input id='email' type='email' onkeydown='keyPressedForms(event, 2);'>\
 		<button id='submit-button' class='green-bold-button'>Save</button>\
