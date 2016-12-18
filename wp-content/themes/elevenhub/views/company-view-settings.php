@@ -54,3 +54,14 @@ $company_publications_communication_permissions = get_user_meta( $user_id, "comp
 		<button id="save-company-meta" class="green-bold-button">Save</button>
 	</div>
 </div>
+
+<script type="text/javascript">
+jQuery( document ).ready(function(){
+
+	jQuery( "#company-type #<?php echo $company_type; ?>" ).attr( "selected", "selected" );
+	jQuery( "#company-writing-permissions #<?php echo $company_writing_permissions; ?>" ).attr( "selected", "selected" );
+	jQuery( "#company-publications-communication-permissions #<?php echo $company_publications_communication_permissions; ?>" ).attr( "selected", "selected" );
+	jQuery( "#company-media-uploads-permissions #<?php echo $company_media_uploads_permissions; ?>" ).attr( "selected", "selected" );
+
+});
+</script>

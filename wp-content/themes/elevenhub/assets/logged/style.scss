@@ -673,6 +673,7 @@ $asbestos: #7f8c8d;
 			box-shadow: none;
 			text-shadow: none;
 		}
+		input:focus { border-color: $peter_river; }
 
 		#submit-button {
 			display: block;
@@ -1039,7 +1040,7 @@ $asbestos: #7f8c8d;
  	display: inline-block;
     content: " ";
     position: absolute;
-    background: $alizarin;
+    background: #e67e22;
     width: 12px;
     height: 12px;
     border-radius: 100%;
@@ -1092,7 +1093,7 @@ $asbestos: #7f8c8d;
 			padding: 0.5em;
 		}
 		input:focus,
-		select:focus { border-color: $peter_river }
+		select:focus { border-color: $peter_river !important; }
 
 		select {
 			background: #fff;
@@ -1390,7 +1391,8 @@ $asbestos: #7f8c8d;
 
 
 /** BUTTONS **/
-.normal-bold-button {
+.normal-bold-button,
+.just-text {
 	font-family: OpenSansBold;
     font-weight: normal;
     font-size: 1rem;
@@ -1429,6 +1431,67 @@ $asbestos: #7f8c8d;
 	border-color: $nephritis;
 }
 
+#companies-list {
+	.company-anchor {
+		display: block;
+		text-decoration: none;
+		text-shadow: none;
+		outline: 0 !important;
+
+		.list-item {
+			display: block;
+			padding: 1em 0;
+			margin: 0 auto;
+			border-bottom: 1px solid #ddd;
+			font-size: 1rem;
+			position: relative;
+
+			webkit-transition: all 0.25s ease-in-out;
+			-moz-transition: all 0.25s ease-in-out;
+			-o-transition: all 0.25s ease-in-out;
+			transition: all 0.25s ease-in-out;
+
+			.avatar {
+				display: inline-block;
+				font-size: 2.5rem;
+				width: 2em;
+				height: 2em;
+				background-size: cover;
+				background-position: center;
+				background-color: #eee;
+				border-radius: 100%;
+				border: 1px solid #ddd;
+				vertical-align: middle;
+
+				webkit-transition: all 0.25s ease-in-out;
+				-moz-transition: all 0.25s ease-in-out;
+				-o-transition: all 0.25s ease-in-out;
+				transition: all 0.25s ease-in-out;
+			}
+
+			.company-brand {
+				display: inline-block;
+				vertical-align: middle;
+				font-family: OpenSansRegular;
+				font-weight: normal;
+				font-size: 1.75rem;
+				padding: 0;
+				margin-left: 0.25em;
+				color: #333;
+
+				webkit-transition: all 0.25s ease-in-out;
+				-moz-transition: all 0.25s ease-in-out;
+				-o-transition: all 0.25s ease-in-out;
+				transition: all 0.25s ease-in-out;
+			}
+		}
+		.list-item:hover,
+		.list-item:active {
+			.avatar,
+			.company-brand { transform: translateX(0.25em); }
+		}
+	}
+}
 
 /** MESSEGAS **/
 .no-information-message {
@@ -1441,6 +1504,10 @@ $asbestos: #7f8c8d;
 	color: #adb4b9;
 }
 
+.just-text {
+	margin: 0;
+	padding: 0;
+}
 
 /** ANIMATIONS **/
 .hvr-underline-from-center {
@@ -1570,6 +1637,12 @@ $asbestos: #7f8c8d;
 		.inline-media {
 			width: 1.35em !important;
 			height: 1.35em !important;
+		}
+	}
+
+	#companies-list {
+		.list-item {
+			max-width: calc(100% - 2em);
 		}
 	}
 }

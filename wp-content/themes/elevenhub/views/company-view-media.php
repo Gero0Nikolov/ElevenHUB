@@ -20,7 +20,7 @@ $available_space = $brother_->convert_bytes( $brother_->get_available_media_spac
 	companyID = "<?php echo $company_id; ?>";
 </script>
 <div id='media-controls' class='simple-controls mt-1em mb-1em'>
-	<a href="#" id="space-pointer" class="normal-bold-button green"><span class="tiny-text">Available Space:</span><span id="space"><?php echo $available_space; ?></space>MB</a>
+	<p href="#" id="space-pointer" class="just-text green"><span class="tiny-text">Available Space:</span><span id="space"><?php echo $available_space; ?></space>MB</p>
 	<button id="media-uploader-opener" class="blue-bold-button">Upload</button>
 	<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" id="media-uploader" class="hidden" method='POST' enctype='multipart/form-data'>
 		<input type="file" name="upload[]" id="file-holder" multiple="multiple">

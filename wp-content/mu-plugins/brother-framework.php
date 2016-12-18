@@ -829,6 +829,51 @@ class BROTHER {
 	function get_attachment_url( $attachment_id ) {
 		return wp_get_attachment_url( $attachment_id );
 	}
+
+	function get_companies( $data = array() ) {
+		$args = array(
+			"meta_query" => array(
+				"relation" => "AND",
+				array(
+					"key" => "account_association",
+					"value" => "company",
+					"compare" => "="
+				),
+				array(
+					"key" => "company_type",
+					"value" => "public",
+					"compare" => "="
+				)
+			),
+			"orderby" => !empty( $data->orderby ) ? $data->orderby : "ID",
+			"order" => !empty( $data->order ) ? $data->order : "DESC",
+			"offset" => !empty( $data->offset ) ? $data->offset : 0,
+			"number" => !empty( $data->number ) ? $data->number : 20,
+			"fields" => "ID"
+		);
+		$user_ids = get_users( $args );
+
+		if ( empty( $user_ids ) ) { if ( empty( $data->is_ajax ) || !$data->is_ajax ) { echo "<h1 class='no-information-message'>There aren't any public companies.</h1>"; } else { return json_encode( "There aren't any public companies." ); } }
+		else {
+			foreach ( $user_ids as $user_id ) {
+				$user_first_name = get_user_meta( $user_id, "first_name", true );
+				$user_last_name = get_user_meta( $user_id, "last_name", true );
+				$user_short_name = get_user_meta( $user_id, "user_shortname", true );
+				$user_avatar = $this->get_user_avatar_url( $user_id );
+
+				if ( empty( $data->is_ajax ) || !$data->is_ajax ) {
+					?>
+					<a href="<?php echo get_author_posts_url( $user_id ); ?>" id='company-anchor-<?php echo $user_id; ?>' class='company-anchor'>
+						<div id='company-<?php echo $user_id; ?>' class='list-item animated fadeIn'>
+							<div id='company-avatar-<?php echo $user_id; ?>' class='avatar' style='background-image: url(<?php echo $user_avatar; ?>);'></div>
+							<h1 id='company-brand-<?php echo $user_id; ?>' class='company-brand'><?php echo !empty( $user_short_name ) ? $user_short_name : $user_first_name ." ". $user_last_name; ?></h1>
+						</div>
+					</a>
+					<?php
+				} else {}
+			}
+		}
+	}
 }
 
 //Initialize the DB into the framework
