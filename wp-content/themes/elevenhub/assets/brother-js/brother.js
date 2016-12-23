@@ -262,6 +262,88 @@ var UserRelations = function( vUserID, userID = "" ) {
 	this.getUserRelations = function( userID = "", onSuccess ) {
 		generateAJAX( { functionName : "get_user_relations", arguments : userID }, function ( response ) { onSuccess( JSON.parse( JSON.parse( response ) ) ); } );
 	}
+
+	/*
+	*	Function name: buildCompanyJoinDialog
+	*	Function arguments: NONE
+	*	Function purpose: This function is used to build the dialog view as a real HTML markup.
+	*/
+	this.buildCompanyJoinDialog = function() {
+		view_ = "\
+		<div id='media-popup-container' class='popup-container animated fadeIn'>\
+			<div id='media-popup-fields' class='popup-inner-container'>\
+				<button id='close-button' class='close-button fa fa-close'></button>\
+				<label for='cv-holder'>Link to your CV</label>\
+				<input type='text' id='cv-holder'/>\
+				<label for='portfolio-holder'>Link your portfolio website (if you had one)</label>\
+				<input type='text' id='portfolio-holder'/>\
+				<button id='submit-button' class='green-bold-button'>Send request</button>\
+			</div>\
+		</div>\
+		";
+
+		userMediaController = new UserMedia;
+
+		jQuery( "body" ).append( view_ );
+		jQuery( "#media-popup-container" ).on("click", function( e ){ if( e.target == this ){ userMediaController.destroyMediaPopup(); } });
+		jQuery( "#media-popup-container #media-popup-fields #close-button" ).on("click", function(){ userMediaController.destroyMediaPopup(); });
+
+		jQuery( "#media-popup-container #media-popup-fields #submit-button" ).on("click", function(){
+			jQuery( "#media-popup-container #media-popup-fields" ).append( loading );
+
+			cv_ = jQuery( "#media-popup-container #media-popup-fields #cv-holder" ).val().trim();
+			portfolio_ = jQuery( "#media-popup-container #media-popup-fields #portfolio-holder" ).val().trim();
+
+			generateAJAX({
+					functionName : "send_join_request",
+					arguments : {
+						company_id: vUserID,
+						user_id: userID,
+						user_cv_link: cv_,
+						user_portfolio_link: portfolio_
+					}
+				}, function ( response ) {
+					response = JSON.parse( response );
+					if ( response == "requested" ) {
+						window.location.reload( true );
+					} else {
+						jQuery( "#media-popup-fields #loader" ).remove();
+						alert_box = "<div id='alert-box' class='animated bounceInDown'>"+ response +"<button id='close-popup-button' onclick='removeAlertBox();'>Close</button></div>";
+						jQuery( "#media-popup-container" ).append( alert_box );
+					}
+				}
+			);
+		});
+	}
+
+	this.acceptUserRequest = function( requestID = "" ) {
+		generateAJAX({
+				functionName : "update_join_request",
+				arguments : {
+					request_id: requestID,
+					response: "accept"
+				}
+			}, function ( response ) {
+				response = JSON.parse( response );
+				if ( response == "" ) { window.location.reload( true ); }
+				else { console.log( response ); }
+			}
+		);
+	}
+	this.declineUserRequest = function( requestID = "" ) {
+		generateAJAX({
+				functionName : "update_join_request",
+				arguments : {
+					request_id: requestID,
+					response: "decline"
+				}
+			}, function ( response ) {
+				response = JSON.parse( response );
+				if ( response == "" ) { window.location.reload( true ); }
+				else { console.log( response ); }
+			}
+		);
+	}
 }
 
 /*
@@ -325,6 +407,11 @@ var UserMeta = function( userID = "" ) {
 		);
 	}
 
+	/*
+	*	Function name: updateCompanyMeta
+	*	Function argumnets: userID [ INT ] (optional), formID [ STRING_SELECTOR ] (required), passwordPromptID [ STRING_SELECTOR ] (required), onSuccess [ FUNCTION ] (required) (tells the method what to do after the response)
+	*	Function purpose: This function is used to send new company meta information to the back-end of the HUB project.
+	*/
 	this.updateCompanyMeta = function( userID = "", formID, passwordPromptID, onSuccess ) {
 		first_name = jQuery( formID ).find( "#first-name" ).val().trim();
 		last_name = jQuery( formID ).find( "#last-name" ).val().trim();

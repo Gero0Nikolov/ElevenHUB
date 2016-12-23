@@ -148,6 +148,23 @@ jQuery( document ).ready(function(){
 			} );
 		});
 	}
+
+	/* COMPANY PUBLIC CONTROLLERS */
+	if ( jQuery( "#join-controller" ).length ) {
+		jQuery( "#join-controller" ).on("click", function(){ openCompanyJoinDialog(); });
+	}
+
+	/* REQUEST CONTROLLERS */
+	if ( jQuery( "#request-information" ).length ) {
+		jQuery( "#request-information #request-response-controller-accept" ).on("click", function(){
+			requestController = new UserRelations;
+			requestController.acceptUserRequest( jQuery( this ).attr( "request-id" ) );
+		});
+		jQuery( "#request-information #request-response-controller-decline" ).on("click", function(){
+			requestController = new UserRelations;
+			requestController.declineUserRequest( jQuery( this ).attr( "request-id" ) );
+		});
+	}
 });
 
 /*
@@ -171,13 +188,16 @@ function buildUserRelation( container ) {
 			followersText = response.followers.length == 1 ? response.followers.length + " follower" : response.followers.length + " followers" ;
 
 			if ( jQuery( "#user-container .user-meta .followers" ).length ) { jQuery( "#user-container .user-meta .followers" ).html( followersText ); }
+			if ( jQuery( "#company-container #company-information .overlay #company-meta" ).length ) { jQuery( "#company-container #company-information .overlay #company-meta #company-followers-controller" ).html( followersText ); }
 		} else { actionResult = response };
 
 		if ( actionResult == "followed" ) {
-			container.removeClass( "follow-button" ).addClass( "unfollow-button" ).html( "Unfollow" );
+			if ( container.attr( "company" ) == "true" ) { container.removeClass( "green-bold-button" ).addClass( "skeleton-bold-button" ).html( "Unfollow" ); }
+			else { container.removeClass( "follow-button" ).addClass( "unfollow-button" ).html( "Unfollow" ); }
 		}
 		else if ( actionResult == "unfollowed" ) {
-			container.removeClass( "unfollow-button" ).addClass( "follow-button" ).html( "Follow" );
+			if ( container.attr( "company" ) == "true" ) { container.removeClass( "skeleton-bold-button" ).addClass( "green-bold-button" ).html( "Follow" ); }
+			else { container.removeClass( "unfollow-button" ).addClass( "follow-button" ).html( "Follow" ); }
 		}
 	} );
 }
@@ -296,7 +316,7 @@ function buildAndPullUserNotifications( container ) {
 				notification_not_viewed_class = "unopened-notification";
 				unseen_notifications += 1;
 
-				notification.notification_body.notification_link += "?read_notification="+ notification.row_id;
+				notification.notification_body.notification_link += (notification.notification_body.notification_link.indexOf( "?" ) < 0 ? "?" : "&") + "read_notification=" + notification.row_id;
 			}
 
 			build = "\
@@ -338,7 +358,7 @@ function listenForNewUserNotifications( userID = "", listed_notifications_ids = 
 				notification_not_viewed_class = "unopened-notification";
 				unseen_notifications += 1;
 
-				notification.notification_body.notification_link += "?read_notification="+ notification.row_id;
+				notification.notification_body.notification_link += (notification.notification_body.notification_link.indexOf( "?" ) < 0 ? "?" : "&") + "read_notification=" + notification.row_id;
 			}
 
 			build = "\
@@ -387,6 +407,9 @@ function updateUserMetaSubmit() {
 	);
 }
 
+/*
+*	THIS METHOD IS USED TO SUBMIT COMPANY META DATA FROM THE USER SETTINGS PAGE
+*/
 function updateCompanyMetaSubmit() {
 	jQuery( "#media-popup-fields" ).append( loading );
 
@@ -411,6 +434,11 @@ function updateCompanyMetaSubmit() {
 function openMediaHandler( controller ) {
 	mediaController = new UserMedia;
 	mediaController.buildAttachmentController( controller.attr( "id" ), controller.attr( "media-type" ) );
+}
+
+function openCompanyJoinDialog() {
+	relationsController = new UserRelations( vUserID );
+	relationsController.buildCompanyJoinDialog();
 }
 
 

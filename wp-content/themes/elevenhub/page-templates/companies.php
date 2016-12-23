@@ -13,7 +13,7 @@ if ( is_user_logged_in() ) {
 	if ( $association_type == "employee" ) { get_header( "employee" ); }
 	else if ( $association_type == "company" ) { get_header( "company" ); }
 
-	// Load the media view
+	// Load the companies listing view
 	require_once get_template_directory() ."/views/companies-list.php";
 } else {
 	/* Load public view */

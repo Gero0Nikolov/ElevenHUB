@@ -293,6 +293,67 @@ class BROTHER {
 	}
 
 	/*
+	*	Function name: create_user_notificationsmeta
+	*	Function arguments: NONE
+	*	Function purpose: This function is used to generate the WP_PREFIX_user_notificationsmeta table.
+	*/
+	function create_user_notificationsmeta() {
+		global $wpdb;
+
+		$user_notificationsmeta_table = $wpdb->prefix ."user_notificationsmeta";
+
+		if ( $wpdb->get_var( "SHOW TABLES LIKE '$user_notificationsmeta_table'" ) != $user_notificationsmeta_table ) {
+			$charset_collate = $wpdb->get_charset_collate();
+
+			$sql_ = "
+			CREATE TABLE $user_notificationsmeta_table (
+				id INT NOT NULL AUTO_INCREMENT,
+				notification_id INT,
+				meta_key LONGTEXT,
+				meta_value LONGTEXT,
+				PRIMARY KEY(id)
+			) $charset_collate;
+			";
+
+			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+
+			dbDelta( $sql_ );
+		}
+	}
+
+	/*
+	*	Function name: create_user_requests
+	*	Function arguments: NONE
+	*	Function purpose: This function is used to generate the WP_PREFIX_user_requests table.
+	*/
+	function create_user_requests() {
+		global $wpdb;
+
+		$user_requests_table = $wpdb->prefix ."user_requests";
+
+		if ( $wpdb->get_var( "SHOW TABLES LIKE '$user_requests_table'" ) != $user_requests_table ) {
+			$charset_collate = $wpdb->get_charset_collate();
+
+			$sql_ = "
+			CREATE TABLE $user_requests_table (
+				id INT NOT NULL AUTO_INCREMENT,
+				requester_id INT,
+				requester_cv LONGTEXT,
+				requester_portfolio LONGTEXT,
+				request_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				request_response VARCHAR(255),
+				company_id INT,
+				PRIMARY KEY(id)
+			) $charset_collate;
+			";
+
+			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+
+			dbDelta( $sql_ );
+		}
+	}
+
+	/*
 	*	Function name: get_user_followers
 	*	Function arguments: $user_id [ INT ] (optional)
 	*	Function purpose:
@@ -305,7 +366,7 @@ class BROTHER {
 		global $wpdb;
 
 		$table_ = $wpdb->prefix ."user_relations";
-		$sql_ = "SELECT user_follower_id FROM $table_ WHERE user_followed_id=$user_id";
+		$sql_ = "SELECT user_follower_id FROM $table_ WHERE user_followed_id=$user_id AND user_follower_id IS NOT NULL";
 		$user_followers = $wpdb->get_results( $sql_, OBJECT );
 
 		return $user_followers;
@@ -346,6 +407,31 @@ class BROTHER {
 	}
 
 	/*
+	*	Function name: is_employee
+	*	Function arguments: $v_user_id [ INT ] (required), $user_id [ INT ] (optional)
+	*	Function purpose: This function tells if the currently logged user is employee of the specified company via the $v_user_id argument.
+	*/
+	function is_employee( $v_user_id, $user_id = "" ) {
+		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
+
+		global $wpdb;
+
+		$table_ = $wpdb->prefix ."user_relations";
+		$sql_ = "SELECT * FROM $table_ WHERE user_followed_id=$user_id AND user_employer_id=$v_user_id";
+
+		return !empty( $wpdb->get_results( $sql_, OBJECT ) ) ? true : false;
+	}
+
+	/*
+	*	Function name: is_company_public
+	*	Function arguments: $user_id [ INT ] (required) (the ID of the needed company)
+	*	Function purpose: This function tells if the company is public or not.
+	*/
+	function is_company_public( $user_id ) {
+		return get_user_meta( $user_id, "company_type", true ) == "public" ? true : false;
+	}
+
+	/*
 	*	Function name: follow_or_unfollow_relation
 	*	Function arguments: $data [ MIXED_OBJECT ] (required) (containes the $v_user_id, $user_id & $recalculate)
 	*	Function purpose: This function is used to generate user relation from TYPE: FOLLOW or UNFOLLOW
@@ -377,6 +463,33 @@ class BROTHER {
 	}
 
 	/*
+	*	Function name: hire_or_fire_relation
+	*	Function arguments: $data [ MIXED_OBJECT ] (required) (holds the $user_id which will be hired/fired && the $company_id: EMPLOYER;)
+	*	Function purpose: This function is used to generate Hire or Fire relation between User && Company.
+	*/
+	function hire_or_fire_relation( $data ) {
+		$user_id = $data->user_id;
+		$company_id = $data->company_id;
+
+		$result = false;
+
+		if ( !empty( $user_id ) && isset( $user_id ) && !empty( $company_id ) && isset( $company_id ) ) {
+			global $wpdb;
+			$table_ = $wpdb->prefix ."user_relations";
+
+			if ( $this->is_employee( $company_id, $user_id ) ) {
+				$wpdb->delete( $table_, array( "user_followed_id" => $user_id, "user_employer_id" => $company_id ) );
+				$result = "fired";
+			} else {
+				$wpdb->insert( $table_, array( "user_followed_id" => $user_id, "user_employer_id" => $company_id ) );
+				$result = "hired";
+			}
+		}
+
+		return $result;
+	}
+
+	/*
 	*	Function name: get_user_relations
 	*	Function arguments: $user_id [ INT ] (optional), $is_company [ BOOLEAN ] (optional) (specifies if the needed relations are for company profile)
 	*	Function purpose:
@@ -389,7 +502,7 @@ class BROTHER {
 		global $wpdb;
 
 		$table_ = $wpdb->prefix ."user_relations";
-		$sql_ = !$is_company ? "SELECT * FROM $table_ WHERE user_followed_id=$user_id OR user_follower_id=$user_id" : "SELECT * FROM $table_ WHERE user_followed_id=$user_id OR user_employer_id=$user_id";
+		$sql_ = !$is_company ? "SELECT * FROM $table_ WHERE ( user_followed_id=$user_id OR user_follower_id=$user_id ) AND user_follower_id IS NOT NULL" : "SELECT * FROM $table_ WHERE user_followed_id=$user_id OR user_employer_id=$user_id";
 		$results_ = $wpdb->get_results( $sql_, OBJECT );
 
 		$count_followers = 0;
@@ -452,6 +565,8 @@ class BROTHER {
 
 		$table_ = $wpdb->prefix ."user_notifications";
 		$wpdb->insert( $table_, array( "notification_id" => $notification_id, "user_notified_id" => $v_user_id, "user_notifier_id" => $user_id ) );
+
+		return $wpdb->insert_id;
 	}
 
 	/*
@@ -476,8 +591,8 @@ class BROTHER {
 			$notifications_[ $count ][ "row_id" ] = $notification_->id;
 			$notifications_[ $count ][ "notification_body" ][ "notifier_avatar_url" ] = $this->get_user_avatar_url( $notification_->user_notifier_id );
 			$notifications_[ $count ][ "notification_body" ][ "notification_name" ] = get_field( "notification_name", $notification_->notification_id );
-			$notifications_[ $count ][ "notification_body" ][ "notification_link" ] = $this->convert_notification_url( get_field( "notification_url", $notification_->notification_id ), $notification_->user_notifier_id );
-			$notifications_[ $count ][ "notification_body" ][ "notification_text" ] = $this->convert_notification_text( get_field( "notification_text", $notification_->notification_id ), $notification_->user_notifier_id );
+			$notifications_[ $count ][ "notification_body" ][ "notification_link" ] = $this->convert_notification_url( get_field( "notification_url", $notification_->notification_id ), $notification_->user_notifier_id, $notification_->user_notified_id, $notification_->id );
+			$notifications_[ $count ][ "notification_body" ][ "notification_text" ] = $this->convert_notification_text( get_field( "notification_text", $notification_->notification_id ), $notification_->user_notifier_id, $notification_->user_notified_id, $notification_->id );
 			$notifications_[ $count ][ "notification_body" ][ "notification_icon" ] = get_field( "notification_icon_code", $notification_->notification_id );
 			$notifications_[ $count ][ "notification_body" ][ "notification_icon_background" ] = get_field( "notification_icon_background_code", $notification_->notification_id );
 			$notifications_[ $count ][ "notification_date" ] = date( "d-m-Y", strtotime( $notification_->notification_date ) );
@@ -514,8 +629,8 @@ class BROTHER {
 			$notifications_[ $count ][ "row_id" ] = $notification_->id;
 			$notifications_[ $count ][ "notification_body" ][ "notifier_avatar_url" ] = $this->get_user_avatar_url( $notification_->user_notifier_id );
 			$notifications_[ $count ][ "notification_body" ][ "notification_name" ] = get_field( "notification_name", $notification_->notification_id );
-			$notifications_[ $count ][ "notification_body" ][ "notification_link" ] = $this->convert_notification_url( get_field( "notification_url", $notification_->notification_id ), $notification_->user_notifier_id );
-			$notifications_[ $count ][ "notification_body" ][ "notification_text" ] = $this->convert_notification_text( get_field( "notification_text", $notification_->notification_id ), $notification_->user_notifier_id );
+			$notifications_[ $count ][ "notification_body" ][ "notification_link" ] = $this->convert_notification_url( get_field( "notification_url", $notification_->notification_id ), $notification_->user_notifier_id, $notification_->user_notified_id, $notification_->id );
+			$notifications_[ $count ][ "notification_body" ][ "notification_text" ] = $this->convert_notification_text( get_field( "notification_text", $notification_->notification_id ), $notification_->user_notifier_id, $notification_->user_notified_id, $notification_->id );
 			$notifications_[ $count ][ "notification_body" ][ "notification_icon" ] = get_field( "notification_icon_code", $notification_->notification_id );
 			$notifications_[ $count ][ "notification_body" ][ "notification_icon_background" ] = get_field( "notification_icon_background_code", $notification_->notification_id );
 			$notifications_[ $count ][ "notification_date" ] = date( "d-m-Y", strtotime( $notification_->notification_date ) );
@@ -534,8 +649,14 @@ class BROTHER {
 	*	Function purpose:
 	*	This function is used to convert generic notification URL to normal HTTP working address.
 	*/
-	function convert_notification_url( $url, $notifier_id ) {
+	function convert_notification_url( $url, $notifier_id, $notified_id, $notification_id ) {
 		$url = str_replace( "[notifier_archive_page]", get_author_posts_url( $notifier_id ), $url );
+		$url = str_replace( "[notified_archive_page]", get_author_posts_url( $notified_id ), $url );
+
+		if ( strpos( $url, "company_request_preview" ) ) {
+			$request_id = $this->get_notification_meta( $notification_id, "company_joinrequest_id" );
+			$url = str_replace( "[company_request_preview]", get_permalink( 85 ) ."?request_id=". $request_id, $url );
+		}
 
 		return $url;
 	}
@@ -546,8 +667,9 @@ class BROTHER {
 	*	Function purpose:
 	*	This function is used to convert generic notification text to human readeble text.
 	*/
-	function convert_notification_text( $text, $notifier_id ) {
+	function convert_notification_text( $text, $notifier_id, $notified_id, $notificaiton_id ) {
 		$text = str_replace( "[notifier_first_name]", get_user_meta( $notifier_id, "first_name", true ), $text );
+		$text = str_replace( "[notifier_short_name]", get_user_meta( $notifier_id, "user_shortname", true ) ? get_user_meta( $notifier_id, "user_shortname", true ) : get_user_meta( $notifier_id, "first_name", true ) ." ". get_user_meta( $notifier_id, "last_name", true ), $text );
 
 		return $text;
 	}
@@ -665,6 +787,59 @@ class BROTHER {
 
 			return "updated";
 		} else { return "Wrong password!"; }
+	}
+
+	/*
+	*	Function name: generate_notification_meta
+	*	Function arguments: $notification_id [ INT ] (required), $meta_key [ STRING ] (required), $meta_value [ STRING ]
+	*	Function purpose: This function is used to save custom meta information for the specified Notification.
+	*/
+	function generate_notification_meta( $notification_id, $meta_key, $meta_value ) {
+		global $wpdb;
+		$table_ = $wpdb->prefix ."user_notificationsmeta";
+
+		$sql_ = "SELECT * FROM $table_ WHERE notification_id='$notification_id' AND meta_key='$meta_key' AND meta_value='$meta_value'";
+		$result_ = $wpdb->get_results( $sql_, OBJECT );
+
+		if ( count( $result_ ) == 0 ) { // Insert method
+			$wpdb->insert(
+				$table_,
+				array(
+					"notification_id" => $notification_id,
+					"meta_key" => $meta_key,
+					"meta_value" => $meta_value
+				)
+			);
+		} else { // Update method
+			$wpdb->update(
+				$table_,
+				array(
+					"notification_id" => $notification_id,
+					"meta_key" => $meta_key,
+					"meta_value" => $meta_value
+				),
+				array (
+					"notification_id" => $notification_id,
+					"meta_key" => $meta_key,
+					"meta_value" => $meta_value
+				)
+			);
+		}
+	}
+
+	/*
+	*	Function name: get_notification_meta
+	*	Function arguments: $notification_id [ INT ] (required), $meta_key [ STRING ] (required)
+	*	Function purpose: This function is used to get the custom meta information for the specified Notification.
+	*/
+	function get_notification_meta( $notification_id, $meta_key ) {
+		global $wpdb;
+		$table_ = $wpdb->prefix ."user_notificationsmeta";
+
+		$sql_ = "SELECT meta_value FROM $table_ WHERE notification_id='$notification_id' AND meta_key='$meta_key'";
+		$result_ = $wpdb->get_results( $sql_, OBJECT );
+
+		return $result_[0]->meta_value;
 	}
 
 	function update_post_featured_image( $data ) {
@@ -830,6 +1005,11 @@ class BROTHER {
 		return wp_get_attachment_url( $attachment_id );
 	}
 
+	/*
+	*	Function name: get_companies
+	*	Function arguments: $data [ MIXED_OBJECT ] (optional) (it holds information about the ORDERING{ orderby, order }, OFFSET, NUMBERs, IS_AJAX)
+	*	Function purpose: This function is used to return containers with link to the all companies from the HUB which are public.
+	*/
 	function get_companies( $data = array() ) {
 		$args = array(
 			"meta_query" => array(
@@ -853,6 +1033,8 @@ class BROTHER {
 		);
 		$user_ids = get_users( $args );
 
+		if ( isset( $data->is_ajax ) && $data->is_ajax ) { $companies_holder = array(); }
+
 		if ( empty( $user_ids ) ) { if ( empty( $data->is_ajax ) || !$data->is_ajax ) { echo "<h1 class='no-information-message'>There aren't any public companies.</h1>"; } else { return json_encode( "There aren't any public companies." ); } }
 		else {
 			foreach ( $user_ids as $user_id ) {
@@ -860,19 +1042,198 @@ class BROTHER {
 				$user_last_name = get_user_meta( $user_id, "last_name", true );
 				$user_short_name = get_user_meta( $user_id, "user_shortname", true );
 				$user_avatar = $this->get_user_avatar_url( $user_id );
+				$user_banner = $this->get_user_banner_url( $user_id );
 
 				if ( empty( $data->is_ajax ) || !$data->is_ajax ) {
 					?>
 					<a href="<?php echo get_author_posts_url( $user_id ); ?>" id='company-anchor-<?php echo $user_id; ?>' class='company-anchor'>
-						<div id='company-<?php echo $user_id; ?>' class='list-item animated fadeIn'>
-							<div id='company-avatar-<?php echo $user_id; ?>' class='avatar' style='background-image: url(<?php echo $user_avatar; ?>);'></div>
-							<h1 id='company-brand-<?php echo $user_id; ?>' class='company-brand'><?php echo !empty( $user_short_name ) ? $user_short_name : $user_first_name ." ". $user_last_name; ?></h1>
+						<div id='company-<?php echo $user_id; ?>' class='list-item animated fadeIn' style='background-image: url(<?php echo $user_banner; ?>);'>
+							<div class='overlay'>
+								<div id='company-avatar-<?php echo $user_id; ?>' class='avatar' style='background-image: url(<?php echo $user_avatar; ?>);'>
+								</div>
+								<h1 id='company-brand-<?php echo $user_id; ?>' class='company-brand'><?php echo !empty( $user_short_name ) ? $user_short_name : $user_first_name ." ". $user_last_name; ?></h1>
+							</div>
 						</div>
 					</a>
 					<?php
-				} else {}
+				} else {
+					$company_holder = array();
+					$company_holder[ "ID" ] = $user_id;
+					$company_holder[ "AVATAR_URL" ] = $user_avatar;
+					$company_holder[ "COMPANY_URL" ] = get_author_posts_url( $user_id );
+					$company_holder[ "FIRST_NAME" ] = $user_first_name;
+					$company_holder[ "LAST_NAME" ] = $user_last_name;
+					$company_holder[ "SHOR_TNAME" ] = $user_short_name;
+					array_push( $companies_holder, (object)$company_holder );
+				}
+			}
+
+			if ( isset( $data->is_ajax ) && $data->is_ajax ) { return json_encode( $company_holder ); }
+		}
+	}
+
+	/*
+	*	Function name: send_join_request
+	*	Function arguments: $data [ MIXED_OBJECT ] (required) (contains the $company_id, $user_id, $user_cv_link, $user_portfolio_link)
+	*	Function purpose: This function is used to send a JOIN request to the chosed by the user company.
+	*/
+	function send_join_request( $data ) {
+		$company_id = $data->company_id;
+		$user_id = !empty( $data->user_id ) ? $data->user_id : get_current_user_id();
+		$user_cv_link = !empty( $data->user_cv_link ) ? $data->user_cv_link : "";
+		$user_portfolio_link = !empty( $data->user_portfolio_link ) ? $data->user_portfolio_link : "";
+
+		$result = "";
+
+		if ( !empty( $company_id ) ) {
+			if ( empty( $user_cv_link ) ) { $result = "You CV is required to apply!"; }
+			else {
+				if ( !filter_var( $user_cv_link, FILTER_VALIDATE_URL ) ) { $result = "The link to your CV is not valid!"; }
+				else {
+					if ( !empty( $user_portfolio_link ) && !filter_var( $user_portfolio_link, FILTER_VALIDATE_URL ) ) { $result = "The link to your portfolio is not valid!"; }
+					else {
+						global $wpdb;
+						$table_ = $wpdb->prefix ."user_requests";
+
+						$sql_ = "SELECT * FROM $table_ WHERE requester_id='$user_id' AND company_id='$company_id'";
+						$result_ = $wpdb->get_results( $sql_, OBJECT );
+
+						if ( count( $result_ ) > 0 ) { // Update method
+							$request_id = $result_[0]->id;
+							$wpdb->update(
+								$table_,
+								array(
+									"requester_id" => $user_id,
+									"requester_cv" => esc_url( $user_cv_link ),
+									"requester_portfolio" => esc_url( $user_portfolio_link ),
+									"company_id" => $company_id
+								),
+								array (
+									"id" => $request_id
+								)
+							);
+
+						} else { // Insert method
+							$wpdb->insert(
+								$table_,
+								array (
+									"requester_id" => $user_id,
+									"requester_cv" => esc_url( $user_cv_link ),
+									"requester_portfolio" => esc_url( $user_portfolio_link ),
+									"company_id" => $company_id
+								)
+							);
+							$request_id = $wpdb->insert_id;
+						}
+
+
+						$notification_id = $this->generate_notification( 223, $company_id, $user_id );
+						$this->generate_notification_meta( $notification_id, "company_joinrequest_id", $request_id );
+
+						$result = "requested";
+					}
+				}
+			}
+		} else { $result = "ERROR: Company ID is empty."; }
+
+		return $result;
+	}
+
+	/*
+	*	Function name: update_join_request
+	*	Function argumnets: $data [ MIXED_OBJECT ] (required) (holds the $request_id && the $request_response given by the Company owner)
+	*	Function purpose: This function is used to update with answer (accept / decline) already created Company Join Request.
+	*/
+	function update_join_request( $data ) {
+		$result = false;
+
+		if ( !empty( $data->request_id ) && isset( $data->request_id ) && !empty( $data->response ) && isset( $data->response ) ) {
+			global $wpdb;
+			$table_ = $wpdb->prefix ."user_requests";
+			$wpdb->update(
+				$table_,
+				array( "request_response" => $data->response ),
+				array( "id" => $data->request_id )
+			);
+
+			$sql_ = "SELECT * FROM $table_ WHERE id='$data->request_id'";
+			$result_ = $wpdb->get_results( $sql_, OBJECT )[0];
+
+			if ( $data->response == "accept" ) {
+				$this->hire_or_fire_relation( (object)array( "user_id" => $result_->requester_id, "company_id" => $result_->company_id ) );
+				$this->generate_notification( 225, $result_->requester_id, $result_->company_id );
+			} else { $this->generate_notification( 226, $result_->requester_id, $result_->company_id ); }
+		}
+
+		return $result;
+	}
+
+	/*
+	*	Function name: get_requests
+	*	Function arguments: $data [ MIXED_OBJECT ] (required) (usually holds the $company_id && the $is_ajax pointer: TRUE || FALSE;)
+	*	Function purpose: This function is used to get all requests send to the specified company.
+	*/
+	function get_requests( $data ) {
+		$company_id = !empty( $data->company_id ) ? $data->company_id : get_current_user_id();
+		$requests_holder = array();
+		$listed_users = array();
+
+		global $wpdb;
+		$table_ = $wpdb->prefix ."user_requests";
+
+		$sql_ = "SELECT DISTINCT * FROM $table_ WHERE company_id='$company_id' ORDER BY request_date DESC";
+		$results_ = $wpdb->get_results( $sql_, OBJECT );
+
+		foreach ( $results_ as $request_ ) {
+			if ( !in_array( $request_->requester_id, $listed_users ) ) {
+				$user_first_name = get_user_meta( $request_->requester_id, "first_name", true );
+				$user_last_name = get_user_meta( $request_->requester_id, "last_name", true );
+
+				if ( !isset( $data->is_ajax ) || !$data->is_ajax ) {
+					?>
+
+					<a href="<?php echo get_permalink( 85 ); ?>?request_id=<?php echo $request_->id; ?>" class="request-anchor">
+						<div id="request-<?php echo $request_->id; ?>" class="list-item">
+							<div class="avatar" style="background-image: url(<?php echo $this->get_user_avatar_url( $request_->requester_id ); ?>);'"></div>
+							<h1 class="names"><?php echo $user_first_name ." ". $user_last_name; ?></h1>
+							<div class="list-item-meta">
+								<?php if ( !empty( $request_->requester_cv ) ) { ?> <p class="meta icon blue">CV</p> <?php } ?>
+								<?php if ( !empty( $request_->requester_portfolio ) ) { ?> <p class="meta icon green">PF</p> <?php } ?>
+								<p class="meta"><?php echo date( "d-m-Y", strtotime( $request_->request_date ) ); ?></p>
+							</div>
+						</div>
+					</a>
+
+					<?php
+				} elseif ( $data->is_ajax ) {
+					$request_holder = array();
+					$request_holder[ "ID" ] = $request_->id;
+					$request_holder[ "REQUESTER_ID" ] = $request_->requester_id;
+					$request_holder[ "REQUESTER_CV" ] = $request_->requester_cv;
+					$request_holder[ "REQUESTER_PORTFOLIO" ] = $request_->requester_portfolio;
+					$request_holder[ "REQUEST_DATE" ] = $request_->request_date;
+					$request_holder[ "REQUEST_RESPONSE" ] = $request_->request_response;
+					$request_holder[ "COMPANY_ID" ] = $request_->company_id;
+					array_push( $requests_holder, (object)$request_holder );
+				}
+
+				array_push( $listed_users, $request_->requester_id );
 			}
 		}
+
+		if ( isset( $data->is_ajax ) && $data->is_ajax ) { return json_encode( $requests_holder ); }
+	}
+
+	function get_request( $request_id ) {
+		$result_ = false;
+		if ( !empty( $request_id ) && isset( $request_id ) ) {
+			global $wpdb;
+			$table_ = $wpdb->prefix ."user_requests";
+
+			$sql_ = "SELECT * FROM $table_ WHERE id='$request_id'";
+			$result_ = $wpdb->get_results( $sql_, OBJECT )[0];
+		}
+		return $result_;
 	}
 }
 
@@ -880,4 +1241,6 @@ class BROTHER {
 $db_brother = new BROTHER;
 if ( !$db_brother->is_table_exists( "user_relations" ) ) { $db_brother->create_user_relations(); }
 if ( !$db_brother->is_table_exists( "user_notifications" ) ) { $db_brother->create_user_notifications(); }
+if ( !$db_brother->is_table_exists( "user_notificationsmeta" ) ) { $db_brother->create_user_notificationsmeta(); }
+if ( !$db_brother->is_table_exists( "user_requests" ) ) { $db_brother->create_user_requests(); }
 ?>

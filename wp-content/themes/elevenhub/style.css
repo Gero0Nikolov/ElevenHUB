@@ -1094,6 +1094,31 @@ a.skeleton-bold-button {
   background: #ecf0f1;
   border-color: #ecf0f1; }
 
+.red-skeleton-bold-button {
+  display: inline-block;
+  font-family: OpenSansBold;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  padding: 1em 2.5em;
+  letter-spacing: 1px;
+  background: transparent;
+  box-shadow: none !important;
+  text-shadow: none;
+  font-weight: normal;
+  color: #c0392b;
+  border: 1px solid #c0392b;
+  border-radius: 100px;
+  outline: 0;
+  webkit-transition: all 0.25s ease-in-out;
+  -moz-transition: all 0.25s ease-in-out;
+  -o-transition: all 0.25s ease-in-out;
+  transition: all 0.25s ease-in-out; }
+
+.red-skeleton-bold-button:hover {
+  background: #e74c3c;
+  color: #fff;
+  border-color: #e74c3c; }
+
 .skeleton-icon-button {
   display: inline-block;
   font-size: 1.25rem;

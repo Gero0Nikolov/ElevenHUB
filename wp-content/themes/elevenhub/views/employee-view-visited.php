@@ -16,8 +16,8 @@ $v_user_first_name = get_user_meta( $v_user_id, "first_name", true );
 $v_user_last_name = get_user_meta( $v_user_id, "last_name", true );
 $v_user_biography = get_user_meta( $v_user_id, "user_biography", true );
 ?>
-<script type="text/javascript">var vUserID = "<?php echo $v_user_id; ?>";</script>
 
+<script type="text/javascript">var vUserID = "<?php echo $v_user_id; ?>";</script>
 <div id="user-container" class="user-container-profile visited" style="background-image: url(<?php echo $brother_->get_user_banner_url( $v_user_id ); ?>);">
 	<div class="white-box">
 		<div class="user-information">
@@ -31,7 +31,7 @@ $v_user_biography = get_user_meta( $v_user_id, "user_biography", true );
 			echo $v_user_followers_num == 1 ? $v_user_followers_num ." follower" : $v_user_followers_num ." followers";
 			?>
 			</h2>
-			<?php			
+			<?php
 			if ( get_user_meta( get_current_user_id(), "account_association", true ) != "company" ) {
 				if ( $brother_->is_follower( $v_user_id ) ) {
 					?>

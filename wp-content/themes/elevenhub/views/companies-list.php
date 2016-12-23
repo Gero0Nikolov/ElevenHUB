@@ -10,5 +10,5 @@
 $brother_ = new BROTHER;
 ?>
 <div id="companies-list">
-	<?php $brother_->get_companies(); ?>
+	<?php $brother_->get_companies( -1 ); ?>
 </div>

@@ -377,7 +377,8 @@ $asbestos: #7f8c8d;
 			display: block;
 			text-align: right;
 
-			.meta-button {
+			.meta-button,
+            .meta-text {
 				display: inline-block;
 				vertical-align: middle;
 
@@ -840,7 +841,7 @@ $asbestos: #7f8c8d;
 						height: 48px;
 
 						border-radius: 100%;
-						background-color: #ddd;
+						background-color: #eee;
 						background-size: cover;
 						background-position: center;
 
@@ -889,6 +890,8 @@ $asbestos: #7f8c8d;
 .mt-1em { margin-top: 1em !important; }
 
 .mh-auto { margin-left: auto; margin-right: auto; }
+
+.mr-05em { margin-right: 0.5em !important; }
 
 .width-20p { width: 20% !important; }
 .width-80p { width: 80% !important; }
@@ -985,7 +988,7 @@ $asbestos: #7f8c8d;
 			    display: inline-block;
 			    width: 38px;
 			    height: 38px;
-			    background-color: #ddd;
+			    background-color: #eee;
 				background-size: cover;
 				background-position: center;
 			    border-radius: 100%;
@@ -1437,60 +1440,240 @@ $asbestos: #7f8c8d;
 		text-decoration: none;
 		text-shadow: none;
 		outline: 0 !important;
+        vertical-align: middle;
+        margin: 0 1em 1em;
 
 		.list-item {
 			display: block;
-			padding: 1em 0;
-			margin: 0 auto;
-			border-bottom: 1px solid #ddd;
+			width: 100%;
 			font-size: 1rem;
 			position: relative;
+            border-radius: 3px;
+			text-align: center;
+
+			background-size: cover;
+			background-position: center;
 
 			webkit-transition: all 0.25s ease-in-out;
 			-moz-transition: all 0.25s ease-in-out;
 			-o-transition: all 0.25s ease-in-out;
 			transition: all 0.25s ease-in-out;
 
+			.overlay {
+                display: block;
+                width: 100%;
+                height: 100%;
+                position: relative;
+				padding: 1.5em 0.5em;
+                background: rgba(0, 0, 0, 0.25);
+
+                webkit-transition: all 0.25s ease-in-out;
+				-moz-transition: all 0.25s ease-in-out;
+				-o-transition: all 0.25s ease-in-out;
+				transition: all 0.25s ease-in-out;
+            }
+
 			.avatar {
 				display: inline-block;
-				font-size: 2.5rem;
-				width: 2em;
-				height: 2em;
+				font-size: 3.5rem;
+				width: 1.75em;
+				height: 1.75em;
 				background-size: cover;
 				background-position: center;
 				background-color: #eee;
 				border-radius: 100%;
-				border: 1px solid #ddd;
 				vertical-align: middle;
-
-				webkit-transition: all 0.25s ease-in-out;
-				-moz-transition: all 0.25s ease-in-out;
-				-o-transition: all 0.25s ease-in-out;
-				transition: all 0.25s ease-in-out;
+                margin: 0 auto;
 			}
 
 			.company-brand {
 				display: inline-block;
 				vertical-align: middle;
-				font-family: OpenSansRegular;
+				font-family: OpenSansLight;
 				font-weight: normal;
-				font-size: 1.75rem;
+				font-size: 2.5rem;
 				padding: 0;
-				margin-left: 0.25em;
-				color: #333;
-
-				webkit-transition: all 0.25s ease-in-out;
-				-moz-transition: all 0.25s ease-in-out;
-				-o-transition: all 0.25s ease-in-out;
-				transition: all 0.25s ease-in-out;
+				color: #fff;
+                margin: 0 auto 0 0.5em;
+                text-align: center;
+				letter-spacing: 1px;
 			}
 		}
 		.list-item:hover,
 		.list-item:active {
-			.avatar,
-			.company-brand { transform: translateX(0.25em); }
+            .overlay { background: rgba(0, 0, 0, 0.45);}
 		}
 	}
+}
+
+#requests-list {
+	display: block;
+	margin-top: 1em;
+
+	.request-anchor {
+		display: block;
+		text-decoration: none;
+		text-shadow: none;
+		outline: 0 !important;
+
+		.list-item {
+			display: block;
+			border-bottom: 1px solid #ddd;
+			margin: 0 auto 1em;
+			padding: 0.75em;
+
+			.avatar {
+				display: inline-block;
+
+				font-size: 2rem;
+				width: 2em;
+				height: 2em;
+
+				border-radius: 100%;
+				box-shadow: 0 0 0 1px #ddd;
+
+				background-size: cover;
+				background-position: center;
+				background-color: #eee;
+
+				vertical-align: middle;
+			}
+
+			.names {
+				display: inline-block;
+
+				font-family: OpenSansRegular;
+				font-size: 1.25rem;
+				font-weight: normal;
+
+				color: #333;
+
+				margin: 0 auto 0 0.5em;
+
+				vertical-align: middle;
+				letter-spacing: 1px;
+			}
+
+			.list-item-meta {
+				display: block;
+				text-align: right;
+
+				.meta {
+					display: inline-block;
+					vertical-align: middle;
+
+					font-family: PlayFairRegular;
+					font-size: 1rem;
+					font-weight: normal;
+
+					color: #777;
+
+					letter-spacing: 1px;
+					margin: 0 0 0 0.25em;
+				}
+
+				.icon {
+					border: 1px solid;
+					border-radius: 100%;
+					padding: 0.25em 0.15em;
+					width: 34px;
+					height: 34px;
+					text-align: center;
+				}
+
+				.blue.icon { color: $peter_river; }
+				.green.icon { color: $emerald; }
+			}
+		}
+		.list-item:hover,
+		.list-item:active { box-shadow: 0 0 0 1px #ddd; }
+	}
+
+    #request-information {
+        .requester-information {
+            display: inline-block;
+            width: 85%;
+            vertical-align: top;
+
+            .requester_anchor {
+                outline: 0 !important;
+                text-shadow: none !important;
+                text-decoration: none;
+            }
+
+            .avatar {
+                display: inline-block;
+                font-size: 3rem;
+                width: 2em;
+                height: 2em;
+                background-size: cover;
+                background-position: center;
+                background-color: #eee;
+                border-radius: 100%;
+                vertical-align: middle;
+                box-shadow: 0 0 0 1px #ddd;
+            }
+
+            .names {
+                display: inline-block;
+                font-family: OpenSansRegular;
+                font-size: 2rem;
+                font-weight: normal;
+                color: #333;
+                letter-spacing: 1px;
+                vertical-align: middle;
+                margin-left: 0.5em;
+            }
+
+            .bio {
+                display: block;
+
+                h1 {
+                    font-family: OpenSansRegular;
+                    font-size: 1.5rem;
+                    font-weight: normal;
+                    color: #333;
+                    letter-spacing: 1px;
+                    margin: 1em 0 0.25em;
+                }
+
+                .text {
+                    display: block;
+                    font-family: OpenSansRegular;
+                    font-size: 1rem;
+                    font-weight: normal;
+                    color: #333;
+                    letter-spacing: 1px;
+                    line-height: 200%;
+                }
+            }
+        }
+
+        .requester-links {
+            display: inline-block;
+            width: 15%;
+            vertical-align: top;
+            padding: 2em 0;
+            text-align: right;
+        }
+
+        .request-meta {
+            border-top: 1px solid #ddd;
+            margin: 2em 0;
+            padding: 1em 0;
+            display: block;
+
+            .meta {
+                display: block;
+                margin: 0 0 0.5em 0;
+                font-family: OpenSansRegular;
+                font-size: 1rem;
+                font-weight: normal;
+                color: #333;
+                letter-spacing: 1px;
+            }
+        }
+    }
 }
 
 /** MESSEGAS **/
@@ -1642,7 +1825,30 @@ $asbestos: #7f8c8d;
 
 	#companies-list {
 		.list-item {
-			max-width: calc(100% - 2em);
+			max-width: 100%;
+
+			.company-brand { font-size: 2.25rem; }
+		}
+	}
+
+	#requests-list {
+		#request-information {
+			.requester-information {
+				display: block;
+			    width: 100%;
+			    text-align: center;
+			}
+
+			.requester-links {
+				display: block;
+				width: 100%;
+				padding: 2em;
+			}
+
+			.request-meta {
+				margin: 0;
+				text-align: center;
+			}
 		}
 	}
 }

@@ -313,7 +313,8 @@
     .company-container .company-information-container .company-meta-container {
       display: block;
       text-align: right; }
-      .company-container .company-information-container .company-meta-container .meta-button {
+      .company-container .company-information-container .company-meta-container .meta-button,
+      .company-container .company-information-container .company-meta-container .meta-text {
         display: inline-block;
         vertical-align: middle;
         background: none;
@@ -683,7 +684,7 @@
             width: 48px;
             height: 48px;
             border-radius: 100%;
-            background-color: #ddd;
+            background-color: #eee;
             background-size: cover;
             background-position: center;
             vertical-align: middle; }
@@ -729,6 +730,9 @@
 .mh-auto {
   margin-left: auto;
   margin-right: auto; }
+
+.mr-05em {
+  margin-right: 0.5em !important; }
 
 .width-20p {
   width: 20% !important; }
@@ -822,7 +826,7 @@
         display: inline-block;
         width: 38px;
         height: 38px;
-        background-color: #ddd;
+        background-color: #eee;
         background-size: cover;
         background-position: center;
         border-radius: 100%;
@@ -1188,51 +1192,182 @@
   display: block;
   text-decoration: none;
   text-shadow: none;
-  outline: 0 !important; }
+  outline: 0 !important;
+  vertical-align: middle;
+  margin: 0 1em 1em; }
   #companies-list .company-anchor .list-item {
     display: block;
-    padding: 1em 0;
-    margin: 0 auto;
-    border-bottom: 1px solid #ddd;
+    width: 100%;
     font-size: 1rem;
     position: relative;
+    border-radius: 3px;
+    text-align: center;
+    background-size: cover;
+    background-position: center;
     webkit-transition: all 0.25s ease-in-out;
     -moz-transition: all 0.25s ease-in-out;
     -o-transition: all 0.25s ease-in-out;
     transition: all 0.25s ease-in-out; }
+    #companies-list .company-anchor .list-item .overlay {
+      display: block;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      padding: 1.5em 0.5em;
+      background: rgba(0, 0, 0, 0.25);
+      webkit-transition: all 0.25s ease-in-out;
+      -moz-transition: all 0.25s ease-in-out;
+      -o-transition: all 0.25s ease-in-out;
+      transition: all 0.25s ease-in-out; }
     #companies-list .company-anchor .list-item .avatar {
       display: inline-block;
+      font-size: 3.5rem;
+      width: 1.75em;
+      height: 1.75em;
+      background-size: cover;
+      background-position: center;
+      background-color: #eee;
+      border-radius: 100%;
+      vertical-align: middle;
+      margin: 0 auto; }
+    #companies-list .company-anchor .list-item .company-brand {
+      display: inline-block;
+      vertical-align: middle;
+      font-family: OpenSansLight;
+      font-weight: normal;
       font-size: 2.5rem;
+      padding: 0;
+      color: #fff;
+      margin: 0 auto 0 0.5em;
+      text-align: center;
+      letter-spacing: 1px; }
+  #companies-list .company-anchor .list-item:hover .overlay,
+  #companies-list .company-anchor .list-item:active .overlay {
+    background: rgba(0, 0, 0, 0.45); }
+
+#requests-list {
+  display: block;
+  margin-top: 1em; }
+  #requests-list .request-anchor {
+    display: block;
+    text-decoration: none;
+    text-shadow: none;
+    outline: 0 !important; }
+    #requests-list .request-anchor .list-item {
+      display: block;
+      border-bottom: 1px solid #ddd;
+      margin: 0 auto 1em;
+      padding: 0.75em; }
+      #requests-list .request-anchor .list-item .avatar {
+        display: inline-block;
+        font-size: 2rem;
+        width: 2em;
+        height: 2em;
+        border-radius: 100%;
+        box-shadow: 0 0 0 1px #ddd;
+        background-size: cover;
+        background-position: center;
+        background-color: #eee;
+        vertical-align: middle; }
+      #requests-list .request-anchor .list-item .names {
+        display: inline-block;
+        font-family: OpenSansRegular;
+        font-size: 1.25rem;
+        font-weight: normal;
+        color: #333;
+        margin: 0 auto 0 0.5em;
+        vertical-align: middle;
+        letter-spacing: 1px; }
+      #requests-list .request-anchor .list-item .list-item-meta {
+        display: block;
+        text-align: right; }
+        #requests-list .request-anchor .list-item .list-item-meta .meta {
+          display: inline-block;
+          vertical-align: middle;
+          font-family: PlayFairRegular;
+          font-size: 1rem;
+          font-weight: normal;
+          color: #777;
+          letter-spacing: 1px;
+          margin: 0 0 0 0.25em; }
+        #requests-list .request-anchor .list-item .list-item-meta .icon {
+          border: 1px solid;
+          border-radius: 100%;
+          padding: 0.25em 0.15em;
+          width: 34px;
+          height: 34px;
+          text-align: center; }
+        #requests-list .request-anchor .list-item .list-item-meta .blue.icon {
+          color: #3498db; }
+        #requests-list .request-anchor .list-item .list-item-meta .green.icon {
+          color: #2ecc71; }
+    #requests-list .request-anchor .list-item:hover,
+    #requests-list .request-anchor .list-item:active {
+      box-shadow: 0 0 0 1px #ddd; }
+  #requests-list #request-information .requester-information {
+    display: inline-block;
+    width: 85%;
+    vertical-align: top; }
+    #requests-list #request-information .requester-information .requester_anchor {
+      outline: 0 !important;
+      text-shadow: none !important;
+      text-decoration: none; }
+    #requests-list #request-information .requester-information .avatar {
+      display: inline-block;
+      font-size: 3rem;
       width: 2em;
       height: 2em;
       background-size: cover;
       background-position: center;
       background-color: #eee;
       border-radius: 100%;
-      border: 1px solid #ddd;
       vertical-align: middle;
-      webkit-transition: all 0.25s ease-in-out;
-      -moz-transition: all 0.25s ease-in-out;
-      -o-transition: all 0.25s ease-in-out;
-      transition: all 0.25s ease-in-out; }
-    #companies-list .company-anchor .list-item .company-brand {
+      box-shadow: 0 0 0 1px #ddd; }
+    #requests-list #request-information .requester-information .names {
       display: inline-block;
-      vertical-align: middle;
       font-family: OpenSansRegular;
+      font-size: 2rem;
       font-weight: normal;
-      font-size: 1.75rem;
-      padding: 0;
-      margin-left: 0.25em;
       color: #333;
-      webkit-transition: all 0.25s ease-in-out;
-      -moz-transition: all 0.25s ease-in-out;
-      -o-transition: all 0.25s ease-in-out;
-      transition: all 0.25s ease-in-out; }
-  #companies-list .company-anchor .list-item:hover .avatar,
-  #companies-list .company-anchor .list-item:hover .company-brand,
-  #companies-list .company-anchor .list-item:active .avatar,
-  #companies-list .company-anchor .list-item:active .company-brand {
-    transform: translateX(0.25em); }
+      letter-spacing: 1px;
+      vertical-align: middle;
+      margin-left: 0.5em; }
+    #requests-list #request-information .requester-information .bio {
+      display: block; }
+      #requests-list #request-information .requester-information .bio h1 {
+        font-family: OpenSansRegular;
+        font-size: 1.5rem;
+        font-weight: normal;
+        color: #333;
+        letter-spacing: 1px;
+        margin: 1em 0 0.25em; }
+      #requests-list #request-information .requester-information .bio .text {
+        display: block;
+        font-family: OpenSansRegular;
+        font-size: 1rem;
+        font-weight: normal;
+        color: #333;
+        letter-spacing: 1px;
+        line-height: 200%; }
+  #requests-list #request-information .requester-links {
+    display: inline-block;
+    width: 15%;
+    vertical-align: top;
+    padding: 2em 0;
+    text-align: right; }
+  #requests-list #request-information .request-meta {
+    border-top: 1px solid #ddd;
+    margin: 2em 0;
+    padding: 1em 0;
+    display: block; }
+    #requests-list #request-information .request-meta .meta {
+      display: block;
+      margin: 0 0 0.5em 0;
+      font-family: OpenSansRegular;
+      font-size: 1rem;
+      font-weight: normal;
+      color: #333;
+      letter-spacing: 1px; }
 
 /** MESSEGAS **/
 .no-information-message {
@@ -1351,6 +1486,19 @@
   width: 1.35em !important;
   height: 1.35em !important; }
 .mobile #companies-list .list-item {
-  max-width: calc(100% - 2em); }
+  max-width: 100%; }
+  .mobile #companies-list .list-item .company-brand {
+    font-size: 2.25rem; }
+.mobile #requests-list #request-information .requester-information {
+  display: block;
+  width: 100%;
+  text-align: center; }
+.mobile #requests-list #request-information .requester-links {
+  display: block;
+  width: 100%;
+  padding: 2em; }
+.mobile #requests-list #request-information .request-meta {
+  margin: 0;
+  text-align: center; }
 
 /*# sourceMappingURL=style.css.map */

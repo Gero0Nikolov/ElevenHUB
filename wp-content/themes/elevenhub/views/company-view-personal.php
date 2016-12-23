@@ -44,7 +44,7 @@ if ( empty( $user_shortname ) || !isset( $user_shortname ) ) {
 		<span class="bull-separator">&bull;</span>
 		<button id="events-controller" class="orange-bold-button">Events</button>
 		<span class="bull-separator">&bull;</span>
-		<button id="requests-controller" class="banana-bold-button">Requests</button>
+		<a href="<?php echo get_permalink( 85 ) ."?company_id=". $user_id; ?>" id="requests-controller" class="banana-bold-button">Requests</a>
 		<span class="bull-separator">&bull;</span>
 		<a href="<?php echo get_permalink( 98 ) ."?company_id=". $user_id; ?>" id="media-conroller" class="grape-bold-button">Media</a>
 	</div>
