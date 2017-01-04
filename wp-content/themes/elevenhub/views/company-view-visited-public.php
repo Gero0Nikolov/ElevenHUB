@@ -25,14 +25,14 @@ if ( empty( $v_user_shortname ) || !isset( $v_user_shortname ) ) {
 			<div id="company-logo" class="logo" style="background-image: url('<?php echo $brother_->get_user_avatar_url( $v_user_id ); ?>');"></div>
 			<h1 id="company-brand" class="brand"><?php echo empty( $v_user_shortname ) || !isset( $v_user_shortname ) ? $v_user_first_name ." ". $v_user_last_name : $v_user_shortname; ?></h1>
 			<div id="company-meta" class="company-meta-container">
-				<span id="company-followers-controller" class="meta-text">
+				<span class="meta-text">
 					<?php
 					$v_user_followers_num = count( $brother_->get_user_followers( $v_user_id ) );
 					echo $v_user_followers_num == 1 ? $v_user_followers_num ." follower" : $v_user_followers_num ." followers";
 					?>
 				</span>
 				<span class="bull-separator">&bull;</span>
-				<span id="company-employees-controller" class="meta-text">
+				<span class="meta-text">
 					<?php
 					$v_user_employees_num = count( $brother_->get_user_employees( $v_user_id ) );
 					echo $v_user_employees_num == 1 ? $v_user_employees_num ." employee" : $v_user_employees_num ." employees";

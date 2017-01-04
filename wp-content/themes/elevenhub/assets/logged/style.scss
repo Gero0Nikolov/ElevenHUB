@@ -21,6 +21,9 @@ $pomegranate: #c0392b;
 $silver: #bdc3c7;
 $asbestos: #7f8c8d;
 
+html,
+body { margin: 0 !important; padding: 0 !important; }
+
 /** EDITABLE CONTAINERS **/
 [contenteditable=true]:empty:before{
   	content: attr(placeholder);
@@ -186,7 +189,7 @@ $asbestos: #7f8c8d;
 
 .user-container-profile {
 	display: block;
-	padding: 3em 0;
+	padding: 4em 0;
 	background-color: $midnight_blue;
 	background-size: cover;
 	background-position: center;
@@ -287,6 +290,27 @@ $asbestos: #7f8c8d;
 		}
 		.unfollow-button:hover,
 		.unfollow-button:active { background: #eee; }
+
+        .badges {
+            .badge {
+                display: inline-block;
+                border: 1px solid;
+                font-size: 1rem;
+                width: 28px;
+                height: 28px;
+                text-align: center;
+                border-radius: 100%;
+
+				position: relative;
+            }
+			.badge:before {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+			}
+            .badge.employee { color: #fff; border-color: $sun_flower; background-color: $sun_flower; }
+        }
 	}
 }
 .user-container-profile:hover .invisible-control,
@@ -511,6 +535,7 @@ $asbestos: #7f8c8d;
 		font-weight: normal;
 		font-size: 1.25rem;
 		letter-spacing: 1px;
+        z-index: 9;
 
 		#close-popup-button {
 			display: block;
@@ -630,6 +655,8 @@ $asbestos: #7f8c8d;
 			font-weight: normal;
 			text-shadow: none;
 
+            z-index: 9;
+
 			padding: 0.5em;
 
 			color: $alizarin;
@@ -722,6 +749,9 @@ $asbestos: #7f8c8d;
 			justify-content: flex-start;
 			border-bottom: 1px solid #ddd;
 			padding: 0.5em;
+            position: relative;
+            z-index: 8;
+            background: #fff;
 
 			.relation-anchor-controller {
 				display: inline-block;
@@ -804,14 +834,15 @@ $asbestos: #7f8c8d;
 		display: block;
 		position: relative;
 
-		#user-followers-container { transform: translateX(-100%); }
-		#user-follows-container { transform: translateX(100%); }
+		#user-followers-container { transform: translateY(-100%); }
+		#user-follows-container { transform: translateY(-100%); }
 
 		.user-list {
 			display: block;
 			width: 100%;
 			position: absolute;
 			top: 0;
+            background: #fff;
 
 			webkit-transition: all 0.5s ease-in-out;
 		    -moz-transition: all 0.5s ease-in-out;
@@ -824,46 +855,76 @@ $asbestos: #7f8c8d;
 				text-shadow: none;
 				outline: 0 !important;
 				color: #333 !important;
-
-				.relation-container {
-					display: block;
-					border-bottom: 1px solid #ddd;
-					padding: 1em;
-
-					webkit-transition: all 0.25s ease-in-out;
-				    -moz-transition: all 0.25s ease-in-out;
-				    -o-transition: all 0.25s ease-in-out;
-				    transition: all 0.25s ease-in-out;
-
-					.user-avatar {
-						display: inline-block;
-						width: 48px;
-						height: 48px;
-
-						border-radius: 100%;
-						background-color: #eee;
-						background-size: cover;
-						background-position: center;
-
-						vertical-align: middle;
-					}
-
-					.user-names {
-						display: inline-block;
-					    vertical-align: middle;
-					    margin: 0;
-					    font-family: OpenSansRegular;
-					    font-weight: normal;
-					    font-size: 1.25rem;
-					    letter-spacing: 1px;
-					    color: #333;
-					}
-				}
-				.relation-container:hover,
-				.relation-container:active { background: #f9f9f9; }
 			}
+
+			.relation-container {
+				display: block;
+				border-bottom: 1px solid #ddd;
+				padding: 1em;
+				position: relative;
+
+				webkit-transition: all 0.25s ease-in-out;
+				-moz-transition: all 0.25s ease-in-out;
+				-o-transition: all 0.25s ease-in-out;
+				transition: all 0.25s ease-in-out;
+
+				.user-avatar {
+					display: inline-block;
+					width: 48px;
+					height: 48px;
+
+					border-radius: 100%;
+					background-color: #eee;
+					background-size: cover;
+					background-position: center;
+
+					vertical-align: middle;
+				}
+
+				.user-names {
+					display: inline-block;
+					vertical-align: middle;
+					margin: 0;
+					font-family: OpenSansRegular;
+					font-weight: normal;
+					font-size: 1.25rem;
+					letter-spacing: 1px;
+					color: #333;
+				}
+
+				.relation-controls {
+					display: inline-block;
+					position: absolute;
+					top: 50%;
+					right: 0;
+					transform: translateY(-50%);
+
+					.option {
+						display: inline-block;
+						background: none;
+						border: 1px solid;
+						border-radius: 100%;
+						outline: 0 !important;
+						box-shadow: none !important;
+					    padding: 0.55em 0.65em;
+						margin: 0 0.5em;
+						font-size: 0.8rem;
+
+						webkit-transition: all 0.25s ease-in-out;
+						-moz-transition: all 0.25s ease-in-out;
+						-o-transition: all 0.25s ease-in-out;
+						transition: all 0.25s ease-in-out;
+					}
+
+					.red.option { color: $alizarin; }
+					.red.option:hover,
+					.red.option:active { color: $pomegranate; }
+				}
+			}
+			.relation-container:hover,
+			.relation-container:active { background: #f9f9f9; }
 		}
-		.active.user-list { transform: translateX(0) !important; position: relative !important; }
+		.active.user-list { transform: translateY(0) !important; position: relative !important; }
 	}
 }
 
@@ -892,6 +953,9 @@ $asbestos: #7f8c8d;
 .mh-auto { margin-left: auto; margin-right: auto; }
 
 .mr-05em { margin-right: 0.5em !important; }
+
+.ml-auto { margin-left: auto; }
+.mr-auto { margin-right: auto; }
 
 .width-20p { width: 20% !important; }
 .width-80p { width: 80% !important; }
@@ -1018,13 +1082,20 @@ $asbestos: #7f8c8d;
 				    width: 20px;
 				    height: 20px;
 				    text-align: center;
-				    padding: 3.5px;
+				    padding: 0;
 				    color: #fff;
 				    background: $alizarin;
 				    border-radius: 5px;
 				    font-size: 0.8rem;
 				    margin-left: 10px;
+					position: relative;
 			    }
+				.notification-icon:before {
+					position: absolute;
+					top: 50%;
+					left: 50%;
+					transform: translate(-50%, -50%);
+				}
 
 			    .notification-date {
 		    	    font-family: PlayFairRegular;
@@ -1328,6 +1399,8 @@ $asbestos: #7f8c8d;
 }
 
 #medias-container {
+    text-align: center;
+
 	.no-information-message { margin: 5em 0; }
 
 	.media-container {
@@ -1337,7 +1410,7 @@ $asbestos: #7f8c8d;
 	    font-size: 6rem;
 	    background-size: cover;
 	    background-position: center;
-	    margin: 0.075em 0.05em;
+	    margin: 0.15em;
 		cursor: pointer;
 		box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
 
@@ -1434,25 +1507,28 @@ $asbestos: #7f8c8d;
 	border-color: $nephritis;
 }
 
-#companies-list {
-	.company-anchor {
+#companies-list,
+#hubbers-list {
+	.company-anchor,
+    .user-anchor {
 		display: block;
 		text-decoration: none;
 		text-shadow: none;
 		outline: 0 !important;
         vertical-align: middle;
-        margin: 0 1em 1em;
+        margin: 0 0 2em;
 
 		.list-item {
 			display: block;
 			width: 100%;
 			font-size: 1rem;
 			position: relative;
-            border-radius: 3px;
-			text-align: center;
+            border-radius: 0px;
+			text-align: left;
 
 			background-size: cover;
 			background-position: center;
+            background-color: $midnight_blue;
 
 			webkit-transition: all 0.25s ease-in-out;
 			-moz-transition: all 0.25s ease-in-out;
@@ -1464,8 +1540,9 @@ $asbestos: #7f8c8d;
                 width: 100%;
                 height: 100%;
                 position: relative;
-				padding: 1.5em 0.5em;
+				padding: 1em 1em;
                 background: rgba(0, 0, 0, 0.25);
+                border-radius: 3px;
 
                 webkit-transition: all 0.25s ease-in-out;
 				-moz-transition: all 0.25s ease-in-out;
@@ -1486,7 +1563,8 @@ $asbestos: #7f8c8d;
                 margin: 0 auto;
 			}
 
-			.company-brand {
+			.company-brand,
+            .user-brand {
 				display: inline-block;
 				vertical-align: middle;
 				font-family: OpenSansLight;
@@ -1583,10 +1661,11 @@ $asbestos: #7f8c8d;
 
 				.blue.icon { color: $peter_river; }
 				.green.icon { color: $emerald; }
+				.red.icon { color: $alizarin; }
 			}
 		}
 		.list-item:hover,
-		.list-item:active { box-shadow: 0 0 0 1px #ddd; }
+		.list-item:active { border: none; box-shadow: 0 0 0 1px #ddd; }
 	}
 
     #request-information {
@@ -1823,11 +1902,14 @@ $asbestos: #7f8c8d;
 		}
 	}
 
-	#companies-list {
+	#companies-list,
+    #hubbers-list {
 		.list-item {
 			max-width: 100%;
 
 			.company-brand { font-size: 2.25rem; }
+
+            .user-brand { font-size: 1.5rem;}
 		}
 	}
 

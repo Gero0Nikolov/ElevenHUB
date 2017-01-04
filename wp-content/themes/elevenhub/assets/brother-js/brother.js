@@ -257,10 +257,55 @@ var UserRelations = function( vUserID, userID = "" ) {
 	/*
 	*	Function name: getUserRelationStatistics
 	*	Function arguments: userID [ INT ] (optional) (the ID of the current logged user), onSuccess [ FUNCTION ] (required) tells the method what to do after the response, userID [ INT ] (optional) (the user ID of the currently logged in user).
-	*	Function purpse: This function is used to return JSON objects for the user with userID with his/hers followers & follows.
+	*	Function purpse: This function is used to return JSON objects for the user with userID with his/hers followers & follows || company employees if the $is_company argument is set to true.
 	*/
 	this.getUserRelations = function( userID = "", onSuccess ) {
 		generateAJAX( { functionName : "get_user_relations", arguments : userID }, function ( response ) { onSuccess( JSON.parse( JSON.parse( response ) ) ); } );
+	}
+
+	/*
+	*	Function name: getUserFollowers
+	*	Function arguments: userID [ INT ] (optional) (the ID of the current logged user), onSuccess [ FUNCTION ] (required) tells the method what to do after the response, userID [ INT ] (optional) (the user ID of the currently logged in user).
+	*	Function purpose: This function is used to return JSON objects for the user with userID with his/hers followers.
+	*/
+	this.getUserFollowers = function( userID = "", onSuccess ) {
+		generateAJAX( { functionName : "get_user_followers", arguments : userID }, function ( response ) { onSuccess( JSON.parse( response ) ); } );
+	}
+
+	/*
+	*	Function name: getUserFollowers
+	*	Function arguments: userID [ INT ] (optional) (the ID of the current logged user), onSuccess [ FUNCTION ] (required) tells the method what to do after the response, userID [ INT ] (optional) (the user ID of the currently logged in user).
+	*	Function purpose: This function is used to return JSON objects for the user with userID with his/hers follows.
+	*/
+	this.getUserFollows = function( userID = "", onSuccess ) {
+		generateAJAX( { functionName : "get_user_follows", arguments : userID }, function ( response ) { onSuccess( JSON.parse( response ) ); } );
+	}
+
+	/*
+	*	Function name: getUserFollowers
+	*	Function arguments: userID [ INT ] (optional) (the ID of the current logged user), onSuccess [ FUNCTION ] (required) tells the method what to do after the response, userID [ INT ] (optional) (the user ID of the currently logged in user).
+	*	Function purpose: This function is used to return JSON objects for the user with userID with company employees.
+	*/
+	this.getUserEmployees = function( userID = "", onSuccess ) {
+		generateAJAX( { functionName : "get_user_employees", arguments : userID }, function ( response ) { onSuccess( JSON.parse( response ) ); } );
+	}
+
+	/*
+	*	Function name: removeCompanyEmployee
+	*	Function arguments: userID [ INT ] (required), companyID [ INT ] (required), onSuccess [ FUNCTION ] (required) tells the method what to do after the response.
+	*	Function purpose: This function is used to fire company from a company.
+	*/
+	this.removeCompanyEmployee = function( userID, companyID, onSuccess ) {
+		generateAJAX( { functionName : "hire_or_fire_relation", arguments : { user_id: userID, company_id: companyID } }, function( response ) { onSuccess( JSON.parse( response ) ); } );
+	}
+
+	/*
+	*	Function name: sendCompanyInviteRequest
+	*	Function arguments: userID [ INT ] (required), companyID [ INT ] (optional), onSuccess [ FUNCTION ] (required) tells the method what to do after the response.
+	*	Function purpose: This function is used to send invitation request from the specified companyID to the specific userID.
+	*/
+	this.sendCompanyInviteRequest = function( userID, companyID = "", onSuccess ) {
+		generateAJAX( { functionName : "send_invite_request", arguments : { user_id: userID, company_id: companyID } }, function ( response ) { onSuccess( JSON.parse( response ) ); } );
 	}
 
 	/*
@@ -316,12 +361,88 @@ var UserRelations = function( vUserID, userID = "" ) {
 		});
 	}
 
-	this.acceptUserRequest = function( requestID = "" ) {
+	this.buildCompanyLeaveDialog = function() {
+		view_ = "\
+		<div id='media-popup-container' class='popup-container animated fadeIn'>\
+			<div id='media-popup-fields' class='popup-inner-container'>\
+				<button id='close-button' class='close-button fa fa-close'></button>\
+				<label for='password-holder'>Enter your password for confirmation</label>\
+				<input type='text' id='password-holder'/>\
+				<button id='submit-button' class='green-bold-button'>Leave</button>\
+			</div>\
+		</div>\
+		";
+
+		userMediaController = new UserMedia;
+
+		jQuery( "body" ).append( view_ );
+		jQuery( "#media-popup-container" ).on("click", function( e ){ if( e.target == this ){ userMediaController.destroyMediaPopup(); } });
+		jQuery( "#media-popup-container #media-popup-fields #close-button" ).on("click", function(){ userMediaController.destroyMediaPopup(); });
+
+		jQuery( "#media-popup-container #media-popup-fields #submit-button" ).on("click", function(){
+			jQuery( "#media-popup-container #media-popup-fields" ).append( loading );
+			password = jQuery( "#media-popup-container #media-popup-fields #password-holder" ).val().trim();
+
+			generateAJAX({
+					functionName : "leave_company",
+					arguments : {
+						password : password,
+						user_id : "",
+						company_id : vUserID
+					}
+				}, function( response ) {
+					response = JSON.parse( response );
+					jQuery( "#media-popup-container #media-popup-fields #loader" ).remove();
+
+					if ( response == "left" ) {
+
+					} else {
+						alert_box = "<div id='alert-box' class='animated bounceInDown'>"+ response +"<button id='close-popup-button' onclick='removeAlertBox();'>Close</button></div>";
+						jQuery( "#media-popup-container" ).append( alert_box );
+					}
+				}
+			);
+		});
+
+		jQuery( "#media-popup-container #media-popup-fields #password-holder" ).on("keydown", function(e){
+			if ( e.keyCode == 13 ) {
+				jQuery( "#media-popup-container #media-popup-fields" ).append( loading );
+				password = jQuery( "#media-popup-container #media-popup-fields #password-holder" ).val().trim();
+
+				generateAJAX({
+						functionName : "leave_company",
+						arguments : {
+							password : password,
+							user_id : "",
+							company_id : vUserID
+						}
+					}, function( response ) {
+						response = JSON.parse( response );
+						jQuery( "#media-popup-container #media-popup-fields #loader" ).remove();
+
+						if ( response == "left" ) { window.location.reload( true ); }
+						else {
+							alert_box = "<div id='alert-box' class='animated bounceInDown'>"+ response +"<button id='close-popup-button' onclick='removeAlertBox();'>Close</button></div>";
+							jQuery( "#media-popup-container" ).append( alert_box );
+						}
+					}
+				);
+			}
+		});
+	}
+
+	/*
+	*	Function name: acceptUserRequest
+	*	Function arguments: requestID [ INT ] (required), requestType [ STRING ] (required) the types can be: JOIN to company && INVITE by company;
+	*	Function purpose: This function is used to accept users Company Join Request (CJR).
+	*/
+	this.acceptUserRequest = function( requestID, requestType ) {
 		generateAJAX({
 				functionName : "update_join_request",
 				arguments : {
 					request_id: requestID,
-					response: "accept"
+					response: "accept",
+					request_type: requestType
 				}
 			}, function ( response ) {
 				response = JSON.parse( response );
@@ -330,12 +451,19 @@ var UserRelations = function( vUserID, userID = "" ) {
 			}
 		);
 	}
-	this.declineUserRequest = function( requestID = "" ) {
+
+	/*
+	*	Function name: declineUserRequest
+	*	Function arguments: requestID [ INT ] (required), requestType [ STRING ] (required) the types can be: JOIN to company && INVITE by company;
+	*	Function purpose: This function is used to decline users Company Join Request (CJR).
+	*/
+	this.declineUserRequest = function( requestID ) {
 		generateAJAX({
 				functionName : "update_join_request",
 				arguments : {
 					request_id: requestID,
-					response: "decline"
+					response: "decline",
+					request_type: requestType
 				}
 			}, function ( response ) {
 				response = JSON.parse( response );
@@ -795,6 +923,20 @@ var UserStory = function( userID = "" ) {
 	}
 }
 
+var PublicLists = function() {
+	var classHolder = this;
+
+	this.getMoreHubbers = function( usersOffset, onSuccess ) {
+		generateAJAX({
+				functionName : "get_hubbers",
+				arguments : {
+					offset: usersOffset,
+					is_ajax: true
+				}
+			}, function ( response ) { onSuccess( JSON.parse( JSON.parse( response ) ) ); }
+		);
+	}
+}
 
 /*
 *	Function name: generateAJAX

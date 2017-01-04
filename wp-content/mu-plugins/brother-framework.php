@@ -343,6 +343,7 @@ class BROTHER {
 				request_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 				request_response VARCHAR(255),
 				company_id INT,
+				request_type VARCHAR(255),
 				PRIMARY KEY(id)
 			) $charset_collate;
 			";
@@ -357,37 +358,95 @@ class BROTHER {
 	*	Function name: get_user_followers
 	*	Function arguments: $user_id [ INT ] (optional)
 	*	Function purpose:
-	*	This function return the followers (as a list of user IDs) for the specific user provided by his ID.
+	*	This function return the followers (as a list of user OBJECTS) for the specific user provided by his ID.
 	*	Or if the $user_id is empty, the function will get the current logged user id.
 	*/
 	function get_user_followers( $user_id = "" ) {
 		$user_id = empty( $user_id ) ? get_current_user_id() : $user_id ;
 
+		$followers_holder = array();
+
 		global $wpdb;
-
 		$table_ = $wpdb->prefix ."user_relations";
-		$sql_ = "SELECT user_follower_id FROM $table_ WHERE user_followed_id=$user_id AND user_follower_id IS NOT NULL";
-		$user_followers = $wpdb->get_results( $sql_, OBJECT );
+		$sql_ = "SELECT * FROM $table_ WHERE user_followed_id=$user_id AND user_follower_id IS NOT NULL";
+		$followers = $wpdb->get_results( $sql_, OBJECT );
 
-		return $user_followers;
+		foreach ( $followers as $follower ) {
+			$follower_holder = array();
+			$follower_holder[ "row_id" ] = $follower->id;
+			$follower_holder[ "user_follower_body" ][ "user_id" ] = $follower->user_follower_id;
+			$follower_holder[ "user_follower_body" ][ "user_url" ] = get_author_posts_url( $follower->user_follower_id );
+			$follower_holder[ "user_follower_body" ][ "user_avatar_url" ] = $this->get_user_avatar_url( $follower->user_follower_id );
+			$follower_holder[ "user_follower_body" ][ "user_first_name" ] = get_user_meta( $follower->user_follower_id, "first_name", true );
+			$follower_holder[ "user_follower_body" ][ "user_last_name" ] = get_user_meta( $follower->user_follower_id, "last_name", true );
+			$follower_holder[ "user_follower_body" ][ "user_shortname" ] = get_user_meta( $follower->user_follower_id, "user_shortname", true );
+			array_push( $followers_holder, (object)$follower_holder );
+		}
+
+		return $followers_holder;
+	}
+
+	/*
+	*	Function name: get_user_follows
+	*	Function arguments: $user_id [ INT ] (optional)
+	*	Function purpose:
+	*	This function return the follows (as a list of user OBJECTS) for the specific user provided by his ID.
+	*	Or if the $user_id is empty, the function will get the current logged user id.
+	*/
+	function get_user_follows( $user_id = "" ) {
+		$user_id = empty( $user_id ) ? get_current_user_id() : $user_id ;
+
+		$follows_holder = array();
+
+		global $wpdb;
+		$table_ = $wpdb->prefix ."user_relations";
+		$sql_ = "SELECT * FROM $table_ WHERE user_follower_id=$user_id AND user_followed_id IS NOT NULL";
+		$follows = $wpdb->get_results( $sql_, OBJECT );
+
+		foreach ( $follows as $follow ) {
+			$follow_holder = array();
+			$follow_holder[ "row_id" ] = $follow->id;
+			$follow_holder[ "user_follow_body" ][ "user_id" ] = $follow->user_follow_id;
+			$follow_holder[ "user_follow_body" ][ "user_url" ] = get_author_posts_url( $follow->user_followed_id );
+			$follow_holder[ "user_follow_body" ][ "user_avatar_url" ] = $this->get_user_avatar_url( $follow->user_followed_id );
+			$follow_holder[ "user_follow_body" ][ "user_first_name" ] = get_user_meta( $follow->user_followed_id, "first_name", true );
+			$follow_holder[ "user_follow_body" ][ "user_last_name" ] = get_user_meta( $follow->user_followed_id, "last_name", true );
+			$follow_holder[ "user_follow_body" ][ "user_shortname" ] = get_user_meta( $follow->user_followed_id, "user_shortname", true );
+			array_push( $follows_holder, (object)$follow_holder );
+		}
+
+		return $follows_holder;
 	}
 
 	/*
 	*	Function name: get_user_employees
 	*	Function argumnets: $user_id [ INT ] (optional)
 	*	Function purpose:
-	*	This function return the employees (as a list of user IDs) for the specific user provided by his ID.
+	*	This function return the employees (as a list of user OBJECTS) for the specific user provided by his ID.
 	*/
 	function get_user_employees( $user_id = "" ) {
 		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
 
+		$employees_holder = array();
+
 		global $wpdb;
-
 		$table_ = $wpdb->prefix ."user_relations";
-		$sql_ = "SELECT user_followed_id FROM $table_ WHERE user_employer_id=$user_id";
-		$user_followers = $wpdb->get_results( $sql_, OBJECT );
+		$sql_ = "SELECT * FROM $table_ WHERE user_employer_id=$user_id";
+		$employees = $wpdb->get_results( $sql_, OBJECT );
 
-		return $user_followers;
+		foreach ( $employees as $employee ) {
+			$employee_holder = array();
+			$employee_holder[ "row_id" ] = $employee->id;
+			$employee_holder[ "user_employee_body" ][ "user_id" ] = $employee->user_followed_id;
+			$employee_holder[ "user_employee_body" ][ "user_url"] = get_author_posts_url( $employee->user_followed_id );
+			$employee_holder[ "user_employee_body" ][ "user_avatar_url" ] = $this->get_user_avatar_url( $employee->user_followed_id );
+			$employee_holder[ "user_employee_body" ][ "user_first_name" ] = get_user_meta( $employee->user_followed_id, "first_name", true );
+			$employee_holder[ "user_employee_body" ][ "user_last_name" ] = get_user_meta( $employee->user_followed_id, "last_name", true );
+			$employee_holder[ "user_employee_body" ][ "user_shortname" ] = get_user_meta( $employee->user_followed_id, "user_shortname", true );
+			array_push( $employees_holder, (object)$employee_holder );
+		}
+
+		return $employees_holder;
 	}
 
 	/*
@@ -497,7 +556,11 @@ class BROTHER {
 	*	The function returns JSON array to the front end which contains two Objects (followers && followed || employees) in it.
 	*/
 	function get_user_relations( $user_id = "", $is_company = false ) {
-		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
+		if ( !is_object( $user_id ) ) { if ( empty( $user_id ) ) { $user_id = get_current_user_id(); } }
+		else {
+			$is_company = empty( $user_id->is_company ) ? false : $user_id->is_company;
+			$user_id = $user_id->user_id;
+		}
 
 		global $wpdb;
 
@@ -519,6 +582,7 @@ class BROTHER {
 				$followers_[ $count_followers ][ "user_follower_body" ][ "user_avatar_url" ] = $this->get_user_avatar_url( $result_->user_follower_id );
 				$followers_[ $count_followers ][ "user_follower_body" ][ "user_first_name" ] = get_user_meta( $result_->user_follower_id, "first_name", true );
 				$followers_[ $count_followers ][ "user_follower_body" ][ "user_last_name" ] = get_user_meta( $result_->user_follower_id, "last_name", true );
+				$followers_[ $count_followers ][ "user_follower_body" ][ "user_shortname" ] = get_user_meta( $result_->user_follower_id, "user_shortname", true );
 
 				$count_followers += 1;
 			} else { // Follows or Employees array
@@ -529,6 +593,7 @@ class BROTHER {
 					$follows_[ $count_follows ][ "user_followed_body" ][ "user_avatar_url" ] = $this->get_user_avatar_url( $result_->user_followed_id );
 					$follows_[ $count_follows ][ "user_followed_body" ][ "user_first_name" ] = get_user_meta( $result_->user_followed_id, "first_name", true );
 					$follows_[ $count_follows ][ "user_followed_body" ][ "user_last_name" ] = get_user_meta( $result_->user_followed_id, "last_name", true );
+					$follows_[ $count_follows ][ "user_followed_body" ][ "user_shortname" ] = get_user_meta( $result_->user_followed_id, "user_shortname", true );
 
 					$count_follows += 1;
 				} else {
@@ -538,6 +603,7 @@ class BROTHER {
 					$employees_[ $count_employees ][ "user_employee_body" ][ "user_avatar_url" ] = $this->get_user_avatar_url( $result_->user_followed_id );
 					$employees_[ $count_employees ][ "user_employee_body" ][ "user_first_name" ] = get_user_meta( $result_->user_followed_id, "first_name", true );
 					$employees_[ $count_employees ][ "user_employee_body" ][ "user_last_name" ] = get_user_meta( $result_->user_followed_id, "last_name", true );
+					$employees_[ $count_employees ][ "user_employee_body" ][ "user_shortname" ] = get_user_meta( $result_->user_shortname, "user_shortname", true );
 
 					$count_employees += 1;
 				}
@@ -658,6 +724,11 @@ class BROTHER {
 			$url = str_replace( "[company_request_preview]", get_permalink( 85 ) ."?request_id=". $request_id, $url );
 		}
 
+		if ( strpos( $url, "company_invite_preview" ) ) {
+			$request_id = $this->get_notification_meta( $notification_id, "company_inviterequest_id" );
+			$url = str_replace( "[company_invite_preview]", get_permalink( 85 ) ."?request_id=". $request_id, $url );
+		}
+
 		return $url;
 	}
 
@@ -698,8 +769,8 @@ class BROTHER {
 		if ( !empty( $arguments ) ) {
 			foreach ( $arguments as $argument ) {
 				if ( !empty( $argument ) && isset( $argument ) ) {
-					$arg_key = explode( "=", $argument )[0];
-					$arg_val = explode( "=", $argument )[1];
+					$arg_key = isset( explode( "=", $argument )[0] ) ? explode( "=", $argument )[0] : NULL;
+					$arg_val = isset( explode( "=", $argument )[1] ) ? explode( "=", $argument )[1] : NULL;
 
 					switch ( $arg_key ) {
 						case "read_notification":
@@ -787,6 +858,27 @@ class BROTHER {
 
 			return "updated";
 		} else { return "Wrong password!"; }
+	}
+
+	/*
+	*	Function name: get_company_meta
+	*	Function arguments: $company_id [ INT ] (optional)
+	*	Function purpose: This function is used to return the whole $_COMPANY_META from the HUB DB in one single MIXED_OBJECT.
+	*/
+	function get_company_meta( $company_id = "" ) {
+		if ( empty( $company_id ) ) { $company_id = get_current_user_id(); }
+
+		$meta_ = array();
+		$meta_[ "first_name" ] = get_user_meta( $company_id, "first_name", true );
+		$meta_[ "last_name" ] = get_user_meta( $company_id, "last_name", true );
+		$meta_[ "short_name" ] = get_user_meta( $company_id, "user_shortname", true );
+		$meta_[ "company_type" ] = get_user_meta( $company_id, "company_type", true );
+		$meta_[ "writing_permissions" ] = get_user_meta( $company_id, "company_writing_permissions", true );
+		$meta_[ "publications_communication_permissions" ] = get_user_meta( $company_id, "company_publications_communication_permissions", true );
+		$meta_[ "media_uploads_permissions" ] = get_user_meta( $company_id, "company_media_uploads_permissions", true );
+		$meta_ = (object)$meta_;
+
+		return $meta_;
 	}
 
 	/*
@@ -1005,6 +1097,67 @@ class BROTHER {
 		return wp_get_attachment_url( $attachment_id );
 	}
 
+	function get_hubbers( $data = array() ) {
+		$args = array(
+			"meta_key" => "account_association",
+			"meta_value" => "employee",
+			"meta_compare" => "=",
+			"orderby" => !empty( $data->orderby ) ? $data->orderby : "ID",
+			"order" => !empty( $data->order ) ? $data->order : "DESC",
+			"offset" => !empty( $data->offset ) ? $data->offset : 0,
+			"number" => !empty( $data->number ) ? $data->number : 20,
+			"fields" => "ID"
+		);
+		$user_ids = get_users( $args );
+
+		if ( isset( $data->is_ajax ) && $data->is_ajax ) { $hubbers_holder = array(); }
+
+		if ( empty( $user_ids ) ) { if ( empty( $data->is_ajax ) || !$data->is_ajax ) { echo "<h1 class='no-information-message'>There aren't any users.</h1>"; } else { return json_encode( "There aren't any users." ); } }
+		else {
+			foreach ( $user_ids as $user_id ) {
+				$user_first_name = get_user_meta( $user_id, "first_name", true );
+				$user_last_name = get_user_meta( $user_id, "last_name", true );
+				$user_short_name = get_user_meta( $user_id, "user_shortname", true );
+				$user_avatar = $this->get_user_avatar_url( $user_id );
+				$user_banner = $this->get_user_banner_url( $user_id );
+
+				if ( !isset( $data->is_ajax ) || !$data->is_ajax ) {
+					?>
+
+					<a href="<?php echo get_author_posts_url( $user_id ); ?>" id='user-anchor-<?php echo $user_id; ?>' class='user-anchor'>
+						<div id='user-<?php echo $user_id; ?>' class='list-item animated fadeIn' style='background-image: url(<?php echo $user_banner; ?>);'>
+							<div class='overlay'>
+								<div id='user-avatar-<?php echo $user_id; ?>' class='avatar' style='background-image: url(<?php echo $user_avatar; ?>);'>
+								</div>
+								<h1 id='user-brand-<?php echo $user_id; ?>' class='user-brand'><?php echo !empty( $user_short_name ) ? $user_short_name : $user_first_name ." ". $user_last_name; ?></h1>
+							</div>
+						</div>
+					</a>
+
+					<?php
+				} else {
+					$user_holder = array();
+					$user_holder[ "ID" ] = $user_id;
+					$user_holder[ "AVATAR_URL" ] = $user_avatar;
+					$user_holder[ "BANNER_URL" ] = $user_banner;
+					$user_holder[ "USER_URL" ] = get_author_posts_url( $user_id );
+					$user_holder[ "FIRST_NAME" ] = $user_first_name;
+					$user_holder[ "LAST_NAME" ] = $user_last_name;
+					$user_holder[ "SHORT_NAME" ] = $user_short_name;
+					array_push( $hubbers_holder, (object)$user_holder );
+				}
+			}
+
+			if ( !isset( $data->is_ajax ) || !$data->is_ajax ) {
+				if ( count( $user_ids ) == ( isset( $data->number ) && empty( $data->number ) ? $data->number : 20 ) ) {
+					?>
+					<button id="more-users-controller" class="blue-skeleton-bold-button display-block mh-auto mt-1em">Load more</button>
+				 	<?php
+				}
+			} else if ( isset( $data->is_ajax ) && $data->is_ajax ) { return json_encode( $hubbers_holder ); }
+		}
+	}
+
 	/*
 	*	Function name: get_companies
 	*	Function arguments: $data [ MIXED_OBJECT ] (optional) (it holds information about the ORDERING{ orderby, order }, OFFSET, NUMBERs, IS_AJAX)
@@ -1060,16 +1213,73 @@ class BROTHER {
 					$company_holder = array();
 					$company_holder[ "ID" ] = $user_id;
 					$company_holder[ "AVATAR_URL" ] = $user_avatar;
+					$company_holder[ "BANNER_URL" ] = $user_banner;
 					$company_holder[ "COMPANY_URL" ] = get_author_posts_url( $user_id );
 					$company_holder[ "FIRST_NAME" ] = $user_first_name;
 					$company_holder[ "LAST_NAME" ] = $user_last_name;
-					$company_holder[ "SHOR_TNAME" ] = $user_short_name;
+					$company_holder[ "SHORT_NAME" ] = $user_short_name;
 					array_push( $companies_holder, (object)$company_holder );
 				}
 			}
 
-			if ( isset( $data->is_ajax ) && $data->is_ajax ) { return json_encode( $company_holder ); }
+			if ( !isset( $data->is_ajax ) || !$data->is_ajax ) {
+				if ( count( $user_ids ) == ( isset( $data->number ) && !empty( $data->number ) ? $data->number : 20 ) ) {
+					?>
+					<button id="more-companies-controller" class="blue-skeleton-bold-button display-block mh-auto mt-1em">Load more</button>
+					<?php
+				}
+			} else if ( isset( $data->is_ajax ) && $data->is_ajax ) { return json_encode( $companies_holder ); }
 		}
+	}
+
+	/*
+	*	Function name: send_invite_request
+	*	Function arguments: $data [ MIXED_OBJECT ] (required) this object holds the $user_id and the $company_id
+	*	Function purpose: This function is used to generate Company Invite Request (CIR) to the specified by $user_id user from the HUB.
+	*/
+	function send_invite_request( $data ) {
+		$user_id = $data->user_id;
+		$company_id = !empty( $data->company_id ) ? $data->company_id : get_current_user_id();
+		$result = "";
+
+		if ( !empty( $user_id ) && isset( $user_id ) ) {
+			global $wpdb;
+			$table_ = $wpdb->prefix ."user_requests";
+
+			$sql_ = "SELECT * FROM $table_ WHERE requester_id='$company_id' AND company_id='$user_id' AND request_type='invite'";
+			$result_ = $wpdb->get_results( $sql_, OBJECT );
+
+			if ( count( $result_ ) > 0 ) { // Update method
+				$request_id = $result_[0]->id;
+				$wpdb->update(
+					$table_,
+					array(
+						"requester_id" => $company_id,
+						"request_response" => NULL,
+						"company_id" => $user_id,
+						"request_type" => "invite"
+					),
+					array (
+						"id" => $request_id
+					)
+				);
+			} else { // Insert method
+				$wpdb->insert(
+					$table_,
+					array(
+						"requester_id" => $company_id,
+						"company_id" => $user_id,
+						"request_type" => "invite"
+					)
+				);
+				$request_id = $wpdb->insert_id;
+			}
+
+			$notification_id = $this->generate_notification( 228, $user_id, $company_id );
+			$this->generate_notification_meta( $notification_id, "company_inviterequest_id", $request_id );
+		} else { $result = "ERROR: User ID is empty."; }
+
+		return $result;
 	}
 
 	/*
@@ -1095,7 +1305,7 @@ class BROTHER {
 						global $wpdb;
 						$table_ = $wpdb->prefix ."user_requests";
 
-						$sql_ = "SELECT * FROM $table_ WHERE requester_id='$user_id' AND company_id='$company_id'";
+						$sql_ = "SELECT * FROM $table_ WHERE requester_id='$user_id' AND company_id='$company_id' AND request_type='join'";
 						$result_ = $wpdb->get_results( $sql_, OBJECT );
 
 						if ( count( $result_ ) > 0 ) { // Update method
@@ -1106,13 +1316,13 @@ class BROTHER {
 									"requester_id" => $user_id,
 									"requester_cv" => esc_url( $user_cv_link ),
 									"requester_portfolio" => esc_url( $user_portfolio_link ),
-									"company_id" => $company_id
+									"company_id" => $company_id,
+									"request_type" => "join"
 								),
 								array (
 									"id" => $request_id
 								)
 							);
-
 						} else { // Insert method
 							$wpdb->insert(
 								$table_,
@@ -1120,7 +1330,8 @@ class BROTHER {
 									"requester_id" => $user_id,
 									"requester_cv" => esc_url( $user_cv_link ),
 									"requester_portfolio" => esc_url( $user_portfolio_link ),
-									"company_id" => $company_id
+									"company_id" => $company_id,
+									"request_type" => "join"
 								)
 							);
 							$request_id = $wpdb->insert_id;
@@ -1160,9 +1371,17 @@ class BROTHER {
 			$result_ = $wpdb->get_results( $sql_, OBJECT )[0];
 
 			if ( $data->response == "accept" ) {
-				$this->hire_or_fire_relation( (object)array( "user_id" => $result_->requester_id, "company_id" => $result_->company_id ) );
-				$this->generate_notification( 225, $result_->requester_id, $result_->company_id );
-			} else { $this->generate_notification( 226, $result_->requester_id, $result_->company_id ); }
+				if ( $data->request_type == "join" ) {
+					$this->hire_or_fire_relation( (object)array( "user_id" => $result_->requester_id, "company_id" => $result_->company_id ) );
+					$this->generate_notification( 225, $result_->requester_id, $result_->company_id );
+				} else {
+					$this->hire_or_fire_relation( (object)array( "user_id" => $result_->company_id, "company_id" => $result_->requester_id ) );
+					$this->generate_notification( 231, $result_->requester_id, $result_->company_id );
+				}
+			} else {
+				if ( $data->request_type == "join" ) { $this->generate_notification( 226, $result_->requester_id, $result_->company_id ); }
+				else { $this->generate_notification( 232, $result_->requester_id, $result_->company_id ); }
+			}
 		}
 
 		return $result;
@@ -1188,6 +1407,7 @@ class BROTHER {
 			if ( !in_array( $request_->requester_id, $listed_users ) ) {
 				$user_first_name = get_user_meta( $request_->requester_id, "first_name", true );
 				$user_last_name = get_user_meta( $request_->requester_id, "last_name", true );
+				$user_short_name = get_user_meta( $request_->requester_id, "user_shortname", true );
 
 				if ( !isset( $data->is_ajax ) || !$data->is_ajax ) {
 					?>
@@ -1195,8 +1415,9 @@ class BROTHER {
 					<a href="<?php echo get_permalink( 85 ); ?>?request_id=<?php echo $request_->id; ?>" class="request-anchor">
 						<div id="request-<?php echo $request_->id; ?>" class="list-item">
 							<div class="avatar" style="background-image: url(<?php echo $this->get_user_avatar_url( $request_->requester_id ); ?>);'"></div>
-							<h1 class="names"><?php echo $user_first_name ." ". $user_last_name; ?></h1>
+							<h1 class="names"><?php echo !empty( $user_short_name ) ? $user_short_name : $user_first_name ." ". $user_last_name; ?></h1>
 							<div class="list-item-meta">
+								<?php if ( !empty( $request_->request_response ) ) { ?> <p class="meta icon <?php echo $request_->request_response == "accept" ? "green" : "red"; ?>"><i class="fa <?php echo $request_->request_response == "accept" ? "fa-check" : "fa-close" ?>"></i></p> <?php } ?>
 								<?php if ( !empty( $request_->requester_cv ) ) { ?> <p class="meta icon blue">CV</p> <?php } ?>
 								<?php if ( !empty( $request_->requester_portfolio ) ) { ?> <p class="meta icon green">PF</p> <?php } ?>
 								<p class="meta"><?php echo date( "d-m-Y", strtotime( $request_->request_date ) ); ?></p>
@@ -1224,6 +1445,11 @@ class BROTHER {
 		if ( isset( $data->is_ajax ) && $data->is_ajax ) { return json_encode( $requests_holder ); }
 	}
 
+	/*
+	*	Function name: get_requests
+	*	Function arguments: $request_id [ INT ] (required) (the ID of the desired request in the HUB DB)
+	*	Function purpose: This function is used to return Object with the information about the specified request by the $request_id variable.
+	*/
 	function get_request( $request_id ) {
 		$result_ = false;
 		if ( !empty( $request_id ) && isset( $request_id ) ) {
@@ -1231,9 +1457,40 @@ class BROTHER {
 			$table_ = $wpdb->prefix ."user_requests";
 
 			$sql_ = "SELECT * FROM $table_ WHERE id='$request_id'";
-			$result_ = $wpdb->get_results( $sql_, OBJECT )[0];
+			$result_ = $wpdb->get_results( $sql_, OBJECT );
+			if ( !empty( $result_[0] ) ) { $result_ = $result_[0]; }
 		}
 		return $result_;
+	}
+
+	/*
+	*	Function name: leave_company
+	*	Function arguments: $data [ MIXED_OBJECT ] (required) (the ID of the User && the Company are here)
+	*	Function purpose: This function is used to remove an employee from a company.
+	*/
+	function leave_company( $data ) {
+		$user_id = !empty( $data->user_id ) ? $data->user_id : get_current_user_id();
+		$user_password = $data->password;
+		$company_id = $data->company_id;
+
+		$result = "";
+
+		if ( empty( $company_id ) || !isset( $company_id ) ) { $result = "ERROR: Company ID is unknown."; }
+		if ( empty( $user_password ) || !isset( $user_password ) ) { $result = "Enter your password!"; }
+		else {
+			$user_ = get_user_by( "ID", $user_id );
+			if ( $user_ && wp_check_password( $user_password, $user_->data->user_pass, $user_id ) ) {
+				$leave_company = $this->hire_or_fire_relation( (object)array( "user_id" => $user_id, "company_id" => $company_id ) );
+				if ( $leave_company == "fired" ) {
+					$notification_id = $this->generate_notification( 233, $company_id, $user_id );
+					$result = "left";
+				}
+			} else {
+				$result = "Your password is wrong!";
+			}
+		}
+
+		return $result;
 	}
 }
 

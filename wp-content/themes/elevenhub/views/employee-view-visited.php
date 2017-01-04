@@ -9,9 +9,7 @@
 
 $brother_ = new BROTHER;
 
-$v_user = get_queried_object();
-$v_user_id = $v_user->ID;
-
+$v_user_id = get_queried_object_id();
 $v_user_first_name = get_user_meta( $v_user_id, "first_name", true );
 $v_user_last_name = get_user_meta( $v_user_id, "last_name", true );
 $v_user_biography = get_user_meta( $v_user_id, "user_biography", true );
@@ -42,8 +40,17 @@ $v_user_biography = get_user_meta( $v_user_id, "user_biography", true );
 					<button id="follow-controller" class="follow-button">Follow</button>
 					<?php
 				}
+			} else {
+				if ( !$brother_->is_employee( get_current_user_id(), $v_user_id ) ) {
+					?>
+					<button id="invite-to-company-controller" class="green-bold-button">Invite</button>
+					<?php
+				}
 			}
 			?>
+			<div class="badges">
+				<?php if ( $brother_->is_employee( get_current_user_id(), $v_user_id ) ) { ?> <span class="badge employee fa fa-star" title="<?php echo $v_user_first_name; ?> is your employee!"></span> <?php } ?>
+			</div>
 		</div>
 	</div>
 </div>

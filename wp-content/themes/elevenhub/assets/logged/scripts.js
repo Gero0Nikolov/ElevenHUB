@@ -71,9 +71,17 @@ jQuery( document ).ready(function(){
 			if ( jQuery( "#company-controls" ).length ) {
 				jQuery( "#composer-controller" ).on("click", function(){ openComposer(); });
 				jQuery( "#events-controller" ).on("click", function(){});
-				jQuery( "#requests-controller" ).on("click", function(){});
 			}
 		}
+	}
+
+	if ( jQuery( "#invite-to-company-controller" ).length ) {
+		jQuery( "#invite-to-company-controller" ).on("click", function(){
+			relationsController = new UserRelations;
+			relationsController.sendCompanyInviteRequest( vUserID, "", function( response ){
+				if ( response == "" ) { window.location.reload( true ); }
+			} );
+		});
 	}
 
 	/* MEDIA CONTROLLERS */
@@ -154,15 +162,66 @@ jQuery( document ).ready(function(){
 		jQuery( "#join-controller" ).on("click", function(){ openCompanyJoinDialog(); });
 	}
 
+	if ( jQuery( "#leave-company-controller" ).length ) {
+		jQuery( "#leave-company-controller" ).on("click", function(){ openLeaveCompanyDialog(); });
+	}
+
+	if ( jQuery( "#company-followers-controller" ).length ) {
+		jQuery( "#company-followers-controller" ).on("click", function(){
+			openCompanyRelationStatistics( "followers" );
+		});
+	}
+
+	if ( jQuery( "#company-employees-controller" ).length ) {
+		jQuery( "#company-employees-controller" ).on("click", function(){
+			openCompanyRelationStatistics( "employees" );
+		});
+	}
+
 	/* REQUEST CONTROLLERS */
 	if ( jQuery( "#request-information" ).length ) {
 		jQuery( "#request-information #request-response-controller-accept" ).on("click", function(){
 			requestController = new UserRelations;
-			requestController.acceptUserRequest( jQuery( this ).attr( "request-id" ) );
+			requestController.acceptUserRequest( jQuery( this ).attr( "request-id" ), requestType );
 		});
 		jQuery( "#request-information #request-response-controller-decline" ).on("click", function(){
 			requestController = new UserRelations;
-			requestController.declineUserRequest( jQuery( this ).attr( "request-id" ) );
+			requestController.declineUserRequest( jQuery( this ).attr( "request-id" ), requestType );
+		});
+	}
+
+	/* HUBBERS PUBLIC CONTROLLERS */
+	if ( jQuery( "#more-users-controller" ).length ) {
+		jQuery( "#more-users-controller" ).on("click", function(){
+			jQuery( "#hubbers-list" ).append( loading );
+
+			publicListsController = new PublicLists;
+			publicListsController.getMoreHubbers( usersOffset, function( response ){
+				jQuery( "#hubbers-list #loader" ).remove();
+				if ( response == "There aren't any users." ) { jQuery( "#more-users-controller" ).remove(); }
+				else {
+					var hubbers = response;
+					var view_ = "";
+					for ( hubber_key in hubbers ) {
+						var hubber = hubbers[ hubber_key ];
+						names_ = hubber.SHORT_NAME == "" ? hubber.FIRST_NAME +" "+ hubber.LAST_NAME : hubber.SHORT_NAME;
+
+						view_ += "\
+						<a href='"+ hubber.USER_URL +"' id='user-anchor-"+ hubber.ID +"' class='user-anchor'>\
+							<div id='user-"+ hubber.ID +"' class='list-item animated fadeIn' style='background-image: url("+ hubber.BANNER_URL +");'>\
+								<div class='overlay'>\
+									<div id='user-avatar-"+ hubber.ID +"' class='avatar' style='background-image: url("+ hubber.AVATAR_URL +");'></div>\
+									<h1 id='company-brand-"+ hubber.ID +"' class='company-brand'>"+ names_ +"</h1>\
+								</div>\
+							</div>\
+						</a>\
+						";
+					}
+				}
+
+				jQuery( "#hubbers-list" ).append( view_ );
+				usersOffset += 100;
+			} );
 		});
 	}
 });
@@ -202,6 +261,117 @@ function buildUserRelation( container ) {
 	} );
 }
 
+function openCompanyRelationStatistics( statisticsTYPE ) {
+	view_ = "\
+	<div id='media-popup-container' class='popup-container animated fadeIn'>\
+		<div id='media-popup-fields' class='popup-inner-container'>\
+			<button id='close-button' class='close-button fa fa-close'></button>\
+			"+ loading +"\
+		</div>\
+	</div>\
+	";
+
+	jQuery( "body" ).append( view_ );
+	jQuery( "#media-popup-container" ).on("click", function( e ){ if( e.target == this ){ controller = new UserMedia(); controller.destroyMediaPopup(); } });
+	jQuery( "#media-popup-container #media-popup-fields #close-button" ).on("click", function(){ controller = new UserMedia(); controller.destroyMediaPopup(); });
+
+	if ( statisticsTYPE == "followers" ) {
+		relationsController = new UserRelations( -1 );
+		relationsController.getUserFollowers( "", function( response ){
+			var followers = response;
+
+			var count_followers = 0;
+
+			var followers_container = "";
+			for ( follower_key in followers ) {
+				var follower = followers[ follower_key ];
+				var names_ = follower.user_follower_body.user_shortname == "" ? follower.user_follower_body.user_first_name +" "+ follower.user_follower_body.user_last_name : follower.user_follower_body.user_shortname;
+
+				count_followers += 1;
+
+				followers_container += "\
+				<a href='"+ follower.user_follower_body.user_url +"' id='follower-anchor-"+ follower.row_id +"' class='relation-anchor'>\
+					<div class='relation-container'>\
+						<div class='user-avatar' style='background-image: url(\""+ follower.user_follower_body.user_avatar_url +"\");'></div>\
+						<h1 class='user-names'>"+ names_ +"</h1>\
+					</div>\
+				</a>\
+				";
+			}
+
+			followers_button_text = count_followers != 1 ? count_followers +" followers" : count_followers +" follower";
+
+			view_header = "\
+			<div id='user-relations-header' class='user-relations-header'>\
+				<button id='followers-anchor-controller' class='active relation-anchor-controller peter-river'>"+ followers_button_text +"</button>\
+			</div>\
+			";
+
+			view_body = "\
+			<div id='user-relations-body' class='user-relations-body'>\
+				<div id='user-followers-container' class='active user-list'>"+ followers_container +"</div>\
+			</div>\
+			";
+
+			jQuery( "#media-popup-container #media-popup-fields #loader" ).remove();
+			jQuery( "#media-popup-container #media-popup-fields" ).append( view_header ).append( view_body );
+		} );
+	}
+	else if ( statisticsTYPE == "employees" ) {
+		relationsController = new UserRelations( -1 );
+		relationsController.getUserEmployees( "", function( response ){
+			var employees = response;
+
+			var count_employees = 0;
+
+			var employees_container = "";
+			for ( employee_key in employees ) {
+				var employee = employees[ employee_key ];
+				var names_ = employee.user_employee_body.user_shortname == "" ? employee.user_employee_body.user_first_name +" "+ employee.user_employee_body.user_last_name : employee.user_employee_body.user_shortname;
+
+				count_employees += 1;
+
+				employees_container += "\
+				<div class='relation-container'>\
+					<a href='"+ employee.user_employee_body.user_url +"' id='follower-anchor-"+ employee.row_id +"' class='relation-anchor'>\
+						<div class='user-avatar' style='background-image: url(\""+ employee.user_employee_body.user_avatar_url +"\");'></div>\
+						<h1 class='user-names'>"+ names_ +"</h1>\
+					</a>\
+					<div class='relation-controls'><button id='fire-user' user-id='"+ employee.user_employee_body.user_id +"' class='option red fa fa-close' title='Fire this employee.'></button></div>\
+				</div>\
+				";
+			}
+
+			employees_button_text = count_employees!= 1 ? count_employees +" employees" : count_employees +" employee";
+
+			view_header = "\
+			<div id='user-relations-header' class='user-relations-header'>\
+				<button id='employees-anchor-controller' class='active relation-anchor-controller peter-river'>"+ employees_button_text +"</button>\
+			</div>\
+			";
+
+			view_body = "\
+			<div id='user-relations-body' class='user-relations-body'>\
+				<div id='user-employee-container' class='active user-list'>"+ employees_container +"</div>\
+			</div>\
+			";
+
+			jQuery( "#media-popup-container #media-popup-fields #loader" ).remove();
+			jQuery( "#media-popup-container #media-popup-fields" ).append( view_header ).append( view_body );
+
+			jQuery( "#media-popup-container #media-popup-fields #fire-user" ).each(function(){
+				jQuery( this ).on("click", function(){
+					userID = jQuery( this ).attr( "user-id" );
+					relationsController.removeCompanyEmployee( userID, companyID, function( response ){
+						if ( response == "fired" ) { jQuery( "[user-id='"+ userID +"']" ).remove(); }
+						else { console.log( response ); }
+					} );
+				});
+			});
+		} );
+	}
+}
+
 /*
 *	Method used to show user relation statistics
 */
@@ -230,14 +400,15 @@ function openUserRelationStatistics() {
 		var followers_container = "";
 		for ( follower_key in followers ) {
 			var follower = followers[ follower_key ];
+			var names_ = follower.user_follower_body.user_shortname == "" ? follower.user_follower_body.user_first_name +" "+ follower.user_follower_body.user_last_name : follower.user_follower_body.user_shortname;
 
 			count_followers += 1;
 
 			followers_container += "\
-			<a href="+ follower.user_follower_body.user_url +" id='follower-anchor-"+ follower.row_id +"' class='relation-anchor'>\
+			<a href='"+ follower.user_follower_body.user_url +"' id='follower-anchor-"+ follower.row_id +"' class='relation-anchor'>\
 				<div class='relation-container'>\
 					<div class='user-avatar' style='background-image: url(\""+ follower.user_follower_body.user_avatar_url +"\");'></div>\
-					<h1 class='user-names'>"+ follower.user_follower_body.user_first_name +" "+ follower.user_follower_body.user_last_name +"</h1>\
+					<h1 class='user-names'>"+ names_ +"</h1>\
 				</div>\
 			</a>\
 			";
@@ -246,14 +417,15 @@ function openUserRelationStatistics() {
 		var follows_container = "";
 		for ( follow_key in follows ) {
 			var follow = follows[ follow_key ];
+			var names_ = follow.user_followed_body.user_shortname == "" ? follow.user_followed_body.user_first_name +" "+ follow.user_followed_body.user_last_name : follow.user_followed_body.user_shortname;
 
 			count_follows += 1;
 
 			follows_container += "\
-			<a href="+ follow.user_followed_body.user_url +" id='follow-anchor-"+ follow.row_id +"' class='relation-anchor'>\
+			<a href='"+ follow.user_followed_body.user_url +"' id='follow-anchor-"+ follow.row_id +"' class='relation-anchor'>\
 				<div class='relation-container'>\
 					<div class='user-avatar' style='background-image: url(\""+ follow.user_followed_body.user_avatar_url +"\");'></div>\
-					<h1 class='user-names'>"+ follow.user_followed_body.user_first_name +" "+ follow.user_followed_body.user_last_name +"</h1>\
+					<h1 class='user-names'>"+ names_ +"</h1>\
 				</div>\
 			</a>\
 			";
@@ -441,6 +613,10 @@ function openCompanyJoinDialog() {
 	relationsController.buildCompanyJoinDialog();
 }
 
+function openLeaveCompanyDialog() {
+	relationsController = new UserRelations( vUserID );
+	relationsController.buildCompanyLeaveDialog();
+}
 
 function keyPressedForms( e, form ) {
 	if ( e.keyCode == 13 ) {
