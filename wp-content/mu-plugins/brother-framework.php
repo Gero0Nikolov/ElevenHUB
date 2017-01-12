@@ -449,6 +449,77 @@ class BROTHER {
 		return $employees_holder;
 	}
 
+	function get_search_results( $data ) {
+		global $wpdb;
+		$table_user_relations = $wpdb->prefix ."user_relations";
+		$table_user_meta = $wpdb->prefix ."usermeta";
+
+		if ( ( !empty( $data->first_name ) && !empty( $data->last_name ) ) || !empty( $data->universal_name ) ) {
+			$sql_ = "";
+
+			$sql_extension = "OR ";
+			if ( !empty( $data->relations ) ) { $sql_extension = "AND "; }
+			if ( empty( $data->relations ) ) { $data->relations = array( "employees", "followers", "follows" ); }
+
+			foreach ( $data->relations as $relation ) {
+				if ( !empty( $data->universal_name ) ) { if ( $sql_extension != "OR " && $sql_extension != "AND " ) { $sql_extension .= " OR "; } }
+				switch ( $relation ) {
+					case "employees":
+						$sql_extension .= "usermeta.user_id IN ( SELECT user_followed_id FROM $table_user_relations WHERE user_employer_id = $data->user_id )";
+						break;
+
+					case "followers":
+						$sql_extension .= "usermeta.user_id IN ( SELECT user_follower_id FROM $table_user_relations WHERE user_followed_id = $data->user_id )";
+						break;
+
+					case "follows":
+						$sql_extension .= "usermeta.user_id IN ( SELECT user_followed_id FROM $table_user_relations WHERE user_follower_id = $data->user_id )";
+						break;
+
+					default:
+						break;
+				}
+			}
+
+			if ( empty( $data->universal_name ) ) {
+				$sql_ = "
+				SELECT user_id FROM $table_user_meta as usermeta
+				WHERE
+				usermeta.meta_value LIKE '$data->first_name%'
+				$sql_extension
+				UNION
+				SELECT user_id FROM $table_user_meta as usermeta
+				WHERE
+				usermeta.meta_value LIKE '$data->last_name%'
+				$sql_extension
+				";
+			} else {
+				$sql_ = "
+				SELECT DISTINCT user_id FROM $table_user_meta as usermeta
+				WHERE
+				( usermeta.meta_value LIKE '$data->universal_name%' OR usermeta.meta_value LIKE '$data->universal_name%' )
+				$sql_extension";
+			}
+
+			$results_ = $wpdb->get_results( $sql_, OBJECT );
+			$users_container = array();
+
+			foreach ( $results_ as $result_ ) {
+				$user_container = array();
+				$user_container[ "user_id" ] = $result_->user_id;
+				$user_container[ "user_body" ][ "first_name" ] = get_user_meta( $result_->user_id, "first_name", true );
+				$user_container[ "user_body" ][ "last_name" ] = get_user_meta( $result_->user_id, "last_name", true );
+				$user_container[ "user_body" ][ "short_name" ] = get_user_meta( $result_->user_id, "user_shortname", true );
+				$user_container[ "user_body" ][ "avatar_url" ] = $this->get_user_avatar_url( $result_->user_id );
+				$user_container[ "user_body" ][ "banner_url" ] = $this->get_user_banner_url( $result_->user_id );
+				$user_container[ "user_body" ][ "profile_url" ] = get_author_posts_url( $result_->user_id );
+				array_push( $users_container, (object)$user_container );
+			}
+
+			return $users_container;
+		}
+	}
+
 	/*
 	*	Function name: is_follower
 	*	Function arguments: $v_user_id [ INT ] (required) (comes from $VISITED_user_id), $user_id [ INT ] (optional) (the ID of the current logged user)

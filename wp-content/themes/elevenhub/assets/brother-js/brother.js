@@ -822,6 +822,124 @@ var UserStory = function( userID = "" ) {
 			);
 		});
 
+		jQuery( "#add-mention-controller" ).on( "click", function(){
+			build = "\
+			<div id='mention-popup-container' class='popup-container animated fadeIn'>\
+				<div id='mention-popup-fields' class='popup-inner-container'>\
+					<button id='close-button' class='close-button fa fa-close'></button>\
+					<input type='text' id='search' class='mb-1em mt-2em mh-auto' placeholder='Search...' onkeydown='' onkeyup=''>\
+					<div class='user-relations-body'>\
+						<div id='employees-list' class='mb-1em mh-auto line-height-zero text-align-left user-list active'>"+ loading +"</div>\
+						<div id='results-list' class='mb-1em mh-auto line-height-zero text-align-left user-list hidden'></div>\
+					</div>\
+				</div>\
+			</div>\
+			";
+
+			jQuery( "body" ).append( build );
+			jQuery( "#mention-popup-container" ).on("click", function( e ){ if( e.target == this ){ jQuery( "#mention-popup-container" ).removeClass( "fadeIn" ).addClass( "fadeOut" ); setTimeout(function(){ jQuery( "#mention-popup-container" ).remove(); }, 750); } });
+			jQuery( "#mention-popup-container #mention-popup-fields #close-button" ).on("click", function(){ jQuery( "#mention-popup-container" ).removeClass( "fadeIn" ).addClass( "fadeOut" ); setTimeout(function(){ jQuery( "#mention-popup-container" ).remove(); }, 750); });
+
+			searchRequestInterval = setTimeout(function(){}, 1000);
+			jQuery( "#mention-popup-container #mention-popup-fields #search" ).on("keydown", function(){
+				clearTimeout( searchRequestInterval );
+			});
+			jQuery( "#mention-popup-container #mention-popup-fields #search" ).on("keyup", function(){
+				var searchInput = jQuery( "#mention-popup-container #mention-popup-fields #search" ).val().trim();
+
+				if ( searchInput != "" ) {
+					searchRequestInterval = setTimeout(function(){
+						var firstName = "";
+						var lastName = "";
+						var name = "";
+
+						if ( searchInput.indexOf( " " ) > -1 ) {
+							firstName = searchInput.split( " " )[0];
+							lastName = searchInput.split( " " )[1];
+						} else {
+							name = searchInput;
+						}
+
+						jQuery( "#mention-popup-container #mention-popup-fields #employees-list" ).removeClass( "active" ).addClass( "hidden" );
+						jQuery( "#mention-popup-container #mention-popup-fields #results-list" ).removeClass( "hidden" ).addClass( "active" ).empty().append( loading );
+
+						generateAJAX({
+								functionName : "get_search_results",
+								arguments : {
+									first_name: firstName,
+									last_name: lastName,
+									universal_name: name,
+									user_id: companyID,
+									relations: [ "employees" ]
+								}
+							}, function( response ) {
+								response = JSON.parse( response );
+								console.log( response );
+								jQuery( "#mention-popup-container #mention-popup-fields #results-list" ).empty();
+
+								for ( search_result in response ) {
+									user_ = response[ search_result ];
+									names = user_.user_body.short_name == "" ? user_.user_body.first_name +" "+ user_.user_body.last_name : user_.user_body.short_name;
+									build = "\
+									<button id='user-"+ user_.user_id +"' class='relation-anchor' user_url='"+ user_.user_body.profile_url +"'>\
+										<div class='relation-container'>\
+											<div class='user-avatar' style='background-image: url("+ user_.user_body.avatar_url +");'></div>\
+											<h1 class='user-names'>"+ names +"</h1>\
+										</div>\
+									</button>\
+									";
+									jQuery( "#mention-popup-container #mention-popup-fields #results-list" ).append( build );
+									jQuery( "#mention-popup-container #mention-popup-fields #results-list #user-"+ user_.user_id ).on("click", function(){
+										build = "\
+										<a href='"+ jQuery( this ).attr( "user_url" ) +"' target='_blank' class='user-preview'>\
+											"+ jQuery( this ).find( ".user-names" ).html().trim(); +"\
+										</a>\
+										";
+										tinymce.activeEditor.execCommand( 'mceInsertContent', false, build );
+									});
+								}
+							}
+						);
+					}, 1000);
+				} else {
+					jQuery( "#mention-popup-container #mention-popup-fields #employees-list" ).removeClass( "hidden" ).addClass( "active" );
+					jQuery( "#mention-popup-container #mention-popup-fields #results-list" ).removeClass( "active" ).addClass( "hidden" ).empty();
+				}
+			});
+
+			generateAJAX({
+					functionName : "get_user_employees",
+					arguments : companyID
+				}, function( response ) {
+					response = JSON.parse( response );
+
+					for ( employee_key in response ) {
+						employee = response[ employee_key ];
+						user_names = employee.user_employee_body.user_shortname == "" ? employee.user_employee_body.user_first_name +" "+ employee.user_employee_body.user_last_name : employee.user_employee_body.user_shortname;
+
+						build = "\
+						<button id='employee-anchor-"+ employee.row_id +"' class='relation-anchor' employee-url='"+ employee.user_employee_body.user_url +"'>\
+							<div class='relation-container'>\
+								<div class='user-avatar' style='background-image: url("+ employee.user_employee_body.user_avatar_url +");'></div>\
+								<h1 class='user-names'>"+ user_names +"</h1>\
+							</div>\
+						</button>\
+						";
+						jQuery( "#mention-popup-container #mention-popup-fields #employees-list #loader" ).remove();
+						jQuery( "#mention-popup-container #mention-popup-fields #employees-list" ).append( build );
+						jQuery( "#mention-popup-container #mention-popup-fields #employees-list #employee-anchor-"+ employee.row_id ).on("click", function(){
+							build = "\
+							<a href='"+ jQuery( this ).attr( "employee-url" ) +"' target='_blank' class='user-preview'>\
+								"+ jQuery( this ).find( ".user-names" ).html().trim(); +"\
+							</a>\
+							";
+							tinymce.activeEditor.execCommand( 'mceInsertContent', false, build );
+						});
+					}
+				}
+			);
+		} );
+
 		jQuery( "#close-controller" ).on( "click", function(){ classHolder.destroyComposer(); } );
 	}
 
