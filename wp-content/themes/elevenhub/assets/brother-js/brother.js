@@ -618,12 +618,13 @@ var UserStory = function( userID = "" ) {
 		";
 
 		composer = "\
-		<div id='story-composer' class='animated slideInUp'>\
+		<div id='story-composer' class='animated slideInUp' post-id='0'>\
 			"+ composer_controls +"\
-			<div id='story-featured-image' class='story-banner'><button id='featured-image-controller' class='fa fa-pencil'></button></div>\
+			<div id='story-featured-image' class='story-banner' attachment-id><button id='featured-image-controller' class='fa fa-pencil'></button></div>\
 			<h1 id='story-header' class='story-header' contenteditable='true' placeholder='Story title'></h1>\
 			<div id='story-content' class='story-content' contenteditable='true'></div>\
 			"+ floating_controls +"\
+			<script type='text/javascript'>var canSave = true;</script>\
 		</div>\
 		";
 
@@ -646,19 +647,16 @@ var UserStory = function( userID = "" ) {
 				});
 			}
   		});
+		tinymce.EditorManager.execCommand('mceAddEditor',true, "#story-content");
 
-		//Set autosave
-		autoSaveInterval = classHolder.autoSave();
+		var autoSave = setTimeout(function(){}, 0);
 
 		//Composer controlls
-		jQuery( "#story-header" ).on("keydown", function(){
-			window.clearInterval( autoSaveInterval );
-			autoSaveInterval = classHolder.autoSave();
-		});
-		jQuery( "#story-content" ).on("keydown", function(){
-			window.clearInterval( autoSaveInterval );
-			autoSaveInterval = classHolder.autoSave();
-		});
+		jQuery( "#story-header" ).on("keydown", function(){ window.clearTimeout( autoSave ); });
+		jQuery( "#story-header" ).on("keyup", function(){ autoSave = classHolder.autoSave(); });
+
+		jQuery( "#story-content" ).on("keydown", function(){ window.clearTimeout( autoSave ); });
+		jQuery( "#story-content" ).on("keyup", function(){ autoSave = classHolder.autoSave(); });
 
 		jQuery( "#featured-image-controller" ).on("click", function(){
 			build = "\
@@ -695,6 +693,9 @@ var UserStory = function( userID = "" ) {
 					jQuery( "#media-popup-container #media-popup-fields #media-list .inline-media" ).each(function(){
 						jQuery( this ).on("click", function(){
 							jQuery( "#story-featured-image" ).css( "background-image", "url("+ jQuery( this ).attr( "attachment_src" ) +")" );
+							jQuery( "#story-featured-image" ).attr( "attachment-id", jQuery( this ).attr( "id" ) );
+							window.clearTimeout( autoSave );
+							autoSave = classHolder.autoSave();
 						});
 					});
 
@@ -874,7 +875,6 @@ var UserStory = function( userID = "" ) {
 								}
 							}, function( response ) {
 								response = JSON.parse( response );
-								console.log( response );
 								jQuery( "#mention-popup-container #mention-popup-fields #results-list" ).empty();
 
 								for ( search_result in response ) {
@@ -940,6 +940,83 @@ var UserStory = function( userID = "" ) {
 			);
 		} );
 
+		jQuery( "#drafts-controller" ).on("click", function(){
+			build = "\
+			<div id='drafts-popup-container' class='popup-container animated fadeIn'>\
+				<div id='drafts-popup-fields' class='popup-inner-container'>\
+					<button id='close-button' class='close-button fa fa-close'></button>\
+					<div id='drafts-container' class='stories-list'>"+ loading +"</div>\
+				</div>\
+			</div>\
+			";
+
+			jQuery( "body" ).append( build );
+			jQuery( "#drafts-popup-container" ).on("click", function( e ){ if( e.target == this ){ jQuery( "#drafts-popup-container" ).removeClass( "fadeIn" ).addClass( "fadeOut" ); setTimeout(function(){ jQuery( "#drafts-popup-container" ).remove(); }, 750); } });
+			jQuery( "#drafts-popup-container #drafts-popup-fields #close-button" ).on("click", function(){ jQuery( "#drafts-popup-container" ).removeClass( "fadeIn" ).addClass( "fadeOut" ); setTimeout(function(){ jQuery( "#drafts-popup-container" ).remove(); }, 750); });
+
+			generateAJAX({
+				functionName : "get_user_drafts",
+				arguments : {
+					company_id: companyID
+				}
+			}, function( response ) {
+				jQuery( "#drafts-popup-container #drafts-popup-fields #loader" ).remove();
+
+				response = JSON.parse( response );
+				for ( draft_key in response ) {
+					draft_ = response[ draft_key ];
+
+					build = "\
+					<button id='post-draft-"+ draft_.ID +"' class='post-draft' post-id='"+ draft_.ID +"'>\
+						<div class='post-draft-banner' style='background-image: url("+ draft_.banner.url +");'></div>\
+						<h1 class='post-draft-title'>"+ draft_.title +"</h1>\
+					</button>\
+					";
+
+					jQuery( "#drafts-popup-container #drafts-popup-fields #drafts-container" ).append( build );
+					jQuery( "#drafts-popup-container #drafts-popup-fields #drafts-container #post-draft-"+ draft_.ID ).on("click", function(){
+						jQuery( "#drafts-popup-container #drafts-popup-fields #drafts-container" ).empty().append( loading );
+
+						post_id = jQuery( this ).attr( "post-id" );
+
+						generateAJAX({
+							functionName : "get_user_story",
+							arguments : {
+								post_id: post_id,
+								company_id: companyID
+							}
+						}, function( response ) {
+							response = JSON.parse( response );
+
+							jQuery( "#story-composer" ).attr( "post-id", response.ID );
+							jQuery( "#story-composer #story-featured-image" ).attr( "attachment-id", response.banner.ID ).attr( "style", "background-image: url("+ response.banner.url +")" );
+							jQuery( "#story-composer #story-header" ).html( response.title );
+							tinyMCE.activeEditor.setContent('');
+							tinymce.activeEditor.execCommand( 'mceInsertContent', false, response.content );
+
+							jQuery( "#drafts-popup-container" ).removeClass( "fadeIn" ).addClass( "fadeOut" ); setTimeout(function(){ jQuery( "#drafts-popup-container" ).remove(); }, 750);
+						});
+					});
+				}
+			});
+		});
+
+		jQuery( "#publish-controller" ).on("click", function(){
+			post_id = jQuery( "#story-composer" ).attr( "post-id" );
+
+			generateAJAX({
+				functionName : "publish_user_story",
+				arguments : {
+					post_id: post_id,
+					company_id: companyID
+				}
+			}, function( response ) {
+				response = JSON.parse( response );
+				if ( response == "true" ) { window.location.reload( true ); }
+				else { console.log( response ); }
+			});
+		});
+
 		jQuery( "#close-controller" ).on( "click", function(){ classHolder.destroyComposer(); } );
 	}
 
@@ -949,7 +1026,7 @@ var UserStory = function( userID = "" ) {
 	*	Function purpose: This function destroys the story composer which was created by this.buildComposer method.
 	*/
 	this.destroyComposer = function() {
-		window.clearInterval( autoSaveInterval )
+		tinymce.EditorManager.execCommand('mceRemoveEditor',true, "#story-content");
 		jQuery( "#story-composer" ).removeClass( "slideInUp" ).addClass( "slideOutDown" );
 		setTimeout(function(){ jQuery( "#story-composer" ).remove(); }, 750);
 	}
@@ -958,34 +1035,39 @@ var UserStory = function( userID = "" ) {
 	*	Function name: autoSave
 	*	Function arguments: NONE
 	*	Function purpose:
-	*	This function makes sends the latest drafts over the user story to the back-end.
-	*	After 3 seconds without beign edited.
+	*	This function sends the latest drafts over the user story to the back-end after 2 seconds without beign edited.
 	*/
 	this.autoSave = function() {
-		return setInterval(function(){ classHolder.draftPost(); }, 3000);
-	}
+		return setTimeout(function(){
+			if ( canSave == true ) {
+				canSave = false;
+				bannerID = jQuery( "#story-featured-image" ).attr( "attachment-id" );
+				bannerID = bannerID !== undefined ? bannerID.split( "-" )[1] : false;
+				title = jQuery( "#story-header").html().trim();
+				content = tinyMCE.activeEditor.getContent();
+				postID = jQuery( "#story-composer" ).attr( "post-id" );
 
-	/*
-	*	Function name: draftPost
-	*	Function arguments: NONE
-	*	Function purpose:
-	*	This function sends the post info to the back-end to draft them on the server.
-	*/
-	this.draftPost = function() {
-		title = jQuery( "#story-header" ).html().trim();
-		content = tinyMCE.activeEditor.getContent();
-		postID = jQuery( "#story-composer" ).attr( "post-id" );
-
-		if ( title != "" && title !== undefined ) {
-			generateAJAX({
-				functionName : "draft_user_post",
-				arguments : {
-					post_id: postID,
-					post_title: title,
-					post_content: content
+				if ( title != "" && title !== undefined ) {
+					generateAJAX({
+						functionName : "draft_user_post",
+						arguments : {
+							post_id: postID,
+							post_title: title,
+							post_content: content,
+							post_attachment_id: bannerID,
+							company_id: companyID
+						}
+					}, function( response ) {
+						response = JSON.parse( response );
+						if ( jQuery.isNumeric( response ) ) {
+							jQuery( "#story-composer" ).attr( "post-id", response );
+							canSave = true;
+						}
+						else { console.log( response ); }
+					} );
 				}
-			}, function( response ) { console.log( response ); } );
-		}
+			}
+		}, 2000);
 	}
 
 	/*

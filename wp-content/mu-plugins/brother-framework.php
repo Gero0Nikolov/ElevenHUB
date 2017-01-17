@@ -449,7 +449,27 @@ class BROTHER {
 		return $employees_holder;
 	}
 
+	/*
+	*	Function name: get_search_results
+	*	Function arguments: $data [ MIXED_OBJECT ] (required) (contains the searched user:
+																			First Name,
+																			Last Name,
+																			Universal Name: That is First OR Last name used for the specific search,
+																			Group relations:
+																				Employees,
+																				Followers,
+																				Follows
+																			)
+	*	Function purpose:
+	*	This function is used to search for specific users or user group (Group relations).
+	*	It receives a MIXED_OBJECT from the front-end part which contains: $first_name [ STRING ], $last_name [ STRING ], $universal_name [ STRING ] && $relations [ ARRAY_STRING ].
+	*	It can be used for search in the _GLOBAL_ users of the HUB or just for a specific _GROUP_CASE_.
+	*/
 	function get_search_results( $data ) {
+		$data->first_name = sanitize_text_field( $data->first_name );
+		$data->last_name = sanitize_text_field( $data->last_name );
+		$data->universal_name = sanitize_text_field( $data->universal_name );
+
 		global $wpdb;
 		$table_user_relations = $wpdb->prefix ."user_relations";
 		$table_user_meta = $wpdb->prefix ."usermeta";
@@ -1005,12 +1025,124 @@ class BROTHER {
 		return $result_[0]->meta_value;
 	}
 
-	function update_post_featured_image( $data ) {
-		return $data;
+	/*
+	*	Function name: draft_user_post
+	*	Function arguments: $data [ MIXED_OBJECT ] (required)
+	*	Function purpose:
+	*	This function is used to generate draft for user posts.
+	*	The $data argument contains $post_id (which is 0 before the first call of the function), $post_attachment_id (the ID of the post banner), $post_title && $post_content.
+	*/
+	function draft_user_post( $data ) {
+		$attachment_id = is_numeric( $data->post_attachment_id ) == true ? $data->post_attachment_id : "";
+		$response = "";
+
+		$post_arr = array(
+			"ID" => $data->post_id,
+			"post_title" => sanitize_text_field( $data->post_title ),
+			"post_content" => $data->post_content
+		);
+		$post_id = wp_insert_post( $post_arr );
+		if ( is_wp_error( $post_id ) ) { $response = $post_id->get_error_message(); } else { $response = $post_id; }
+		if ( !empty( $attachment_id ) && !is_wp_error( $post_id ) ) { $post_thumbnail_meta_id = set_post_thumbnail( $post_id, $attachment_id ); }
+		if ( !is_wp_error( $post_id ) ) { update_field( "related_company_id", !empty( $data->company_id ) ? $data->company_id : "", $post_id ); }
+
+		return $response;
 	}
 
-	function draft_user_post( $data ) {
-		return $data;
+
+	function publish_user_story( $data ) {
+		if ( !empty( $data->post_id ) ) {
+			if ( !empty( $data->company_id ) ) {
+				wp_publish_post( $data->post_id );
+				return "true";
+			} else { return "ERROR: Company ID is not set."; }
+		} else { return "ERROR: Post ID is not set."; }
+	}
+
+	/*
+	*	Function name: get_user_drafts
+	*	Function arguments: $data [ MIXED_OBJECT ] (required)
+	*	Function purpose:
+	*	This function is used to retrieve user posts from the specified Company_Group.
+	*/
+	function get_user_drafts( $data ) {
+		$user_id = !empty( $data->user_id ) ? $data->user_id : get_current_user_id();
+		$drafts_container = array();
+
+		if ( !empty( $data->company_id ) ) {
+			$company_id = $data->company_id;
+
+			$args = array(
+				"posts_per_page" => -1,
+				"order_by" => "date",
+				"order" => "DESC",
+				"meta_key" => "related_company_id",
+				"meta_value" => $company_id,
+				"post_type" => "post",
+				"post_status" => "draft",
+				"author" => $user_id
+			);
+			$user_posts = get_posts( $args );
+			foreach ( $user_posts as $post_ ) {
+				$draft_container = array();
+				$draft_container[ "ID" ] = $post_->ID;
+				$draft_container[ "title" ] = $post_->post_title;
+				$draft_container[ "content" ] = $post_->post_content;
+				$draft_container[ "banner" ][ "ID" ] = get_post_thumbnail_id( $post_->ID );
+				$draft_container[ "banner" ][ "url" ] = $this->get_post_banner_url( $post_->ID );
+				$draft_container[ "date" ] = $post_->post_date;
+				$draft_container[ "author" ][ "ID" ] = $post_->post_author;
+				$draft_container[ "author" ][ "first_name" ] = get_user_meta( $post_->post_author, "first_name", true );
+				$draft_container[ "author" ][ "last_name" ] = get_user_meta( $post_->post_author, "last_name", true );
+				$draft_container[ "author" ][ "short_name" ] = get_user_meta( $post_->post_author, "user_shortname", true );
+				$draft_container[ "author" ][ "avatar_url" ] = $this->get_user_avatar_url( $post_->post_author );
+				$draft_container[ "author" ][ "banner_url" ] = $this->get_user_banner_url( $post_->post_author );
+				$draft_container[ "author" ][ "author_url" ] = get_author_posts_url( $post_->post_author );
+				$draft_container[ "company_id" ] = get_post_meta( $post_->ID, "related_company_id", true );
+				array_push( $drafts_container, (object)$draft_container );
+			}
+		} else {
+			$drafts_container = "ERROR: Company ID is not set.";
+		}
+
+		return $drafts_container;
+	}
+
+	/*
+	*	Function name: get_user_story
+	*	Function arguments: $data [ MIXED_OBJECT ] (required)
+	*	Function purpose:
+	*	This function is used to return the full information about the specified by the $post_id Post.
+	*/
+	function get_user_story( $data ) {
+		$user_id = !empty( $data->user_id ) ? $data->user_id : get_current_user_id();
+		$post_id = !empty( $data->post_id ) ? $data->post_id : NULL;
+		$company_id = !empty( $data->company_id ) ? $data->company_id : NULL;
+
+		$story_container = array();
+
+		if ( empty( $post_id ) || empty( $company_id ) ) {
+			$story_container = "ERROR: Post ID or Company ID is empty.";
+		} else {
+			$post_ = get_post( $post_id );
+			$story_container[ "ID" ] = $post_id;
+			$story_container[ "title" ] = $post_->post_title;
+			$story_container[ "content" ] = $post_->post_content;
+			$story_container[ "banner" ][ "ID" ] = get_post_thumbnail_id( $post_id );
+			$story_container[ "banner" ][ "url" ] = $this->get_post_banner_url( $post_id );
+			$story_container[ "date" ] = $post_->post_date;
+			$story_container[ "author" ][ "ID" ] = $user_id;
+			$story_container[ "author" ][ "first_name" ] = get_user_meta( $user_id, "first_name", true );
+			$story_container[ "author" ][ "last_name" ] = get_user_meta( $user_id, "last_name", true );
+			$story_container[ "author" ][ "short_name" ] = get_user_meta( $user_id, "user_shortname", true );
+			$story_container[ "author" ][ "avatar_url" ] = $this->get_user_avatar_url( $user_id );
+			$story_container[ "author" ][ "banner_url" ] = $this->get_user_banner_url( $user_id );
+			$story_container[ "author" ][ "author_url" ] = get_author_posts_url( $user_id );
+			$story_container[ "company_id" ] = $company_id;
+			$story_container = (object)$story_container;
+		}
+
+		return $story_container;
 	}
 
 	/*
@@ -1168,6 +1300,14 @@ class BROTHER {
 		return wp_get_attachment_url( $attachment_id );
 	}
 
+	/*
+	*	Function name: get_hubbers
+	*	Function arguments: $data [ MIXED_OBJECT / ARRAY ] (optional)
+	*	Function purpose:
+	*	This function is used to retrieve users from the HUB project.
+	*	It can be used to return users from specified Company_Group or the all users which are registered in the HUB project.
+	*	Example can be found at the original_HUB_project/hubbers.
+	*/
 	function get_hubbers( $data = array() ) {
 		$args = array(
 			"meta_key" => "account_association",
@@ -1563,6 +1703,13 @@ class BROTHER {
 
 		return $result;
 	}
+
+	/*
+	*	Function name: get_post_banner_url
+	*	Function arguments: $post_id [ INT ] (required)
+	*	Function purpose: This function is used to retrieve the banner URL of the specified Post by the $post_id variable.
+	*/
+	function get_post_banner_url( $post_id ) { return wp_get_attachment_image_src( get_post_thumbnail_id( $post_id ), "full" )[0]; }
 }
 
 //Initialize the DB into the framework

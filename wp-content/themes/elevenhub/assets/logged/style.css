@@ -677,6 +677,43 @@ body {
       background-color: #c0392b;
       color: #fff;
       border-color: transparent; }
+  .popup-container .stories-list .post-draft {
+    display: block;
+    width: 100%;
+    background: none;
+    box-shadow: none !important;
+    border: none;
+    border-bottom: 1px solid #ddd;
+    border-radius: 0;
+    outline: 0 !important;
+    margin: 0;
+    padding: 1em;
+    text-align: left;
+    webkit-transition: all 0.25s ease-in-out;
+    -moz-transition: all 0.25s ease-in-out;
+    -o-transition: all 0.25s ease-in-out;
+    transition: all 0.25s ease-in-out; }
+    .popup-container .stories-list .post-draft .post-draft-banner {
+      display: inline-block;
+      width: 54px;
+      height: 54px;
+      border-radius: 0;
+      background-size: cover;
+      background-color: #34495e;
+      background-position: center;
+      vertical-align: middle;
+      margin-right: 0.5em; }
+    .popup-container .stories-list .post-draft .post-draft-title {
+      display: inline-block;
+      font-family: OpenSansRegular;
+      font-weight: normal;
+      font-size: 1.25rem;
+      margin: 0;
+      vertical-align: middle;
+      color: #333; }
+  .popup-container .stories-list .post-draft:hover,
+  .popup-container .stories-list .post-draft:active {
+    background-color: #f9f9f9; }
   .popup-container .user-relations-body {
     display: block;
     position: relative; }
