@@ -955,8 +955,9 @@ var UserStory = function( userID = "" ) {
 			jQuery( "#drafts-popup-container #drafts-popup-fields #close-button" ).on("click", function(){ jQuery( "#drafts-popup-container" ).removeClass( "fadeIn" ).addClass( "fadeOut" ); setTimeout(function(){ jQuery( "#drafts-popup-container" ).remove(); }, 750); });
 
 			generateAJAX({
-				functionName : "get_user_drafts",
+				functionName : "get_user_stories",
 				arguments : {
+					post_status: "draft",
 					company_id: companyID
 				}
 			}, function( response ) {
@@ -967,34 +968,53 @@ var UserStory = function( userID = "" ) {
 					draft_ = response[ draft_key ];
 
 					build = "\
-					<button id='post-draft-"+ draft_.ID +"' class='post-draft' post-id='"+ draft_.ID +"'>\
+					<button id='post-draft-"+ draft_.ID +"' class='post-draft animated fadeIn' post-id='"+ draft_.ID +"'>\
 						<div class='post-draft-banner' style='background-image: url("+ draft_.banner.url +");'></div>\
 						<h1 class='post-draft-title'>"+ draft_.title +"</h1>\
+						<div class='remove-button fa fa-trash-o'></div>\
 					</button>\
 					";
 
 					jQuery( "#drafts-popup-container #drafts-popup-fields #drafts-container" ).append( build );
-					jQuery( "#drafts-popup-container #drafts-popup-fields #drafts-container #post-draft-"+ draft_.ID ).on("click", function(){
-						jQuery( "#drafts-popup-container #drafts-popup-fields #drafts-container" ).empty().append( loading );
 
-						post_id = jQuery( this ).attr( "post-id" );
+					jQuery( "#drafts-popup-container #drafts-popup-fields #drafts-container #post-draft-"+ draft_.ID ).on("click", function( e ){
+						if ( e.target == this ) {
+							jQuery( "#drafts-popup-container #drafts-popup-fields #drafts-container" ).empty().append( loading );
 
+							post_id = jQuery( this ).attr( "post-id" );
+
+							generateAJAX({
+								functionName : "get_user_story",
+								arguments : {
+									post_id: post_id,
+									company_id: companyID
+								}
+							}, function( response ) {
+								response = JSON.parse( response );
+
+								jQuery( "#story-composer" ).attr( "post-id", response.ID );
+								jQuery( "#story-composer #story-featured-image" ).attr( "attachment-id", response.banner.ID ).attr( "style", "background-image: url("+ response.banner.url +")" );
+								jQuery( "#story-composer #story-header" ).html( response.title );
+								tinyMCE.activeEditor.setContent('');
+								tinymce.activeEditor.execCommand( 'mceInsertContent', false, response.content );
+
+								jQuery( "#drafts-popup-container" ).removeClass( "fadeIn" ).addClass( "fadeOut" ); setTimeout(function(){ jQuery( "#drafts-popup-container" ).remove(); }, 750);
+							});
+						}
+					});
+
+					jQuery( "#drafts-popup-container #drafts-popup-fields #drafts-container #post-draft-"+ draft_.ID +" .remove-button" ).on("click", function(){
+						post_id = jQuery( this ).parent().attr( "post-id" );
 						generateAJAX({
-							functionName : "get_user_story",
+							functionName : "delete_user_story",
 							arguments : {
 								post_id: post_id,
 								company_id: companyID
 							}
 						}, function( response ) {
 							response = JSON.parse( response );
-
-							jQuery( "#story-composer" ).attr( "post-id", response.ID );
-							jQuery( "#story-composer #story-featured-image" ).attr( "attachment-id", response.banner.ID ).attr( "style", "background-image: url("+ response.banner.url +")" );
-							jQuery( "#story-composer #story-header" ).html( response.title );
-							tinyMCE.activeEditor.setContent('');
-							tinymce.activeEditor.execCommand( 'mceInsertContent', false, response.content );
-
-							jQuery( "#drafts-popup-container" ).removeClass( "fadeIn" ).addClass( "fadeOut" ); setTimeout(function(){ jQuery( "#drafts-popup-container" ).remove(); }, 750);
+							jQuery( "#drafts-popup-container #drafts-popup-fields #drafts-container #post-draft-"+ response ).removeClass( "fadeIn" ).addClass( "fadeOut" );
+							setTimeout( function(){ jQuery( "#drafts-popup-container #drafts-popup-fields #drafts-container #post-draft-"+ response ).remove(); }, 750 );
 						});
 					});
 				}
@@ -1012,7 +1032,7 @@ var UserStory = function( userID = "" ) {
 				}
 			}, function( response ) {
 				response = JSON.parse( response );
-				if ( response == "true" ) { window.location.reload( true ); }
+				if ( response == true ) { window.location.reload( true ); }
 				else { console.log( response ); }
 			});
 		});
@@ -1120,6 +1140,56 @@ var UserStory = function( userID = "" ) {
 	   }
 
 	   return content;
+	}
+
+	/*
+	*	Function name: likeUnlikeStory
+	*	Function arguments: storyID [ INT ] (required), userID [ INT ] (optional), onSuccess [ FUNCTION ] (required) tells the function what to do after the response.
+	*	Function purpose: This function is used to send LIKE || UNLIKE to the $BROTHER_->like_unlike_story method via simplified AJAX request.
+	*/
+	this.likeUnlikeStory = function( storyID, userID = "", onSuccess ){
+		generateAJAX({
+				functionName : "like_unlike_story",
+				arguments : {
+					story_id: storyID,
+					user_id: userID
+				}
+			}, function ( response ) { onSuccess( JSON.parse( response ) ); }
+		);
+	}
+
+	/*
+	*	Function name: publishComment
+	*	Function arguments: storyID [ INT ] (required), userID [ INT ] (optional), commentContent [ STRING ] (required), onSuccess [ FUNCTION ] (required) tells the function what to do after the response.
+	*	Function purpose: This function is used to send user comment to the Brother.PHP framework.
+	*/
+	this.publishComment = function( storyID, userID = "", commentContent, onSuccess ) {
+		generateAJAX({
+				functionName : "publish_story_comment",
+				arguments : {
+					story_id: storyID,
+					user_id: userID,
+					comment_content: commentContent
+				}
+			}, function ( response ) { onSuccess( JSON.parse( response ) ); }
+		);
+	}
+
+	/*
+	*	Function name: getComments
+	*	Function arguments: storyID [ INT ] (required), userID [ INT ] (optional), onSuccess [ FUNCTION ] (required) tells the function what to do after the response.
+	*	Function purpose:
+	*	This function is used to send front-end request to pull story comments.
+	*/
+	this.getComments = function( storyID, userID = "", onSuccess ) {
+		generateAJAX({
+				functionName : "get_story_comments",
+				arguments : {
+					story_id: storyID,
+					user_id: userID
+				}
+			}, function ( response ) { onSuccess( JSON.parse( response ) ); }
+		);
 	}
 }
 

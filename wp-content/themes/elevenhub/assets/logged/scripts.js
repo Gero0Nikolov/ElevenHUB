@@ -224,6 +224,22 @@ jQuery( document ).ready(function(){
 			} );
 		});
 	}
+
+	// STORY BOARDS CONTROLLS
+	if ( jQuery( "#company-story-board" ).length ) {
+		jQuery( window ).scroll(function(){
+			if ( jQuery( window ).scrollTop() + jQuery( window ).height() > jQuery( document ).height() - 200 ) {
+				console.log( "LOAD" );
+			}
+		});
+
+		jQuery( "#company-story-board .story-container .story-banner" ).each(function(){
+			jQuery( this ).on("click", function(){ openStoryReader( jQuery( this ).parent().attr( "id" ).split( "-" )[1] ); });
+		});
+		jQuery( "#company-story-board .story-container .story" ).each(function(){
+			jQuery( this ).on("click", function(){ openStoryReader( jQuery( this ).parent().attr( "id" ).split( "-" )[1] ); });
+		});
+	}
 });
 
 /*
@@ -616,6 +632,174 @@ function openCompanyJoinDialog() {
 function openLeaveCompanyDialog() {
 	relationsController = new UserRelations( vUserID );
 	relationsController.buildCompanyLeaveDialog();
+}
+
+function openStoryReader( storyID, slideToComments = false ) {
+	view = "\
+	<div id='story-reader-popup' class='reader-popup animated fadeIn'>\
+		<div id='story-reader-inline' class='reader-inline-popup'>\
+			<button id='close-button' class='close-button fa fa-times'></button>\
+			"+ loading +"\
+		</div>\
+	</div>\
+	";
+
+	jQuery( "body" ).append( view );
+	jQuery( "#story-reader-popup #close-button" ).on("click", function(){
+		jQuery( "#story-reader-popup" ).removeClass( "fadeIn" ).addClass( "fadeOut" );
+		setTimeout(function(){ jQuery( "#story-reader-popup" ).remove(); }, 750);
+	});
+	jQuery( "#story-reader-popup" ).on("click", function( e ){
+		if ( e.target == this ) {
+			jQuery( "#story-reader-popup" ).removeClass( "fadeIn" ).addClass( "fadeOut" );
+			setTimeout(function(){ jQuery( "#story-reader-popup" ).remove(); }, 750);
+		}
+	});
+
+	generateAJAX({
+		functionName : "get_user_story",
+		arguments : {
+			post_id: storyID,
+			company_id: companyID
+		}
+	}, function( response ) {
+		story_ = JSON.parse( response );
+
+		names = story_.author.short_name != "" ? story_.author.short_name : story_.author.first_name +" "+ story_.author.last_name;
+		like_sign = story_.meta.is_liked ? "fa-heart" : "fa-heart-o";
+
+		view = "\
+		<div class='author'>\
+			<a href='"+ story_.author.author_url +"' class='author-anchor'>\
+				<div class='avatar' style='background-image: url("+ story_.author.avatar_url +");'></div>\
+				"+ names +"\
+			</a>\
+		</div>\
+		<div class='story-container'>\
+			<div class='story-banner' style='background-image: url("+ story_.banner.url +");'></div>\
+			<div class='story'>\
+				<h1 class='story-title'>"+ story_.title +"</h1>\
+				<div class='story-content'>"+ story_.content +"</div>\
+			</div>\
+		</div>\
+		<div class='story-meta'>\
+			<button id='story-like-controller' class='like-button fa "+ like_sign +" hvr-bounce-out' story-id='"+ storyID +"'><i class='numbers'>"+ story_.meta.likes.length +"</i></button>\
+			<button id='story-comments-controller' class='comment-button fa fa-comment hvr-bounce-out' story-id='"+ storyID +"'><i class='numbers'>"+ story_.meta.comments_count +"</i></button>\
+		</div>\
+		<div id='comments-container' class='story-comments'>\
+			<div id='comments'>"+ loading +"</div>\
+			<div class='comment-composer'>\
+				<input type='text' id='comment-holder'>\
+				<button id='comment-controller' class='fa fa-paper-plane'></button>\
+			</div>\
+		</div>\
+		";
+
+		jQuery( "#story-reader-popup #story-reader-inline #loader" ).remove();
+		jQuery( "#story-reader-popup #story-reader-inline" ).append( view );
+
+		// Attach controls
+		jQuery( "#story-reader-popup #story-reader-inline .story-meta #story-like-controller" ).on( "click", function(){
+			storyController = new UserStory();
+			storyID = jQuery( this ).attr( "story-id" );
+			storyController.likeUnlikeStory( storyID, "", function( response ) {
+				actionController = jQuery( "#story-reader-popup #story-reader-inline .story-meta #story-like-controller");
+				actionController.children( ".numbers" ).html( response.likes_count );
+				if ( response.action == "like" ) { actionController.removeClass( "fa-heart-o" ).addClass( "fa-heart" ); }
+				else if ( response.action == "dislike" ) { actionController.removeClass( "fa-heart" ).addClass( "fa-heart-o" ); }
+			} );
+		} );
+		jQuery( "#story-reader-popup #story-reader-inline .story-meta #story-comments-controller" ).on( "click", function(){
+			jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder" ).focus();
+		} );
+
+		jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder" ).on( "keydown", function( e ){
+			if ( e.keyCode == 13 ) {
+				storyID = jQuery( "#story-reader-popup #story-reader-inline .story-meta #story-comments-controller" ).attr( "story-id" );
+				commentContent = jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder" ).val().trim();
+
+				var storyController = new UserStory();
+				storyController.publishComment( storyID, "", commentContent, function( response ){
+					jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder" ).val( "" );
+					storyController.getComments( storyID, "", function( response ) {
+						if ( Array.isArray( response ) ) {
+							jQuery( "#story-reader-popup #story-reader-inline .story-meta #story-comments-controller .numbers" ).html( response.length );
+							parseComments( response );
+						}
+					} );
+				} );
+			}
+		} );
+
+		jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-controller" ).on( "click", function(){
+			storyID = jQuery( "#story-reader-popup #story-reader-inline .story-meta #story-comments-controller" ).attr( "story-id" );
+			commentContent = jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder" ).val().trim();
+
+			var storyController = new UserStory();
+			storyController.publishComment( storyID, "", commentContent, function( response ){
+				jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder" ).val( "" );
+				storyController.getComments( storyID, "", function( response ) {
+					if ( Array.isArray( response ) ) {
+						jQuery( "#story-reader-popup #story-reader-inline .story-meta #story-comments-controller .numbers" ).html( response.length );
+						parseComments( response );
+					}
+				} );
+			} );
+		} );
+
+		// Pull comments
+		storyController = new UserStory();
+		storyController.getComments( storyID, "", function( response ) { if ( Array.isArray( response ) ) { parseComments( response ); } } );
+
+		// Slide to comments - If needed
+		if ( slideToComments == true ) {
+			jQuery( "#story-reader-popup #story-reader-inline" ).animate({
+        		scrollTop: jQuery( "#story-reader-popup #story-reader-inline #comments-container").offset().top
+    		}, 2000);
+			jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder").focus();
+		}
+	});
+}
+
+function parseComments( comments ) {
+	jQuery( "#story-reader-popup #story-reader-inline #comments-container #comments" ).empty();
+
+	for ( comment_key in comments ) {
+		comment_ = comments[ comment_key ];
+
+		view_ = "\
+		<div id='comment-"+ comment_.id +"' class='comment'>\
+			<div id='author-"+ comment_.user.id +"' class='user-container'>\
+				<a href='"+ comment_.user.url +"' class='user-anchor'>\
+					<div class='avatar' style='background-image: url("+ comment_.user.avatar +");'></div>\
+				</a>\
+			</div>\
+			<div class='comment-content'>"+ comment_.content +"</div>\
+		</div>\
+		";
+		jQuery( "#story-reader-popup #story-reader-inline #comments-container #comments" ).append( view_ );
+	}
+}
+
+function initializeStoryControls() {
+	storyController = new UserStory();
+	jQuery( ".story-container #story-like-controller" ).each(function(){
+		jQuery( this ).on( "click", function(){
+			storyID = jQuery( this ).attr( "story-id" );
+			storyController.likeUnlikeStory( storyID, "", function( response ) {
+				actionController = jQuery( "#story-"+ storyID ).find( "#story-like-controller" );
+				actionController.children( ".numbers" ).html( response.likes_count );
+				if ( response.action == "like" ) { actionController.removeClass( "fa-heart-o" ).addClass( "fa-heart" ); }
+				else if ( response.action == "dislike" ) { actionController.removeClass( "fa-heart" ).addClass( "fa-heart-o" ); }
+			} );
+		} );
+	});
+	jQuery( ".story-container #story-comments-controller" ).each(function(){
+		jQuery( this ).on( "click", function(){
+			storyID = jQuery( this ).attr( "story-id" );
+			openStoryReader( storyID, true );
+		} );
+	});
 }
 
 function keyPressedForms( e, form ) {
