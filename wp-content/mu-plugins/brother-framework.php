@@ -854,6 +854,14 @@ class BROTHER {
 			$url = str_replace( "[single_view]", get_permalink( $story_id ), $url );
 		}
 
+		if ( strpos( $url, "single_view_to_comment" ) ) {
+			$story_id = $this->get_notification_meta( $notification_id, "commented_story_id" );
+			$comment_id = $this->get_notification_meta( $notification_id, "comment_id" );
+			//$url = str_replace( "[single_view_to_comment]", get_permalink( $story_id ) . "?comment_id=". $comment_id, $url );
+
+			$url = get_permalink( $story_id );
+		}
+
 		return $url;
 	}
 
@@ -1073,6 +1081,7 @@ class BROTHER {
 		$post_arr = array(
 			"ID" => $data->post_id,
 			"post_title" => sanitize_text_field( $data->post_title ),
+			"post_name" => sanitize_title_with_dashes( $data->post_title ),
 			"post_content" => $data->post_content
 		);
 		$post_id = wp_insert_post( $post_arr );
@@ -1121,6 +1130,7 @@ class BROTHER {
 	*/
 	function get_company_stories( $data ) {
 		if ( isset( $data->is_ajax ) && $data->is_ajax == true ) { $drafts_container = array(); }
+		if ( !isset( $data->requester_id ) || empty( $data->requester_id ) ) { $data->requester_id = get_current_user_id(); }
 
 		if ( !empty( $data->company_id ) ) {
 			$args = array(
@@ -1131,17 +1141,20 @@ class BROTHER {
 				"meta_value" => $data->company_id,
 				"post_type" => "post",
 				"post_status" => $data->status,
-				"author" => ""
+				"author" => "",
+				"offset" => isset( $data->offset ) && !empty( $data->offset ) ? $data->offset : 0
 			);
 			$company_posts = get_posts( $args );
+
+			if ( isset( $data->is_ajax ) && $data->is_ajax == true ) { $stories_container = array(); }
 
 			foreach ( $company_posts as $post_ ) {
 				if ( isset( $data->is_ajax ) && $data->is_ajax == true ) {
 					$story_container = array();
 					$story_container[ "ID" ] = $post_->ID;
-					$story_container[ "title" ] = $post_->title;
-					$story_container[ "content" ] = $post_->content;
-					$story_container[ "excerpt" ] = wp_trim_words( $post_->content, 50, "..." );
+					$story_container[ "title" ] = $post_->post_title;
+					$story_container[ "content" ] = $post_->post_content;
+					$story_container[ "excerpt" ] = wp_trim_words( $post_->post_content, 50, "..." );
 					$story_container[ "banner" ][ "ID" ] = get_post_thumbnail_id( $post_->ID );
 					$story_container[ "banner" ][ "url" ] = $this->get_post_banner_url( $post_->ID );
 					$story_container[ "date" ] = $post_->post_date;
@@ -1155,11 +1168,18 @@ class BROTHER {
 					$story_container[ "meta" ][ "likes_count" ] = count( $this->get_story_likes( $post_->ID ) );
 					$story_container[ "meta" ][ "comments_count" ] = get_comments( array( "post_id" => $post_->ID, "count" => true ) );
 					$story_container[ "meta" ][ "is_liked" ] = $this->has_liked( get_current_user_id(), $post_->ID );
+					$story_container[ "meta" ][ "is_author" ] = $data->requester_id == $post_->post_author ? true : ( $data->requester_id == $data->company_id ? true : false );
 					array_push( $stories_container, (object)$story_container );
 				} else {
 					?>
 
-					<div id='story-<?php echo $post_->ID; ?>' class='story-container'>
+					<div id='story-<?php echo $post_->ID; ?>' class='story-container new-story animated fadeInUp'>
+						<?php if ( $data->requester_id == $post_->post_author || $data->requester_id == $data->company_id ) { ?>
+						<div id='story-controls' class='story-controls'>
+							<button id='edit-controller' class='fa fa-pencil control'></button>
+							<button id='delete-controller' class='fa fa-trash-o control'></button>
+						</div>
+						<?php } ?>
 						<div id='story-banner' class='story-banner' style='background-image: url(<?php echo $this->get_post_banner_url( $post_->ID ); ?>);'>
 							<div class='overlay'><span class='message'>Read me!</span></div>
 						</div>
@@ -1278,6 +1298,10 @@ class BROTHER {
 		return $story_container;
 	}
 
+	function count_user_stories( $user_id = "" ) {
+		return count_user_posts( empty( $user_id ) ? get_current_user_id() : $user_id );
+	}
+
 	/*
 	*	Function name: get_story_likes
 	*	Function arguments: $story_id [ INT ] (required)
@@ -1371,6 +1395,7 @@ class BROTHER {
 				$comment_container[ "user" ][ "last_name" ] = get_user_meta( $comment_->user_id, "last_name", true );
 				$comment_container[ "user" ][ "user_shortname" ] = get_user_meta( $comment_->user_id, "user_shortname", true );
 				$comment_container[ "user" ][ "url" ] = get_author_posts_url( $comment_->user_id );
+				$comment_container[ "user" ][ "is_author" ] = get_current_user_id() == $comment_->user_id ? true : false;
 				array_push( $comments_container, (object)$comment_container );
 			}
 
@@ -1384,6 +1409,8 @@ class BROTHER {
 	*	Function purpose: This function is used to tell if the specified by $user_id user has liked the specified by $tory_id POST.
 	*/
 	function has_liked( $user_id = "", $story_id ) {
+		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
+
 		global $wpdb;
 		$user_likes_table = $wpdb->prefix ."user_likes";
 		$sql_ = "SELECT * FROM $user_likes_table WHERE story_id=$story_id AND user_id=$user_id";
@@ -1399,23 +1426,46 @@ class BROTHER {
 		if ( !empty( $data->story_id ) ) {
 			if ( !empty( $data->comment_content ) ) {
 				if ( empty( $data->user_id ) ) { $data->user_id =  get_current_user_id(); }
-				$commentdata = array(
-					"comment_post_ID" => $data->story_id,
-					"comment_content" => $data->comment_content,
-					"user_id" => $data->user_id
-				);
-				$comment_id = wp_new_comment( $commentdata );
 
-				if ( is_numeric( $comment_id ) ) {
+				$update_result = 0;
+				$comment_id = "";
+
+				if ( !empty( $data->comment_id ) ) {
+					$update_result = wp_update_comment( array(
+						"comment_ID" => $data->comment_id,
+						"comment_content" => $data->comment_content
+					) );
+				}
+				else {
+					$commentdata = array(
+						"comment_post_ID" => $data->story_id,
+						"comment_content" => $data->comment_content,
+						"user_id" => $data->user_id
+					);
+					$comment_id = wp_new_comment( $commentdata );
+				}
+
+				if ( is_numeric( $comment_id ) || $update_result == 1 ) {
 					$author_id = get_post_field( "post_author", $data->story_id );
-					$notification_id = $this->generate_notification( 324, $author_id, $data->user_id );
-					$this->generate_notification_meta( $notification_id, "commented_story_id", $data->story_id );
 
-					return $comment_id;
+					if ( $update_result == 0 ) {
+						$notification_id = $this->generate_notification( 324, $author_id, $data->user_id );
+						$this->generate_notification_meta( $notification_id, "commented_story_id", $data->story_id );
+						$this->generate_notification_meta( $notification_id, "comment_id", !empty( $comment_id ) ? $comment_id : $data->comment_id );
+					}
+
+					return !empty( $comment_id ) ? $comment_id : $update_result;
 				} else { return ""; }
 			} else { return "ERROR: Story Content is not set."; }
 		} else { return "ERROR: Story ID is not set."; }
 	}
+
+	/*
+	*	Function name: delete_story_comment
+	*	Function arguments: $comment_id [ INT ] (required)
+	*	Function purpose: This function removes the specified by $comment_id, story comment.
+	*/
+	function delete_story_comment( $comment_id ) { return array( "result" => wp_delete_comment( $comment_id, true ), "comment_id" => $comment_id );	}
 
 	/*
 	*	Function name: get_available_media_space

@@ -227,9 +227,73 @@ jQuery( document ).ready(function(){
 
 	// STORY BOARDS CONTROLLS
 	if ( jQuery( "#company-story-board" ).length ) {
+		var lockStoriesLoad = false;
+		var storiesOffset = 5;
+
 		jQuery( window ).scroll(function(){
-			if ( jQuery( window ).scrollTop() + jQuery( window ).height() > jQuery( document ).height() - 200 ) {
-				console.log( "LOAD" );
+			if ( jQuery( window ).scrollTop() + jQuery( window ).height() > jQuery( document ).height() - 100 ) {
+				if ( lockStoriesLoad == false ) {
+					jQuery( "#company-story-board" ).append( loading );
+
+					storiesController = new UserStory();
+					storiesController.getStories( "", storiesOffset, companyID, function( response ) {
+						jQuery( "#company-story-board #loader" ).remove();
+						stories_ = response;
+
+						for ( story_key in stories_ ) {
+							story_ = stories_[ story_key ];
+
+							story_controls = "";
+							if ( story_.meta.is_author ) {
+								story_controls = "\
+								<div id='story-controls' class='story-controls'>\
+									<button id='edit-controller' class='fa fa-pencil control'></button>\
+									<button id='delete-controller' class='fa fa-trash-o control'></button>\
+								</div>\
+								";
+							}
+
+							like_button = !story_.meta.is_liked ? "fa-heart-o" : "fa-heart";
+
+							view_ = "\
+							<div id='story-"+ story_.ID +"' class='story-container new-story animated fadeInUp'>\
+								"+ story_controls +"\
+								<div id='story-banner' class='story-banner' style='background-image: url("+ story_.banner.url +");'>\
+									<div class='overlay'><span class='message'>Read me!</span></div>\
+								</div>\
+								<div class='story-meta'>\
+									<a href='"+ story_.author.author_url +"' class='story-author-anchor'>\
+										<div id='author-avatar' class='story-author-avatar' style='background-image: url("+ story_.author.avatar_url +");'></div>\
+									</a>\
+									<div class='story-interactions'>\
+										<button id='story-like-controller' class='like-button fa "+ like_button +" hvr-bounce-out' story-id='"+ story_.ID +"'><i class='numbers'>"+ story_.meta.likes_count +"</i></button>\
+										<button id='story-comments-controller' class='comment-button fa fa-comment hvr-bounce-out' story-id='"+ story_.ID +"'><i class='numbers'>"+ story_.meta.comments_count +"</i></button>\
+									</div>\
+								</div>\
+								<div class='story'>\
+									<h1 class='story-title'>"+ story_.title +"</h1>\
+									<div class='story-excerpt'>"+ story_.excerpt +"</div>\
+								</div>\
+							</div>\
+							";
+
+							jQuery( "#company-story-board" ).append( view_ );
+
+							jQuery( "#company-story-board .new-story .story-banner" ).each(function(){
+								jQuery( this ).on("click", function(){ openStoryReader( jQuery( this ).parent().attr( "id" ).split( "-" )[1] ); });
+							});
+							jQuery( "#company-story-board .new-story .story" ).each(function(){
+								jQuery( this ).on("click", function(){ openStoryReader( jQuery( this ).parent().attr( "id" ).split( "-" )[1] ); });
+							});
+
+							initializeStoryControls();
+						}
+
+						storiesOffset += 5;
+						if ( stories_.length > 0 ) { lockStoriesLoad = false; }
+					} );
+				}
+				lockStoriesLoad = true;
 			}
 		});
 
@@ -716,11 +780,12 @@ function openStoryReader( storyID, slideToComments = false ) {
 		jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder" ).on( "keydown", function( e ){
 			if ( e.keyCode == 13 ) {
 				storyID = jQuery( "#story-reader-popup #story-reader-inline .story-meta #story-comments-controller" ).attr( "story-id" );
+				commentID = jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder" ).attr( "comment-id" );
 				commentContent = jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder" ).val().trim();
 
 				var storyController = new UserStory();
-				storyController.publishComment( storyID, "", commentContent, function( response ){
-					jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder" ).val( "" );
+				storyController.publishComment( storyID, "", commentContent, commentID, function( response ){
+					jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder" ).val( "" ).removeAttr( "comment-id" );
 					storyController.getComments( storyID, "", function( response ) {
 						if ( Array.isArray( response ) ) {
 							jQuery( "#story-reader-popup #story-reader-inline .story-meta #story-comments-controller .numbers" ).html( response.length );
@@ -733,10 +798,11 @@ function openStoryReader( storyID, slideToComments = false ) {
 
 		jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-controller" ).on( "click", function(){
 			storyID = jQuery( "#story-reader-popup #story-reader-inline .story-meta #story-comments-controller" ).attr( "story-id" );
+			commentID = jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder" ).attr( "comment-id" );
 			commentContent = jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder" ).val().trim();
 
 			var storyController = new UserStory();
-			storyController.publishComment( storyID, "", commentContent, function( response ){
+			storyController.publishComment( storyID, "", commentContent, commentID, function( response ){
 				jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder" ).val( "" );
 				storyController.getComments( storyID, "", function( response ) {
 					if ( Array.isArray( response ) ) {
@@ -761,11 +827,14 @@ function openStoryReader( storyID, slideToComments = false ) {
 	});
 }
 
-function parseComments( comments ) {
-	jQuery( "#story-reader-popup #story-reader-inline #comments-container #comments" ).empty();
+function parseComments( comments, container = "#story-reader-popup #story-reader-inline #comments-container" ) {
+	jQuery( container +" #comments" ).empty();
 
 	for ( comment_key in comments ) {
 		comment_ = comments[ comment_key ];
+
+		edit_button = comment_.user.is_author ? "<button id='edit-"+ comment_.id +"' class='edit-controller fa fa-pencil'></button>" : "";
+		delete_button = comment_.user.is_author ? "<button id='remove-"+ comment_.id +"' class='delete-controller fa fa-trash-o'></button>" : "";
 
 		view_ = "\
 		<div id='comment-"+ comment_.id +"' class='comment'>\
@@ -775,15 +844,29 @@ function parseComments( comments ) {
 				</a>\
 			</div>\
 			<div class='comment-content'>"+ comment_.content +"</div>\
+			<div class='comment-meta'>"+ edit_button + delete_button +"</div>\
 		</div>\
 		";
-		jQuery( "#story-reader-popup #story-reader-inline #comments-container #comments" ).append( view_ );
+		jQuery( container +" #comments").append( view_ );
+
+		jQuery( container +" #comment-"+ comment_.id +" #edit-"+ comment_.id ).on( "click", function(){
+			storyController = new UserStory();
+			storyController.editComment( jQuery( this ).attr( "id" ).split( "-" )[1], container +" #comment-"+ jQuery( this ).attr( "id" ).split( "-" )[1] +" .comment-content", container +" #comment-holder" );
+		} );
+
+		jQuery( container +" #comment-"+ comment_.id +" #remove-"+ comment_.id ).on( "click", function(){
+			storyController = new UserStory();
+			storyController.deleteComment( jQuery( this ).attr( "id" ).split( "-" )[1], function( response ){
+				if ( response.result == true ) { jQuery( container +" #comment-"+ response.comment_id ).remove(); }
+				else { console.log( response ); }
+			} );
+		} );
 	}
 }
 
 function initializeStoryControls() {
 	storyController = new UserStory();
-	jQuery( ".story-container #story-like-controller" ).each(function(){
+	jQuery( ".new-story #story-like-controller" ).each(function(){
 		jQuery( this ).on( "click", function(){
 			storyID = jQuery( this ).attr( "story-id" );
 			storyController.likeUnlikeStory( storyID, "", function( response ) {
@@ -794,12 +877,90 @@ function initializeStoryControls() {
 			} );
 		} );
 	});
-	jQuery( ".story-container #story-comments-controller" ).each(function(){
+
+	jQuery( ".new-story #story-comments-controller" ).each(function(){
 		jQuery( this ).on( "click", function(){
 			storyID = jQuery( this ).attr( "story-id" );
 			openStoryReader( storyID, true );
 		} );
 	});
+
+	jQuery( ".new-story #edit-controller" ).each(function(){
+		jQuery( this ).on( "click", function(){
+			storyID = jQuery( this ).parent().parent().attr( "id" ).split( "-" )[1];
+
+			generateAJAX({
+					functionName : "get_user_story",
+					arguments : {
+						post_id: storyID,
+						company_id: companyID
+					}
+				}, function( response ) {
+					story_ = JSON.parse( response );
+					console.log( story_ );
+
+					storyComposer = new UserStory();
+					storyComposer.buildComposer();
+
+					jQuery( "#story-composer" ).attr( "post-id", story_.ID );
+					jQuery( "#story-composer #story-featured-image" ).attr( "attachment-id", story_.banner.ID ).attr( "style", "background-image: url("+ story_.banner.url +")" );
+					jQuery( "#story-composer #story-header" ).html( story_.title );
+					setTimeout(function(){ tinymce.activeEditor.setContent( story_.content ); }, 250);
+				}
+			);
+		} );
+	});
+
+	jQuery( ".new-story #delete-controller" ).each(function(){
+		jQuery( this ).on( "click", function(){
+			storyID = jQuery( this ).parent().parent().attr( "id" ).split( "-" )[1];
+			storyController = new UserStory();
+			storyController.deleteStory( storyID, companyID, function( response ) {
+				if ( jQuery.isNumeric( response ) ) {
+					jQuery( "#story-"+ response ).removeClass( "fadeIn" ).addClass( "fadeOut" );
+					setTimeout(function(){ jQuery( "#story-"+ response ).remove(); }, 750);
+				}
+			} );
+		} );
+	});
+
+	jQuery( ".new-story" ).each(function(){ jQuery( this ).removeClass( "new-story" ); });
+}
+
+function initializeSingleStoryControls() {
+	storyController = new UserStory();
+	jQuery( ".story-container #like-controller" ).each(function(){
+		jQuery( this ).on( "click", function(){
+			storyID = jQuery( this ).attr( "story-id" );
+			storyController.likeUnlikeStory( storyID, "", function( response ) {
+				actionController = jQuery( ".story-container" ).find( "#like-controller" );
+				actionController.children( ".numbers" ).html( response.likes_count );
+				if ( response.action == "like" ) { actionController.removeClass( "fa-heart-o" ).addClass( "fa-heart" ); }
+				else if ( response.action == "dislike" ) { actionController.removeClass( "fa-heart" ).addClass( "fa-heart-o" ); }
+			} );
+		} );
+	});
+
+	jQuery( ".story-container #comment-controller" ).on( "click", function(){ jQuery( ".story-container #comment-holder").focus(); } );
+
+	jQuery( ".story-container #comment-holder" ).on( "keydown", function( e ){
+		if ( e.keyCode == 13 ) {
+			storyID = jQuery( ".story-container #comment-controller" ).attr( "story-id" );
+			commentID = jQuery( ".story-container #comment-holder" ).attr( "comment-id" );
+			commentContent = jQuery( ".story-container #comment-holder" ).val().trim();
+
+			var storyController = new UserStory();
+			storyController.publishComment( storyID, "", commentContent, commentID, function( response ){
+				jQuery( ".story-container #comment-holder" ).val( "" ).removeAttr( "comment-id" );
+				storyController.getComments( storyID, "", function( response ) {
+					if ( Array.isArray( response ) ) {
+						jQuery( ".story-container #comment-holder .numbers" ).html( response.length );
+						parseComments( response, ".story-container #comments-container" );
+					}
+				} );
+			} );
+		}
+	} );
 }
 
 function keyPressedForms( e, form ) {

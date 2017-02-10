@@ -7,29 +7,15 @@
  * @package elevenhub
  */
 
-get_header(); ?>
+$brother_ = new BROTHER;
 
-	<div id="primary" class="content-area">
-		<main id="main" class="site-main" role="main">
-
-		<?php
-		while ( have_posts() ) : the_post();
-
-			get_template_part( 'template-parts/content', get_post_format() );
-
-			the_post_navigation();
-
-			// If comments are open or we have at least one comment, load up the comment template.
-			if ( comments_open() || get_comments_number() ) :
-				comments_template();
-			endif;
-
-		endwhile; // End of the loop.
-		?>
-
-		</main><!-- #main -->
-	</div><!-- #primary -->
-
-<?php
-get_sidebar();
-get_footer();
+if ( is_user_logged_in() ) {
+	$user_id = get_current_user_id();
+	$association_type = get_user_meta( $user_id, "account_association", true );
+	if ( $association_type == "employee" ) { get_header( "employee" ); }
+	else if ( $association_type == "company" ) { get_header( "company" ); }
+	require_once get_template_directory() ."/views/single-story-preview.php";
+} else {
+	/* Load public view */
+	wp_redirect( get_site_url() );
+}

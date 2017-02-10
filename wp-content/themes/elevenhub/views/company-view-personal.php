@@ -54,7 +54,8 @@ if ( empty( $user_shortname ) || !isset( $user_shortname ) ) {
 	<?php
 	$brother_->get_company_stories((object)array(
 		"company_id" => $user_id,
-		"stories" => 10,
+		"requester_id" => $user_id,
+		"stories" => 5,
 		"status" => "publish"
 	));
 	?>

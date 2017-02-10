@@ -1484,6 +1484,34 @@ body { margin: 0 !important; padding: 0 !important; }
 		position: relative;
 		margin: 5em 0;
 
+		.story-controls {
+			display: block;
+			text-align: right;
+
+			.control {
+				display: inline-block;
+				border: none;
+				box-shadow: none !important;
+				background: none;
+				font-size: 1rem;
+				padding: 1em 0 0.5em 1em;
+				color: #aaa;
+				text-shadow: none;
+				outline: 0 !important;
+
+				webkit-transition: all 0.25s ease-in-out;
+				-moz-transition: all 0.25s ease-in-out;
+				-o-transition: all 0.25s ease-in-out;
+				transition: all 0.25s ease-in-out;
+			}
+
+			#edit-controller:hover,
+			#edit-controller:active { color: $peter_river; }
+
+			#delete-controller:hover,
+			#delete-controller:active { color: $alizarin; }
+		}
+
 		.story-banner {
 			position: relative;
 			display: block;
@@ -1752,7 +1780,7 @@ body { margin: 0 !important; padding: 0 !important; }
 
 			.comment {
 				display: block;
-			    padding: 0.5em 0;
+			    padding: 0.85em 0;
 			    border-bottom: 1px solid #ddd;
 
 				.user-container {
@@ -1791,6 +1819,30 @@ body { margin: 0 !important; padding: 0 !important; }
 				    line-height: 120%;
 					width: calc(100% - 3.75em);
     				text-align: left;
+				}
+
+				.comment-meta {
+					dispplay: block;
+					text-align: right;
+
+					.delete-controller,
+					.edit-controller {
+						display: inline-block;
+						color: #aaa;
+						background: none;
+						box-shadow: none !important;
+						border: none;
+						font-size: 1rem;
+						padding: 0.5em 0 0.5em 0.5em;
+						text-align: center;
+						outline: 0 !important;
+					}
+
+					.delete-controller:active,
+					.delete-controller:hover { color: $alizarin; }
+
+					.edit-controller:active,
+					.edit-controller:hover { color: $peter_river; }
 				}
 			}
 
@@ -2228,6 +2280,341 @@ body { margin: 0 !important; padding: 0 !important; }
     }
 }
 
+/** SINGLE STORY VIEW **/
+.single-story-view {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: flex-start;
+
+	.author-container,
+	.story-container {
+		display: inline-block;
+		vertical-align: middle;
+	}
+
+	.author-container {
+		width: 30%;
+		padding-right: 1em;
+
+		.author-anchor {
+			display: block;
+			text-decoration: none;
+			text-align: center;
+
+			.author-banner {
+				display: block;
+				width: 100%;
+				height: 3em;
+				font-size: 4rem;
+				background-size: cover;
+				background-position: center;
+				position: relative;
+				text-decoration: none;
+
+				.author-avatar {
+					display: inline-block;
+				    width: 4em;
+				    height: 4em;
+				    font-size: 2rem;
+				    background-size: cover;
+				    background-position: center;
+				    border-radius: 100%;
+				    box-shadow: 0 0 0 3px #fff;
+				    position: absolute;
+				    bottom: 0;
+				    left: 50%;
+				    transform: translate(-50%, 25%);
+				}
+			}
+
+			.author-names {
+				font-family: OpenSansRegular;
+			    font-weight: normal;
+			    font-size: 2rem;
+			    color: #333;
+			    margin: 1.25em 0 0.5em;
+			}
+		}
+
+		.author-meta {
+			display: block;
+
+			.meta {
+				display: block;
+			    font-size: 1rem;
+			    font-family: OpenSansRegular;
+			    font-weight: normal;
+			    border-bottom: 1px solid #ddd;
+			    padding: 1em 0;
+			    margin: 0 !important;
+				color: #333;
+
+				a {
+					outline: 0;
+					text-decoration: none;
+					display: inline-block;
+					vertical-align: middle;
+
+					&:hover { color: $peter_river; }
+				}
+
+				.icon {
+					display: inline-block;
+					vertical-align: middle;
+				    background: #ccc;
+					color: #333;
+				    padding: 0.5em;
+				    border-radius: 5px;
+				    margin-right: 0.5em;
+					font-size: 0.85rem;
+
+					width: 26px;
+					height: 26px;
+					text-align: center;
+
+					&.belize-hole { background: $belize_hole; color: #fff; }
+					&.wisteria { background: $wisteria; color: #fff; }
+
+				}
+
+				.company-avatar {
+					display: inline-block;
+					width: 1.75em;
+					height: 1.75em;
+					font-size: 1rem;
+					background-size: cover;
+					background-position: center;
+					vertical-align: middle;
+					margin-left: 0.5em;
+				}
+			}
+		}
+	}
+
+	.story-container {
+		width: 70%;
+		border-left: 1px dashed #ddd;
+		padding-left: 1em;
+
+		.story-banner {
+			display: block;
+			width: 100%;
+			height: 6em;
+			font-size: 4rem;
+			background-color: $wet_asphalt;
+			background-size: cover;
+			background-position: center;
+		}
+
+		.story-title {
+			display: block;
+			margin: 0.25em 0;
+			font-family: OpenSansBold;
+			font-size: 3rem;
+			font-weight: bold;
+			letter-spacing: 1px;
+			color: #333;
+		}
+
+		.post-content {
+			display: block;
+			font-family: PlayFairRegular;
+			font-size: 1rem;
+			font-weight: normal;
+			color: #333;
+			letter-spacing: 1px;
+			line-height: 200%;
+			text-align: justify;
+
+			p {
+				margin-top: 0;
+			}
+		}
+
+		.post-meta {
+			display: block;
+			border-top: 1px solid #ddd;
+			border-bottom: 1px solid #ddd;
+			margin: 1em auto;
+			padding: 0;
+
+			.control {
+				display: inline-block;
+			    vertical-align: middle;
+			    background: none;
+			    border: none;
+			    box-shadow: none !important;
+			    outline: 0 !important;
+			    padding: 1em;
+			    position: relative;
+			    font-size: 1.25rem;
+
+				webkit-transition: all 0.25s ease-in-out;
+				-moz-transition: all 0.25s ease-in-out;
+				-o-transition: all 0.25s ease-in-out;
+				transition: all 0.25s ease-in-out;
+
+				.numbers {
+					font-size: 0.65rem;
+					font-family: OpenSansRegular;
+					font-weight: normal;
+					font-style: normal;
+					display: inline-block;
+					position: absolute;
+					top: 1em;
+					right: 1em;
+				}
+			}
+
+			#like-controller { color: $alizarin; }
+			#like-controller:active,
+			#like-controller:hover { color: $pomegranate; }
+
+			#comment-controller { color: $peter_river; }
+			#comment-controller:active,
+			#comment-controller:hover { color: $belize_hole; }
+		}
+
+		.post-comments {
+			display: block;
+
+			.comment {
+				display: block;
+			    padding: 0.85em 0;
+			    border-bottom: 1px solid #ddd;
+
+				.user-container {
+					display: inline-block;
+    				vertical-align: top;
+
+					.user-anchor {
+						display: block;
+						text-align: center;
+						padding: 0;
+						outline: 0 !important;
+
+						.avatar {
+							display: block;
+							width: 1em;
+							height: 1em;
+							font-size: 3rem;
+							background-size: cover;
+							background-position: center;
+							background-color: #ccc;
+							box-shadow: 0 0 0 1px #ddd;
+							border-radius: 100%;
+							margin-right: 0.15em;
+						}
+					}
+				}
+
+				.comment-content {
+					display: inline-block;
+				    vertical-align: top;
+				    font-family: OpenSansRegular;
+				    font-size: 1rem;
+				    font-weight: normal;
+				    color: #333;
+				    letter-spacing: 1px;
+				    line-height: 120%;
+					width: calc(100% - 3.75em);
+    				text-align: left;
+				}
+
+				.comment-meta {
+					dispplay: block;
+					text-align: right;
+
+					.delete-controller,
+					.edit-controller {
+						display: inline-block;
+						color: #aaa;
+						background: none;
+						box-shadow: none !important;
+						border: none;
+						font-size: 1rem;
+						padding: 0.5em 0 0.5em 0.5em;
+						text-align: center;
+						outline: 0 !important;
+					}
+
+					.delete-controller:active,
+					.delete-controller:hover { color: $alizarin; }
+
+					.edit-controller:active,
+					.edit-controller:hover { color: $peter_river; }
+				}
+			}
+
+			.comment-composer {
+				display: flex;
+				flex-direction: row;
+				justify-content: flex-start;
+				align-items: center;
+				margin-top: 1em;
+
+				#comment-holder {
+					display: inline-block;
+					vertical-align: middle;
+
+					width: 90%;
+					color: #333;
+
+					border: 1px solid #ddd;
+					border-right: none;
+					border-radius: 0;
+					border-top-left-radius: 3px;
+					border-bottom-left-radius: 3px;
+
+					padding: 0.25em 0.5em;
+					letter-spacing: 1px;
+
+					font-family: OpenSansRegular;
+					font-size: 1rem;
+					font-weight: normal;
+
+					text-shadow: none;
+					outline: 0 !important;
+					box-shadow: none !important;
+				}
+				#comment-holder:focus { border-color: $peter_river;  }
+
+				#comment-controller {
+					display: inline-block;
+					vertical-align: middle;
+
+					width: 10%;
+					text-align: center;
+					padding: 0.5em;
+
+					border-radius: 0;
+					border-top-right-radius: 3px;
+					border-bottom-right-radius: 3px;
+					border: 1px solid $wet_asphalt;
+					border-left: 0;
+					background: $wet_asphalt;
+					box-shadow: none;
+
+					font-size: 1rem;
+					font-weight: normal;
+
+					text-shadow: none;
+					color: #fff;
+					outline: 0 !important;
+
+					webkit-transition: all 0.25s ease-in-out;
+					-moz-transition: all 0.25s ease-in-out;
+					-o-transition: all 0.25s ease-in-out;
+					transition: all 0.25s ease-in-out;
+				}
+				#comment-controller:hover,
+				#comment-controller:active { background: $midnight_blue; border-color: $midnight_blue; }
+			}
+		}
+	}
+}
+
 /** MESSEGAS **/
 .no-information-message {
 	font-family: OpenSansLight;
@@ -2455,6 +2842,39 @@ body { margin: 0 !important; padding: 0 !important; }
 			}
 
 			.story-meta { padding: 0 !important; }
+		}
+	}
+
+	.single-story-view {
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+
+		.author-container {
+			width: 100%;
+			padding: 0;
+
+			.author-meta {
+				padding: 0 1em;
+			}
+		}
+
+		.story-container {
+			width: 100%;
+			padding: 0;
+			margin-top: 1em;
+			border: none;
+
+			.story-title { padding: 0 0.25em; }
+
+			.post-content { padding: 0 1em; }
+
+			.comment {
+				padding: 0 1em;
+				margin-bottom: 1em;
+			}
+
+			.comment-composer { padding: 0 1em; }
 		}
 	}
 }

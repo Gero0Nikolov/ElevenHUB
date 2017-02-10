@@ -617,12 +617,14 @@ var UserStory = function( userID = "" ) {
 		</div>\
 		";
 
+		var random_editor_id = "editor-"+ Math.floor( ( Math.random() * 1000 ) + 1 );
+
 		composer = "\
 		<div id='story-composer' class='animated slideInUp' post-id='0'>\
 			"+ composer_controls +"\
 			<div id='story-featured-image' class='story-banner' attachment-id><button id='featured-image-controller' class='fa fa-pencil'></button></div>\
 			<h1 id='story-header' class='story-header' contenteditable='true' placeholder='Story title'></h1>\
-			<div id='story-content' class='story-content' contenteditable='true'></div>\
+			<div id='story-content' class='story-content "+ random_editor_id +"' contenteditable='true'></div>\
 			"+ floating_controls +"\
 			<script type='text/javascript'>var canSave = true;</script>\
 		</div>\
@@ -632,7 +634,7 @@ var UserStory = function( userID = "" ) {
 
 		//Initialize Tiny-MCE
 		tinymce.init({
-    		selector: '#story-content',
+    		selector: "."+ random_editor_id,
 			theme: "inlite",
 			inline: true,
 			browser_spellcheck: true,
@@ -1037,7 +1039,7 @@ var UserStory = function( userID = "" ) {
 			});
 		});
 
-		jQuery( "#close-controller" ).on( "click", function(){ classHolder.destroyComposer(); } );
+		jQuery( "#close-controller" ).on( "click", function(){ classHolder.destroyComposer( "."+ random_editor_id ); } );
 	}
 
 	/*
@@ -1045,8 +1047,8 @@ var UserStory = function( userID = "" ) {
 	*	Function arguments: NONE
 	*	Function purpose: This function destroys the story composer which was created by this.buildComposer method.
 	*/
-	this.destroyComposer = function() {
-		tinymce.EditorManager.execCommand('mceRemoveEditor',true, "#story-content");
+	this.destroyComposer = function( editorID ) {
+		tinymce.remove( editorID );
 		jQuery( "#story-composer" ).removeClass( "slideInUp" ).addClass( "slideOutDown" );
 		setTimeout(function(){ jQuery( "#story-composer" ).remove(); }, 750);
 	}
@@ -1159,20 +1161,59 @@ var UserStory = function( userID = "" ) {
 	}
 
 	/*
+	*	Function name: deleteStory
+	*	Function arguments: storyID [ INT ] (required), companyID [ INT ] (required), onSuccess [ FUNCTION ] (required) tells the function what to do after the response.
+	*	Function purpose: This function is used to delete an user story, defined by the storyID argument.
+	*/
+	this.deleteStory = function( storyID, companyID, onSuccess ) {
+		generateAJAX({
+				functionName : "delete_user_story",
+				arguments : {
+					post_id: storyID,
+					company_id: companyID
+				}
+			}, function ( response ) { onSuccess( JSON.parse( response ) ); }
+		);
+	}
+
+	/*
 	*	Function name: publishComment
-	*	Function arguments: storyID [ INT ] (required), userID [ INT ] (optional), commentContent [ STRING ] (required), onSuccess [ FUNCTION ] (required) tells the function what to do after the response.
+	*	Function arguments: storyID [ INT ] (required), userID [ INT ] (optional), commentContent [ STRING ] (required), commentID [ INT ] (required), onSuccess [ FUNCTION ] (required) tells the function what to do after the response.
 	*	Function purpose: This function is used to send user comment to the Brother.PHP framework.
 	*/
-	this.publishComment = function( storyID, userID = "", commentContent, onSuccess ) {
+	this.publishComment = function( storyID, userID = "", commentContent, commentID = "", onSuccess ) {
 		generateAJAX({
 				functionName : "publish_story_comment",
 				arguments : {
 					story_id: storyID,
 					user_id: userID,
-					comment_content: commentContent
+					comment_content: commentContent,
+					comment_id: commentID !== undefined ? commentID : ""
 				}
 			}, function ( response ) { onSuccess( JSON.parse( response ) ); }
 		);
+	}
+
+	/*
+	*	Function name: deleteComment
+	*	Function arguments: commentID [ INT ] (required), onSuccess [ FUNCTION ] (required) tells the function what to do after the response.
+	*	Function purpose: This function is sending a front-end DELETE_COMMENT request to the Brother.PHP framework.
+	*/
+	this.deleteComment = function( commentID, onSuccess ) {
+		generateAJAX({
+				functionName : "delete_story_comment",
+				arguments : commentID
+			}, function ( response ) { onSuccess( JSON.parse( response ) ); }
+		);
+	}
+
+	/*
+	*	Function name: editComment
+	*	Function arguments: commentID [ INT ] (required), commentContainer [ STRING_SELECT ] (required), editorContainer [ STRING_SELECTOR ] (required)
+	*	Function purpose: This function is used to get the comment text from a specified commentContainer and put it to the value of the editorContainer input.
+	*/
+	this.editComment = function( commentID, commentContainer, editorContainer ) {
+		jQuery( editorContainer ).val( jQuery( commentContainer ).html().trim() ).attr( "comment-id", commentID ).focus();
 	}
 
 	/*
@@ -1187,6 +1228,19 @@ var UserStory = function( userID = "" ) {
 				arguments : {
 					story_id: storyID,
 					user_id: userID
+				}
+			}, function ( response ) { onSuccess( JSON.parse( response ) ); }
+		);
+	}
+
+	this.getStories = function( userID = "", offset = "", companyID, onSuccess ) {
+		generateAJAX({
+				functionName : "get_company_stories",
+				arguments : {
+					company_id: companyID,
+					offset: offset,
+					stories: 5,
+					is_ajax: true
 				}
 			}, function ( response ) { onSuccess( JSON.parse( response ) ); }
 		);
