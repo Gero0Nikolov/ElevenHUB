@@ -60,5 +60,17 @@ var companyID = "<?php echo $v_user_id; ?>";
 	</div>
 </div>
 
-<div id="story-board" class="stories-container">
+<div id="company-story-board" class="stories-container">
+	<?php
+	$brother_->get_company_stories((object)array(
+		"company_id" => $v_user_id,
+		"requester_id" => $user_id,
+		"stories" => 5,
+		"status" => "publish"
+	));
+	?>
 </div>
+
+<script type="text/javascript">
+initializeStoryControls();
+</script>

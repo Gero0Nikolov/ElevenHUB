@@ -322,11 +322,11 @@ function buildUserRelation( container ) {
 	relationsController.followOrUnfollowRelation( vUserID, true, function( response ){
 		response = JSON.parse( response );
 
-		if (  typeof( response ) === 'object' ) {
+		if ( typeof( response ) === 'object' ) {
 			actionResult = response.action_result;
 			followersText = response.followers.length == 1 ? response.followers.length + " follower" : response.followers.length + " followers" ;
 
-			if ( jQuery( "#user-container .user-meta .followers" ).length ) { jQuery( "#user-container .user-meta .followers" ).html( followersText ); }
+			if ( jQuery( "#profile-board .user-board #followers" ).length ) { jQuery( "#profile-board .user-board #followers" ).html( followersText ); }
 			if ( jQuery( "#company-container #company-information .overlay #company-meta" ).length ) { jQuery( "#company-container #company-information .overlay #company-meta #company-followers-controller" ).html( followersText ); }
 		} else { actionResult = response };
 
@@ -727,10 +727,28 @@ function openStoryReader( storyID, slideToComments = false ) {
 			company_id: companyID
 		}
 	}, function( response ) {
+		generateAJAX({
+				functionName : "set_story_view",
+				arguments : {
+					story_id: storyID
+				}
+			}, function( response ) {}
+		);
+
 		story_ = JSON.parse( response );
 
 		names = story_.author.short_name != "" ? story_.author.short_name : story_.author.first_name +" "+ story_.author.last_name;
 		like_sign = story_.meta.is_liked ? "fa-heart" : "fa-heart-o";
+
+		comment_composer = "";
+		if ( story_.meta.is_requester_employee ) {
+			comment_composer = "\
+			<div class='comment-composer'>\
+				<input type='text' id='comment-holder'>\
+				<button id='comment-controller' class='fa fa-paper-plane'></button>\
+			</div>\
+			";
+		}
 
 		view = "\
 		<div class='author'>\
@@ -752,10 +770,7 @@ function openStoryReader( storyID, slideToComments = false ) {
 		</div>\
 		<div id='comments-container' class='story-comments'>\
 			<div id='comments'>"+ loading +"</div>\
-			<div class='comment-composer'>\
-				<input type='text' id='comment-holder'>\
-				<button id='comment-controller' class='fa fa-paper-plane'></button>\
-			</div>\
+			"+ comment_composer +"\
 		</div>\
 		";
 
@@ -867,15 +882,17 @@ function parseComments( comments, container = "#story-reader-popup #story-reader
 function initializeStoryControls() {
 	storyController = new UserStory();
 	jQuery( ".new-story #story-like-controller" ).each(function(){
-		jQuery( this ).on( "click", function(){
-			storyID = jQuery( this ).attr( "story-id" );
-			storyController.likeUnlikeStory( storyID, "", function( response ) {
-				actionController = jQuery( "#story-"+ storyID ).find( "#story-like-controller" );
-				actionController.children( ".numbers" ).html( response.likes_count );
-				if ( response.action == "like" ) { actionController.removeClass( "fa-heart-o" ).addClass( "fa-heart" ); }
-				else if ( response.action == "dislike" ) { actionController.removeClass( "fa-heart" ).addClass( "fa-heart-o" ); }
+		if ( !jQuery( this ).hasClass( "inactive" ) ) {
+			jQuery( this ).on( "click", function(){
+				storyID = jQuery( this ).attr( "story-id" );
+				storyController.likeUnlikeStory( storyID, "", function( response ) {
+					actionController = jQuery( "#story-"+ storyID ).find( "#story-like-controller" );
+					actionController.children( ".numbers" ).html( response.likes_count );
+					if ( response.action == "like" ) { actionController.removeClass( "fa-heart-o" ).addClass( "fa-heart" ); }
+					else if ( response.action == "dislike" ) { actionController.removeClass( "fa-heart" ).addClass( "fa-heart-o" ); }
+				} );
 			} );
-		} );
+		}
 	});
 
 	jQuery( ".new-story #story-comments-controller" ).each(function(){
@@ -897,7 +914,6 @@ function initializeStoryControls() {
 					}
 				}, function( response ) {
 					story_ = JSON.parse( response );
-					console.log( story_ );
 
 					storyComposer = new UserStory();
 					storyComposer.buildComposer();
@@ -930,15 +946,17 @@ function initializeStoryControls() {
 function initializeSingleStoryControls() {
 	storyController = new UserStory();
 	jQuery( ".story-container #like-controller" ).each(function(){
-		jQuery( this ).on( "click", function(){
-			storyID = jQuery( this ).attr( "story-id" );
-			storyController.likeUnlikeStory( storyID, "", function( response ) {
-				actionController = jQuery( ".story-container" ).find( "#like-controller" );
-				actionController.children( ".numbers" ).html( response.likes_count );
-				if ( response.action == "like" ) { actionController.removeClass( "fa-heart-o" ).addClass( "fa-heart" ); }
-				else if ( response.action == "dislike" ) { actionController.removeClass( "fa-heart" ).addClass( "fa-heart-o" ); }
+		if ( !jQuery( this ).hasClass( "inactive" ) ) {
+			jQuery( this ).on( "click", function(){
+				storyID = jQuery( this ).attr( "story-id" );
+				storyController.likeUnlikeStory( storyID, "", function( response ) {
+					actionController = jQuery( ".story-container" ).find( "#like-controller" );
+					actionController.children( ".numbers" ).html( response.likes_count );
+					if ( response.action == "like" ) { actionController.removeClass( "fa-heart-o" ).addClass( "fa-heart" ); }
+					else if ( response.action == "dislike" ) { actionController.removeClass( "fa-heart" ).addClass( "fa-heart-o" ); }
+				} );
 			} );
-		} );
+		}
 	});
 
 	jQuery( ".story-container #comment-controller" ).on( "click", function(){ jQuery( ".story-container #comment-holder").focus(); } );
@@ -960,6 +978,58 @@ function initializeSingleStoryControls() {
 				} );
 			} );
 		}
+	} );
+
+	jQuery( ".story-container .comment-composer #comment-controller" ).on( "click", function( e ){
+		storyID = jQuery( ".story-container #comment-controller" ).attr( "story-id" );
+		commentID = jQuery( ".story-container #comment-holder" ).attr( "comment-id" );
+		commentContent = jQuery( ".story-container #comment-holder" ).val().trim();
+
+		var storyController = new UserStory();
+		storyController.publishComment( storyID, "", commentContent, commentID, function( response ){
+			jQuery( ".story-container #comment-holder" ).val( "" ).removeAttr( "comment-id" );
+			storyController.getComments( storyID, "", function( response ) {
+				if ( Array.isArray( response ) ) {
+					jQuery( ".story-container #comment-holder .numbers" ).html( response.length );
+					parseComments( response, ".story-container #comments-container" );
+				}
+			} );
+		} );
+	} );
+}
+
+function pullUserStoriesBoard( storiesContainer, args ) {
+	jQuery( storiesContainer ).append( loading );
+
+	var storiesController = new UserStory();
+	storiesController.getUserStoriesBoard( args.userID, args.offset, args.compositions, function( response ){
+		jQuery( storiesContainer +" #loader" ).remove();
+
+		stories_ = response;
+		for ( story_key in stories_ ) {
+			story_ = stories_[ story_key ];
+
+			view_ = "\
+			<a href='"+ story_.url +"' class='post-anchor'>\
+				<div id='story-"+ story_.ID +"' class='story-container animated fadeInUp'>\
+					<div class='story-banner' style='background-image: url("+ story_.banner +");'></div>\
+					<h1 class='story-title'>"+ story_.title +"</h1>\
+					<div class='story-content'>"+ story_.excerpt +"</div>\
+					<div class='story-meta'>\
+						<span class='meta story-likes fa fa-heart'><i class='numbers'>"+ story_.meta.likes +"</i></span>\
+						<span class='meta' title='Author'><i class='icon fa fa-pencil'></i><div class='avatar' style='background-image: url("+ story_.author.avatar_url +");'></div></span>\
+						<span class='meta' title='Company'><i class='icon fa fa-at'></i><div class='avatar' style='background-image: url("+ story_.company.avatar_url +");'></div></span>\
+					</div>\
+				</div>\
+			</a>\
+			";
+
+			jQuery( storiesContainer ).append( view_ );
+		}
+
+		storiesOffset += 10;
+		if ( stories_.length > 0 ) { lockStoriesLoad = false; }
+		if ( firstLoad == false ) { firstLoad = true; }
 	} );
 }
 

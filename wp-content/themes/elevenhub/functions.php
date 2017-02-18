@@ -285,3 +285,49 @@ function reset_user_password() {
 
 	die();
 }
+
+function get_public_stories( $offset = 0 ) {
+	$brother_ = new BROTHER;
+
+	$args = array(
+		"posts_per_page" => 5,
+		"post_type" => "post",
+		"post_status" => "publish",
+		"order_by" => "ID",
+		"order" => "DESC",
+		"offset" => $offset
+	);
+	$posts_ = get_posts( $args );
+
+	foreach ( $posts_ as $post_ ) {
+		$company_id = get_post_meta( $post_->ID, "related_company_id", true );
+
+		if ( $brother_->is_company_public( $company_id ) ) {
+			$story_banner = $brother_->get_post_banner_url( $post_->ID );
+			$story_url = get_permalink( $post_->ID );
+			$story_excerpt = wp_trim_words( $post_->post_content, 55, "..." );
+			$author_avatar = $brother_->get_user_avatar_url( $post_->post_author );
+			$company_avatar = $brother_->get_user_avatar_url( $post_->post_author );
+
+			?>
+
+			<a href="<?php echo $story_url; ?>" class="post-anchor">
+				<div id="story-<?php $post_->ID ?>" class="story-container animated fadeInUp">
+					<div class="story-banner" style="background-image: url(<?php echo $story_banner; ?>);"></div>
+					<h1 class="story-title"><?php echo $post_->post_title; ?></h1>
+					<div class="story-content"><?php echo $story_excerpt; ?></div>
+					<div class="story-meta">
+						<div class="meta"><i class="icon fa fa-pencil"></i><div class="avatar" style="background-image: url(<?php echo $author_avatar; ?>);"></div></div>
+						<div class="meta"><i class="icon fa fa-at"></i><div class="avatar" style="background-image: url(<?php echo $company_avatar; ?>);"></div></div>
+					</div>
+				</div>
+			</a>
+
+			<?php
+		}
+	}
+}
+
+add_action( 'wp_ajax_nopriv_call_get_public_stories', 'call_get_public_stories' );
+add_action( 'wp_ajax_call_get_public_stories', 'call_get_public_stories' );
+function call_get_public_stories() { get_public_stories( $_POST[ "offset" ] ); die(); }

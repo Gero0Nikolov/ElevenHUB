@@ -11,19 +11,21 @@ $brother_ = new BROTHER;
 
 $post_id = get_the_ID();
 $post_ = get_post( $post_id );
+$company_id = get_post_meta( $post_id, "related_company_id", true );
+$author_id = $post_->post_author;
+
+if ( $brother_->is_company_public( $company_id ) ) :
 $post_banner = $brother_->get_post_banner_url( $post_id );
 $post_likes = count( $brother_->get_story_likes( $post_id ) );
-$post_comments = $brother_->get_story_comments( (object)array( "story_id" => $post_id, "user_id" => $post_->post_author ) );
+$post_comments = $brother_->get_story_comments( (object)array( "story_id" => $post_id ) );
 $post_comments_count = count( $post_comments );
 
-$company_id = get_post_meta( $post_id, "related_company_id", true );
 $company_avatar = $brother_->get_user_avatar_url( $company_id );
 $company_first_name = get_user_meta( $company_id, "first_name", true );
 $company_last_name = get_user_meta( $company_id, "last_name", true );
 $company_short_name = get_user_meta( $company_id, "user_shortname", true );
 $company_url = get_author_posts_url( $company_id );
 
-$author_id = $post_->post_author;
 $author_avatar = $brother_->get_user_avatar_url( $author_id );
 $author_banner = $brother_->get_user_banner_url( $author_id );
 $author_first_name = get_user_meta( $author_id, "first_name", true );
@@ -32,7 +34,7 @@ $author_short_name = get_user_meta( $author_id, "user_shortname", true );
 $author_stories = $brother_->count_user_stories( $author_id );
 $author_url = get_author_posts_url( $author_id );
 
-//var_dump( $post_ );
+$brother_->set_story_view( (object)array( "story_id" => $post_id ) );
 ?>
 
 <div id="story-view" class="single-story-view">
@@ -53,8 +55,8 @@ $author_url = get_author_posts_url( $author_id );
 		<h1 class="story-title"><?php echo $post_->post_title; ?></h1>
 		<div class="post-content"><?php echo $post_->post_content; ?></div>
 		<div class="post-meta">
-			<button id="like-controller" class="fa <?php echo !$brother_->has_liked( "", $post_id ) ? "fa-heart-o" : "fa-heart" ; ?> control" story-id="<?php echo $post_id; ?>"><i class="numbers"><?php echo $post_likes; ?></i></button>
-			<button id="comment-controller" class="fa fa-comment control" story-id="<?php echo $post_id; ?>"><i class="numbers"><?php echo $post_comments_count; ?></i></button>
+			<button id="like-controller" class="fa <?php echo !$brother_->has_liked( "", $post_id ) ? "fa-heart-o" : "fa-heart" ; echo !$brother_->is_employee( $company_id, $author_id ) ? " inactive" : "" ; ?> control" story-id="<?php echo $post_id; ?>"><i class="numbers"><?php echo $post_likes; ?></i></button>
+			<button id="comment-controller" class="fa fa-comment <?php echo !$brother_->is_employee( $company_id, $author_id ) ? " inactive" : "" ; ?> control" story-id="<?php echo $post_id; ?>"><i class="numbers"><?php echo $post_comments_count; ?></i></button>
 		</div>
 		<div id="comments-container" class="post-comments">
 			<div id="comments" class="comments-list">
@@ -71,7 +73,7 @@ $author_url = get_author_posts_url( $author_id );
 					<div class="comment-content">
 						<?php echo $comment_->content; ?>
 					</div>
-					<?php if ( $comment_->user[ "is_author" ] == true ) { ?>
+					<?php if ( $comment_->user[ "is_author" ] == true && $brother_->is_employee( $company_id, $author_id ) ) { ?>
 					<div class="comment-meta">
 						<button id="edit-<?php echo $comment_->id; ?>" class="edit-controller fa fa-pencil"></button>
 						<button id="delete-<?php echo $comment_->id; ?>" class="delete-controller fa fa-trash-o"></button>
@@ -84,10 +86,12 @@ $author_url = get_author_posts_url( $author_id );
 				?>
 			</div>
 
+			<?php if ( $brother_->is_employee( $company_id, $author_id ) ) { ?>
 			<div class="comment-composer">
 				<input type="text" id="comment-holder">
 				<button id="comment-controller" class="fa fa-paper-plane"></button>
 			</div>
+			<?php } ?>
 		</div>
 	</div>
 </div>
@@ -112,3 +116,4 @@ jQuery( document ).ready(function(){
 	});
 });
 </script>
+<?php else: ?> <h1 class='no-information-message'>This company isn't public <i class="fa fa-frown-o"></i></h1> <?php endif; ?>

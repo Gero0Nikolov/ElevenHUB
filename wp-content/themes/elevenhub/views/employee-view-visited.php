@@ -12,59 +12,63 @@ $brother_ = new BROTHER;
 $v_user_id = get_queried_object_id();
 $v_user_first_name = get_user_meta( $v_user_id, "first_name", true );
 $v_user_last_name = get_user_meta( $v_user_id, "last_name", true );
+$v_user_short_name = get_user_meta( $v_user_id, "user_shortname", true );
 $v_user_biography = get_user_meta( $v_user_id, "user_biography", true );
 ?>
 
 <script type="text/javascript">var vUserID = "<?php echo $v_user_id; ?>";</script>
-<div id="user-container" class="user-container-profile visited" style="background-image: url(<?php echo $brother_->get_user_banner_url( $v_user_id ); ?>);">
-	<div class="white-box">
-		<div class="user-information">
-			<div id="user-avatar" class="avatar" style="background-image: url('<?php echo $brother_->get_user_avatar_url( $v_user_id ); ?>');"></div>
-			<h1 class="user-names"><?php echo $v_user_first_name ." ". $v_user_last_name; ?></h1>
+<div id="profile-board" class="profile-board">
+	<div class="user-board">
+		<div id="user-container" class="user-container" style="background-image: url(<?php echo $brother_->get_user_banner_url( $v_user_id ); ?>);">
+			<div class="user-information">
+				<div id="user-avatar" class="avatar" style="background-image: url('<?php echo $brother_->get_user_avatar_url( $v_user_id ); ?>');"></div>
+			</div>
 		</div>
+		<h1 class="user-names"><?php echo !empty( $v_user_short_name ) ? $v_user_short_name : $v_user_first_name ." ". $v_user_last_name ; ?></h1>
 		<div class="user-meta">
-			<h2 class="followers">
-			<?php
-			$v_user_followers_num = count( $brother_->get_user_followers( $v_user_id ) );
-			echo $v_user_followers_num == 1 ? $v_user_followers_num ." follower" : $v_user_followers_num ." followers";
-			?>
-			</h2>
 			<?php
 			if ( get_user_meta( get_current_user_id(), "account_association", true ) != "company" ) {
-				if ( $brother_->is_follower( $v_user_id ) ) {
-					?>
-					<button id="follow-controller" class="unfollow-button">Unfollow</button>
-					<?php
-				} else {
-					?>
-					<button id="follow-controller" class="follow-button">Follow</button>
-					<?php
-				}
+			?>
+			<button id="follow-controller" class="<?php echo $brother_->is_follower( $v_user_id ) ? "unfollow" : "follow"; ?>-button mb-05em"><?php echo $brother_->is_follower( $v_user_id ) ? "Unfollow" : "Follow"; ?></button>
+			<?php
 			} else {
 				if ( !$brother_->is_employee( get_current_user_id(), $v_user_id ) ) {
 					?>
-					<button id="invite-to-company-controller" class="green-bold-button">Invite</button>
+					<button id="invite-to-company-controller" class="green-bold-button mb-05em">Invite</button>
 					<?php
 				}
 			}
 			?>
-			<div class="badges">
-				<?php if ( $brother_->is_employee( get_current_user_id(), $v_user_id ) ) { ?> <span class="badge employee fa fa-star" title="<?php echo $v_user_first_name; ?> is your employee!"></span> <?php } ?>
+			<div id="followers" class="meta">
+				<i class="fa fa-globe icon belize-hole"></i>
+				<?php
+				$v_user_followers_num = count( $brother_->get_user_followers( $v_user_id ) );
+				echo $v_user_followers_num == 1 ? $v_user_followers_num ." follower" : $v_user_followers_num ." followers";
+				?>
 			</div>
+			<div class="user-text"><?php echo $v_user_biography; ?></div>
 		</div>
 	</div>
-</div>
-
-<?php if ( !empty( $v_user_biography ) ) { ?>
-<div id="user-bio-container" class='user-bio-container'>
-	<div id="meta-header" class="meta-header">
-		<h1>About me:</h1>
-	</div>
-	<div id="meta-content" class="meta-content">
-		<?php echo $v_user_biography; ?>
+	<div id="stories-board" class="stories-board">
+		<?php $brother_->get_user_board( (object)array( "user_id" => $v_user_id, "user_compositions" => true ) ); ?>
 	</div>
 </div>
-<?php } ?>
+<script type="text/javascript">
+var storiesOffset = 0;
+var firstLoad = false;
+setTimeout(function(){ pullUserStoriesBoard( "#stories-board", { userID: vUserID, offset: storiesOffset, compositions: false } ); }, 1000 );
 
-<div id="stories-container" class="posts-container">
-</div>
+var lockStoriesLoad = false;
+jQuery( window ).scroll(function(){
+if ( jQuery( window ).scrollTop() + jQuery( window ).height() > jQuery( document ).height() - 100 ) {
+	if ( lockStoriesLoad == false && firstLoad == true ) {
+		pullUserStoriesBoard( "#stories-board", {
+			userID: vUserID,
+			offset: storiesOffset,
+			compositions: false
+		} );
+	}
+	lockStoriesLoad = true;
+}
+});
+</script>

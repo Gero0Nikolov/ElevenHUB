@@ -384,6 +384,36 @@ class BROTHER {
 	}
 
 	/*
+	*	Function name: create_story_views
+	*	Function arguments: NONE
+	*	Function purpose: This function is used to create the WP_PREFIX_story_views table.
+	*/
+	function create_story_views() {
+		global $wpdb;
+
+		$story_views_table = $wpdb->prefix ."story_views";
+
+		if ( $wpdb->get_var( "SHOW TABLES LIKE '$story_views_table'" ) != $story_views_table ) {
+			$charset_collate = $wpdb->get_charset_collate();
+
+			$sql_ = "
+			CREATE TABLE $story_views_table (
+				id INT NOT NULL AUTO_INCREMENT,
+				story_id INT,
+				user_id INT,
+				views INT,
+				action_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				PRIMARY KEY(id)
+			) $charset_collate;
+			";
+
+			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+
+			dbDelta( $sql_ );
+		}
+	}
+
+	/*
 	*	Function name: get_user_followers
 	*	Function arguments: $user_id [ INT ] (optional)
 	*	Function purpose:
@@ -593,12 +623,15 @@ class BROTHER {
 	function is_employee( $v_user_id, $user_id = "" ) {
 		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
 
-		global $wpdb;
+		if ( $v_user_id == $user_id ) { return true; }
+		else {
+			global $wpdb;
 
-		$table_ = $wpdb->prefix ."user_relations";
-		$sql_ = "SELECT * FROM $table_ WHERE user_followed_id=$user_id AND user_employer_id=$v_user_id";
+			$table_ = $wpdb->prefix ."user_relations";
+			$sql_ = "SELECT * FROM $table_ WHERE user_followed_id=$user_id AND user_employer_id=$v_user_id";
 
-		return !empty( $wpdb->get_results( $sql_, OBJECT ) ) ? true : false;
+			return !empty( $wpdb->get_results( $sql_, OBJECT ) ) ? true : false;
+		}
 	}
 
 	/*
@@ -1168,13 +1201,13 @@ class BROTHER {
 					$story_container[ "meta" ][ "likes_count" ] = count( $this->get_story_likes( $post_->ID ) );
 					$story_container[ "meta" ][ "comments_count" ] = get_comments( array( "post_id" => $post_->ID, "count" => true ) );
 					$story_container[ "meta" ][ "is_liked" ] = $this->has_liked( get_current_user_id(), $post_->ID );
-					$story_container[ "meta" ][ "is_author" ] = $data->requester_id == $post_->post_author ? true : ( $data->requester_id == $data->company_id ? true : false );
+					$story_container[ "meta" ][ "is_author" ] = $data->requester_id == $post_->post_author && $this->is_employee( $data->company_id, $data->requester_id ) ? true : ( $data->requester_id == $data->company_id ? true : false );
 					array_push( $stories_container, (object)$story_container );
 				} else {
 					?>
 
 					<div id='story-<?php echo $post_->ID; ?>' class='story-container new-story animated fadeInUp'>
-						<?php if ( $data->requester_id == $post_->post_author || $data->requester_id == $data->company_id ) { ?>
+						<?php if ( ( $data->requester_id == $post_->post_author && $this->is_employee( $data->company_id, $data->requester_id ) ) || $data->requester_id == $data->company_id ) { ?>
 						<div id='story-controls' class='story-controls'>
 							<button id='edit-controller' class='fa fa-pencil control'></button>
 							<button id='delete-controller' class='fa fa-trash-o control'></button>
@@ -1188,7 +1221,7 @@ class BROTHER {
 								<div id='author-avatar' class='story-author-avatar' style='background-image: url(<?php echo $this->get_user_avatar_url( $post_->post_author ); ?>);'></div>
 							</a>
 							<div class='story-interactions'>
-								<button id='story-like-controller' class='like-button fa <?php echo !$this->has_liked( get_current_user_id(), $post_->ID ) ? "fa-heart-o" : "fa-heart"; ?> hvr-bounce-out' story-id='<?php echo $post_->ID; ?>'><i class='numbers'><?php echo count( $this->get_story_likes( $post_->ID ) ); ?></i></button>
+								<button id='story-like-controller' class='like-button fa <?php echo !$this->has_liked( get_current_user_id(), $post_->ID ) ? "fa-heart-o" : "fa-heart"; echo !$this->is_employee( $data->company_id, $data->requester_id ) ? " inactive" : "" ; ?> hvr-bounce-out' story-id='<?php echo $post_->ID; ?>'><i class='numbers'><?php echo count( $this->get_story_likes( $post_->ID ) ); ?></i></button>
 								<button id='story-comments-controller' class='comment-button fa fa-comment hvr-bounce-out' story-id='<?php echo $post_->ID; ?>'><i class='numbers'><?php echo get_comments( array( "post_id" => $post_->ID, "count" => true ) ); ?></i></button>
 							</div>
 						</div>
@@ -1264,7 +1297,6 @@ class BROTHER {
 	*	This function is used to return the full information about the specified by the $post_id Post.
 	*/
 	function get_user_story( $data ) {
-		$user_id = !empty( $data->user_id ) ? $data->user_id : get_current_user_id();
 		$post_id = !empty( $data->post_id ) ? $data->post_id : NULL;
 		$company_id = !empty( $data->company_id ) ? $data->company_id : NULL;
 
@@ -1281,23 +1313,29 @@ class BROTHER {
 			$story_container[ "banner" ][ "ID" ] = get_post_thumbnail_id( $post_id );
 			$story_container[ "banner" ][ "url" ] = $this->get_post_banner_url( $post_id );
 			$story_container[ "date" ] = $post_->post_date;
-			$story_container[ "author" ][ "ID" ] = $user_id;
-			$story_container[ "author" ][ "first_name" ] = get_user_meta( $user_id, "first_name", true );
-			$story_container[ "author" ][ "last_name" ] = get_user_meta( $user_id, "last_name", true );
-			$story_container[ "author" ][ "short_name" ] = get_user_meta( $user_id, "user_shortname", true );
-			$story_container[ "author" ][ "avatar_url" ] = $this->get_user_avatar_url( $user_id );
-			$story_container[ "author" ][ "banner_url" ] = $this->get_user_banner_url( $user_id );
-			$story_container[ "author" ][ "author_url" ] = get_author_posts_url( $user_id );
+			$story_container[ "author" ][ "ID" ] = $post_->post_author;
+			$story_container[ "author" ][ "first_name" ] = get_user_meta( $post_->post_author, "first_name", true );
+			$story_container[ "author" ][ "last_name" ] = get_user_meta( $post_->post_author, "last_name", true );
+			$story_container[ "author" ][ "short_name" ] = get_user_meta( $post_->post_author, "user_shortname", true );
+			$story_container[ "author" ][ "avatar_url" ] = $this->get_user_avatar_url( $post_->post_author );
+			$story_container[ "author" ][ "banner_url" ] = $this->get_user_banner_url( $post_->post_author );
+			$story_container[ "author" ][ "author_url" ] = get_author_posts_url( $post_->post_author );
 			$story_container[ "company_id" ] = $company_id;
 			$story_container[ "meta" ][ "likes" ] = $this->get_story_likes( $post_id );
 			$story_container[ "meta" ][ "comments_count" ] = get_comments( array( "post_id" => $post_id, "count" => true ) );
 			$story_container[ "meta" ][ "is_liked" ] = $this->has_liked( get_current_user_id(), $post_id );
+			$story_container[ "meta" ][ "is_requester_employee" ] = $this->is_employee( $company_id, $user_id );
 			$story_container = (object)$story_container;
 		}
 
 		return $story_container;
 	}
 
+	/*
+	*	Function name: count_user_stories
+	*	Function arguments: $user_id [ INT ] (required)
+	*	Function purpose: This function is used to count the stories of the specified User by $user_id.
+	*/
 	function count_user_stories( $user_id = "" ) {
 		return count_user_posts( empty( $user_id ) ? get_current_user_id() : $user_id );
 	}
@@ -1335,35 +1373,37 @@ class BROTHER {
 		if ( !empty( $data->story_id ) ) {
 			if ( empty( $data->user_id ) ) { $data->user_id = get_current_user_id(); }
 
-			global $wpdb;
+			if ( $this->is_employee( get_post_meta( $data->story_id, "related_company_id", true ), $data->user_id ) ) {
+				global $wpdb;
 
-			$user_likes_table = $wpdb->prefix ."user_likes";
-			$response = array();
+				$user_likes_table = $wpdb->prefix ."user_likes";
+				$response = array();
 
-			if ( !$this->has_liked( $data->user_id, $data->story_id ) ) { // LIKE the specified story
-				$wpdb->insert(
-					$user_likes_table,
-					array(
-						"story_id" => $data->story_id,
-						"user_id" => $data->user_id
-					)
-				);
-				$request_id = $wpdb->insert_id;
-				$response[ "action" ] = "like";
+				if ( !$this->has_liked( $data->user_id, $data->story_id ) ) { // LIKE the specified story
+					$wpdb->insert(
+						$user_likes_table,
+						array(
+							"story_id" => $data->story_id,
+							"user_id" => $data->user_id
+						)
+					);
+					$request_id = $wpdb->insert_id;
+					$response[ "action" ] = "like";
 
-				$author_id = get_post_field( "post_author", $data->story_id );
-				$notification_id = $this->generate_notification( 322, $author_id, $data->user_id );
-				$this->generate_notification_meta( $notification_id, "liked_story_id", $data->story_id );
-			} else {
-				$wpdb->delete( $user_likes_table, array( "user_id" => $data->user_id ) );
-				$response[ "action" ] = "dislike";
-			}
+					$author_id = get_post_field( "post_author", $data->story_id );
+					$notification_id = $this->generate_notification( 322, $author_id, $data->user_id );
+					$this->generate_notification_meta( $notification_id, "liked_story_id", $data->story_id );
+				} else {
+					$wpdb->delete( $user_likes_table, array( "user_id" => $data->user_id ) );
+					$response[ "action" ] = "dislike";
+				}
 
-			$response[ "likes_count" ] = count( $this->get_story_likes( $data->story_id ) );
-			$response = (object)$response;
+				$response[ "likes_count" ] = count( $this->get_story_likes( $data->story_id ) );
+				$response = (object)$response;
 
-			return $response;
-		} else { return "ERROR: Story ID is not set."; }
+				return $response;
+			} else { return "ERROR: Story ID is not set."; }
+		}
 	}
 
 	/*
@@ -1372,6 +1412,8 @@ class BROTHER {
 	*	Function purpose: This function returns an ARRAY of OBJECTs, which represent the Comments for the specified by $story_id POSTs.
 	*/
 	function get_story_comments( $data ) {
+		if ( !isset( $data->user_id ) || empty( $data->user_id ) ) { $data->user_id = ""; }
+
 		$args = array(
 			"count" => false,
 			"orberby" => "comment_date",
@@ -1395,7 +1437,7 @@ class BROTHER {
 				$comment_container[ "user" ][ "last_name" ] = get_user_meta( $comment_->user_id, "last_name", true );
 				$comment_container[ "user" ][ "user_shortname" ] = get_user_meta( $comment_->user_id, "user_shortname", true );
 				$comment_container[ "user" ][ "url" ] = get_author_posts_url( $comment_->user_id );
-				$comment_container[ "user" ][ "is_author" ] = get_current_user_id() == $comment_->user_id ? true : false;
+				$comment_container[ "user" ][ "is_author" ] = get_current_user_id() == $comment_->user_id && $this->is_employee( get_post_meta( $data->story_id, "related_company_id", true ), get_current_user_id() ) ? true : false;
 				array_push( $comments_container, (object)$comment_container );
 			}
 
@@ -2032,6 +2074,232 @@ class BROTHER {
 	*	Function purpose: This function is used to retrieve the banner URL of the specified Post by the $post_id variable.
 	*/
 	function get_post_banner_url( $post_id ) { return wp_get_attachment_image_src( get_post_thumbnail_id( $post_id ), "full" )[0]; }
+
+	/*
+	*	Function name: set_story_view
+	*	Function arguments: $data [ MIXED_OBJECT ] (required)
+	*	Function purpose: This function is used to add or update views from specified $user_id to specific $story_id.
+	*/
+	function set_story_view( $data ) {
+		if ( !isset( $data->user_id ) && empty( $data->user_id ) ) { $data->user_id = get_current_user_id(); }
+
+		$response = "";
+
+		if ( isset( $data->story_id ) && !empty( $data->story_id ) ) {
+			global $wpdb;
+			$table_ = $wpdb->prefix ."story_views";
+
+			$sql_ = "SELECT * FROM $table_ WHERE story_id=$data->story_id AND user_id=$data->user_id";
+			$results_ = $wpdb->get_results( $sql_, OBJECT );
+
+			if ( count( $results_ ) > 0 ) { // Update method
+				$wpdb->update(
+					$table_,
+					array(
+						"views" => ++$results_[ 0 ]->views
+					),
+					array(
+						"id" => $results_[ 0 ]->id
+					)
+				);
+			} else {
+				$wpdb->insert(
+					$table_,
+					array(
+						"story_id" => $data->story_id,
+						"user_id" => $data->user_id,
+						"views" => 1
+					)
+				);
+			}
+		} else { $response = "ERROR: Story ID is not set."; }
+
+		return $response;
+	}
+
+	/*
+	*	Function name: get_user_board
+	*	Function arguments: $data [ MIXED_OBJECT ] (required)
+	*	Function purpose: This function is used to pull the stories connected with the specified $user_id based on User: Compositions, Views && Likes
+	*/
+	function get_user_board( $data ) {
+		if ( !isset( $data->user_id ) || empty( $data->user_id ) ) { $data->user_id = get_current_user_id(); }
+		if ( !isset( $data->offset ) || empty( $data->offset ) ) { $data->offset = 0; }
+
+		if ( isset( $data->user_compositions ) && $data->user_compositions == true ) {
+			$args = array(
+				"posts_per_page" => 5,
+				"offset" => $data->offset,
+				"order_by" => "date",
+				"order" => "DESC",
+				"post_type" => "post",
+				"author" => $data->user_id,
+				"post_status" => "publish"
+			);
+			$compositions_ = get_posts( $args );
+
+			if ( isset( $data->is_ajax ) && $data->is_ajax == true ) { $stories_container = array(); }
+
+			foreach ( $compositions_ as $post_ ) {
+				$company_id = get_post_meta( $post_->ID, "related_company_id", true );
+
+				if ( $this->is_company_public( $company_id ) ) {
+					$post_banner = $this->get_post_banner_url( $post_->ID );
+					$post_excerpt = wp_trim_words( $post_->post_content, 50, "..." );
+					$post_likes = count( $this->get_story_likes( $post_->ID ) );
+					$post_url = get_permalink( $post_->ID );
+					$company_avatar = $this->get_user_avatar_url( $company_id );
+					$company_url = get_author_posts_url( $company_id );
+
+					if ( isset( $data->is_ajax ) && $data->is_ajax == true ) {
+						$story_container = array();
+						$story_container[ "ID" ] = $post_->ID;
+						$story_container[ "title" ] = $post_->post_title;
+						$story_container[ "content" ] = $post_->post_content;
+						$story_container[ "excerpt" ] = $post_excerpt;
+						$story_container[ "banner" ] = $post_banner;
+						$story_container[ "url" ] = $post_url;
+						$story_container[ "author" ][ "ID" ] = $post_->post_author;
+						$story_container[ "author" ][ "avatar_url" ] = $this->get_user_avatar_url( $post_->post_author );
+						$story_container[ "author" ][ "banner_url" ] = $this->get_user_banner_url( $post_->post_author );
+						$story_container[ "author" ][ "author_url" ] = get_author_posts_url( $post_->post_author );
+						$story_container[ "author" ][ "first_name" ] = get_user_meta( $post_->post_author, "first_name", true );
+						$story_container[ "author" ][ "last_name" ] = get_user_meta( $post_->post_author, "last_name", true );
+						$story_container[ "author" ][ "short_name" ] = get_user_meta( $post_->post_author, "user_shortname", true );
+						$story_container[ "company" ][ "ID" ] = $company_id;
+						$story_container[ "company" ][ "avatar_url" ] = $company_avatar;
+						$story_container[ "company" ][ "banner_url" ] = $this->get_user_banner_url( $company_id );
+						$story_container[ "company" ][ "company_url" ] = $company_url;
+						$story_container[ "company" ][ "first_name" ] = get_user_meta( $company_id, "first_name", true );
+						$story_container[ "company" ][ "last_name" ] = get_user_meta( $company_id, "last_name", true );
+						$story_container[ "company" ][ "short_name" ] = get_user_meta( $company_id, "user_shortname", true );
+						$story_container[ "meta" ][ "likes" ] = $post_likes;
+						array_push( $stories_container, (object)$story_container );
+					} else {
+						?>
+
+						<a href="<?php echo $post_url; ?>" class="post-anchor">
+							<div id="story-<?php echo $post_->ID; ?>" class="story-container animated fadeInUp">
+								<div class="story-banner" style="background-image: url(<?php echo $post_banner; ?>);"></div>
+								<h1 class="story-title"><?php echo $post_->post_title; ?></h1>
+								<div class="story-content"><?php echo $post_excerpt; ?></div>
+								<div class="story-meta">
+									<span class="meta story-likes fa fa-heart"><i class="numbers"><?php echo $post_likes; ?></i></span>
+									<span class="meta" title="Company"><i class="icon fa fa-at"></i><div class="avatar" style="background-image: url(<?php echo $company_avatar; ?>);"></div></span>
+								</div>
+							</div>
+						</a>
+
+						<?php
+					}
+				}
+			}
+		} else {
+			global $wpdb;
+
+			$user_likes_table = $wpdb->prefix ."user_likes";
+			$story_views_table = $wpdb->prefix ."story_views";
+
+			$post_ids = array();
+			$data->offset = $data->offset / 2;
+
+			$sql_ = "
+			SELECT story_id FROM $user_likes_table
+			WHERE user_id = $data->user_id
+			ORDER BY story_id DESC
+			LIMIT 5
+			OFFSET ". $data->offset;
+			$results_ = $wpdb->get_results( $sql_, OBJECT );
+
+			if ( count( $results_ ) > 0 ) {
+				foreach ( $results_ as $post_data ) { array_push( $post_ids, $post_data->story_id ); }
+				$sql_extension = "story_id NOT IN ( ". implode( ",", $post_ids ) ." )";
+			} else {
+				$sql_extension = "story_id NOT IN ( SELECT story_id FROM $user_likes_table WHERE user_id = $data->user_id )";
+			}
+
+			$sql_ ="
+			SELECT story_id FROM $story_views_table
+			WHERE user_id = $data->user_id AND $sql_extension
+			ORDER BY story_id DESC
+			LIMIT 5
+			OFFSET ". $data->offset;
+			$results_ = $wpdb->get_results( $sql_, OBJECT );
+
+			if ( count( $results_ ) ) { foreach ( $results_ as $post_data ) { array_push( $post_ids, $post_data->story_id ); } }
+
+			if ( isset( $data->is_ajax ) && $data->is_ajax == true ) { $stories_container = array(); }
+
+			if ( !empty( $post_ids ) ) {
+				$args = array(
+					"posts_per_page" => -1,
+					"post__in" => $post_ids,
+					"post_type" => "post",
+					"post_status" => "publish"
+				);
+				$posts_ = get_posts( $args );
+
+				foreach ( $posts_ as $post_ ) {
+					$company_id = get_post_meta( $post_->ID, "related_company_id", true );
+
+					if ( $this->is_company_public( $company_id ) ) {
+						$post_banner = $this->get_post_banner_url( $post_->ID );
+						$post_excerpt = wp_trim_words( $post_->post_content, 50, "..." );
+						$post_likes = count( $this->get_story_likes( $post_->ID ) );
+						$post_url = get_permalink( $post_->ID );
+						$company_avatar = $this->get_user_avatar_url( $company_id );
+						$company_url = get_author_posts_url( $company_id );
+						$author_avatar = $this->get_user_avatar_url( $post_->post_author );
+
+						if ( isset( $data->is_ajax ) && $data->is_ajax == true ) {
+							$story_container = array();
+							$story_container[ "ID" ] = $post_->ID;
+							$story_container[ "title" ] = $post_->post_title;
+							$story_container[ "content" ] = $post_->post_content;
+							$story_container[ "excerpt" ] = $post_excerpt;
+							$story_container[ "banner" ] = $post_banner;
+							$story_container[ "url" ] = $post_url;
+							$story_container[ "author" ][ "ID" ] = $post_->post_author;
+							$story_container[ "author" ][ "avatar_url" ] = $author_avatar;
+							$story_container[ "author" ][ "banner_url" ] = $this->get_user_banner_url( $post_->post_author );
+							$story_container[ "author" ][ "author_url" ] = get_author_posts_url( $post_->post_author );
+							$story_container[ "author" ][ "first_name" ] = get_user_meta( $post_->post_author, "first_name", true );
+							$story_container[ "author" ][ "last_name" ] = get_user_meta( $post_->post_author, "last_name", true );
+							$story_container[ "author" ][ "short_name" ] = get_user_meta( $post_->post_author, "user_shortname", true );
+							$story_container[ "company" ][ "ID" ] = $company_id;
+							$story_container[ "company" ][ "avatar_url" ] = $company_avatar;
+							$story_container[ "company" ][ "banner_url" ] = $this->get_user_banner_url( $company_id );
+							$story_container[ "company" ][ "company_url" ] = $company_url;
+							$story_container[ "company" ][ "first_name" ] = get_user_meta( $company_id, "first_name", true );
+							$story_container[ "company" ][ "last_name" ] = get_user_meta( $company_id, "last_name", true );
+							$story_container[ "company" ][ "short_name" ] = get_user_meta( $company_id, "user_shortname", true );
+							$story_container[ "meta" ][ "likes" ] = $post_likes;
+							array_push( $stories_container, (object)$story_container );
+						} else {
+							?>
+
+							<a href="<?php echo $post_url ?>" class="post-anchor">
+								<div id="story-<?php echo $post_->ID; ?>" class="story-container animated fadeInUp">
+									<div class="story-banner" style="background-image: url(<?php echo $post_banner; ?>);"></div>
+									<h1 class="story-title"><?php echo $post_->post_title; ?></h1>
+									<div class="story-content"><?php echo $post_excerpt; ?></div>
+									<div class="story-meta">
+										<span class="meta story-likes fa fa-heart"><i class="numbers"><?php echo $post_likes; ?></i></span>
+										<span class="meta" title="Author"><i class="icon fa fa-pencil"></i><div class="avatar" style="background-image: url(<?php echo $author_avatar ?>);"></div></span>
+										<span class="meta" title="Company"><i class="icon fa fa-at"></i><div class="avatar" style="background-image: url(<?php echo $company_avatar; ?>);"></div></span>
+									</div>
+								</div>
+							</a>
+
+							<?php
+						}
+					}
+				}
+			}
+		}
+
+		if ( isset( $data->is_ajax ) && $data->is_ajax == true ) { return $stories_container; }
+	}
 }
 
 //Initialize the DB into the framework
@@ -2041,4 +2309,5 @@ if ( !$db_brother->is_table_exists( "user_notifications" ) ) { $db_brother->crea
 if ( !$db_brother->is_table_exists( "user_notificationsmeta" ) ) { $db_brother->create_user_notificationsmeta(); }
 if ( !$db_brother->is_table_exists( "user_requests" ) ) { $db_brother->create_user_requests(); }
 if ( !$db_brother->is_table_exists( "user_likes" ) ) { $db_brother->create_user_likes(); }
+if ( !$db_brother->is_table_exists( "story_views" ) ) { $db_brother->create_story_views(); }
 ?>

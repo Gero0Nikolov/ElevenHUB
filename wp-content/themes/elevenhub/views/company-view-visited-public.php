@@ -1,6 +1,6 @@
 <?php
 /**
- * View for Company page personal
+ * View for Company page public visitor - public
  *
  * @link https://codex.wordpress.org/Template_Hierarchy
  *
@@ -18,7 +18,10 @@ if ( empty( $v_user_shortname ) || !isset( $v_user_shortname ) ) {
 }
 ?>
 
-<script type="text/javascript">var vUserID = "<?php echo $v_user_id; ?>";</script>
+<script type="text/javascript">
+var vUserID = "<?php echo $v_user_id; ?>";
+var companyID = "<?php echo $v_user_id; ?>";
+</script>
 <div id="company-container" class="company-container">
 	<div id="company-information" class="company-information-container" style="background-image: url(<?php echo $brother_->get_user_banner_url( $v_user_id ); ?>);">
 		<div class="overlay">
@@ -52,5 +55,17 @@ if ( empty( $v_user_shortname ) || !isset( $v_user_shortname ) ) {
 	</div>
 </div>
 
-<div id="story-board" class="stories-container">
+<div id="company-story-board" class="stories-container">
+	<?php
+	$brother_->get_company_stories((object)array(
+		"company_id" => $v_user_id,
+		"requester_id" => $user_id,
+		"stories" => 5,
+		"status" => "publish"
+	));
+	?>
 </div>
+
+<script type="text/javascript">
+initializeStoryControls();
+</script>

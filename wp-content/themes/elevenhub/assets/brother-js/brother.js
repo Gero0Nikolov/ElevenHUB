@@ -367,7 +367,7 @@ var UserRelations = function( vUserID, userID = "" ) {
 			<div id='media-popup-fields' class='popup-inner-container'>\
 				<button id='close-button' class='close-button fa fa-close'></button>\
 				<label for='password-holder'>Enter your password for confirmation</label>\
-				<input type='text' id='password-holder'/>\
+				<input type='password' id='password-holder'/>\
 				<button id='submit-button' class='green-bold-button'>Leave</button>\
 			</div>\
 		</div>\
@@ -645,7 +645,7 @@ var UserStory = function( userID = "" ) {
 			setup:
 			function(editor) {
 				editor.on('change', function(e) {
-					classHolder.convertLinksToImageVideo( tinyMCE.activeEditor.getContent({ format: "text" }) )
+					if ( tinyMCE.activeEditor !== undefined ) { classHolder.convertLinksToImageVideo( tinyMCE.activeEditor.getContent({ format: "text" }) ); }
 				});
 			}
   		});
@@ -1233,6 +1233,11 @@ var UserStory = function( userID = "" ) {
 		);
 	}
 
+	/*
+	*	Function name: getStories
+	*	Function arguments: userID [ INT ] (optional), offset [ INT ] (optional), companyID [ INT ] (required), onSuccess [ FUNCTION ] (required) tells the function what to do after the response.
+	*	Function purpose: This function is used to get more stories in the specified Company story board.
+	*/
 	this.getStories = function( userID = "", offset = "", companyID, onSuccess ) {
 		generateAJAX({
 				functionName : "get_company_stories",
@@ -1240,6 +1245,24 @@ var UserStory = function( userID = "" ) {
 					company_id: companyID,
 					offset: offset,
 					stories: 5,
+					is_ajax: true
+				}
+			}, function ( response ) { onSuccess( JSON.parse( response ) ); }
+		);
+	}
+
+	/*
+	*	Function name: getUserStoriesBoard
+	*	Function arguments: userID [ INT ] (optional), offset [ INT ] (required), compositions [ BOOL ] (required), onSuccess [ FUNCTION ] (required) tells the function what to do after the response.
+	*	Function purpose: This function is used to pull stories in the Employee personal || visited story board. Stories can be compositions of the user or just stories, which the user have viewed / liked.
+	*/
+	this.getUserStoriesBoard = function( userID = "", offset, compositions, onSuccess ) {
+		generateAJAX({
+				functionName : "get_user_board",
+				arguments : {
+					user_id: userID,
+					user_compositions: compositions,
+					offset: offset,
 					is_ajax: true
 				}
 			}, function ( response ) { onSuccess( JSON.parse( response ) ); }
