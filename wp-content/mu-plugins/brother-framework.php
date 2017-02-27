@@ -644,6 +644,17 @@ class BROTHER {
 	}
 
 	/*
+	*	Function name: get_user_association
+	*	Function arguments: $user_id [ INT ] (optional)
+	*	Function purpose: This function gives you the association (Company || Employee) of the specified by $user_id, User.
+	*/
+	function get_user_association( $user_id = "" ) {
+		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
+		$association_type = get_user_meta( $user_id, "account_association", true );
+		return $association_type;
+	}
+
+	/*
 	*	Function name: follow_or_unfollow_relation
 	*	Function arguments: $data [ MIXED_OBJECT ] (required) (containes the $v_user_id, $user_id & $recalculate)
 	*	Function purpose: This function is used to generate user relation from TYPE: FOLLOW or UNFOLLOW
@@ -810,8 +821,8 @@ class BROTHER {
 			$notifications_[ $count ][ "row_id" ] = $notification_->id;
 			$notifications_[ $count ][ "notification_body" ][ "notifier_avatar_url" ] = $this->get_user_avatar_url( $notification_->user_notifier_id );
 			$notifications_[ $count ][ "notification_body" ][ "notification_name" ] = get_field( "notification_name", $notification_->notification_id );
-			$notifications_[ $count ][ "notification_body" ][ "notification_link" ] = $this->convert_notification_url( get_field( "notification_url", $notification_->notification_id ), $notification_->user_notifier_id, $notification_->user_notified_id, $notification_->id );
-			$notifications_[ $count ][ "notification_body" ][ "notification_text" ] = $this->convert_notification_text( get_field( "notification_text", $notification_->notification_id ), $notification_->user_notifier_id, $notification_->user_notified_id, $notification_->id );
+			$notifications_[ $count ][ "notification_body" ][ "notification_link" ] = $this->convert_notification_url( get_field( "notification_url", $notification_->notification_id ), $notification_->user_notifier_id, $notification_->user_notified_id, $notification_->id, $notification_->notification_id );
+			$notifications_[ $count ][ "notification_body" ][ "notification_text" ] = $this->convert_notification_text( get_field( "notification_text", $notification_->notification_id ), $notification_->user_notifier_id, $notification_->user_notified_id, $notification_->id, $notification_->notification_id );
 			$notifications_[ $count ][ "notification_body" ][ "notification_icon" ] = get_field( "notification_icon_code", $notification_->notification_id );
 			$notifications_[ $count ][ "notification_body" ][ "notification_icon_background" ] = get_field( "notification_icon_background_code", $notification_->notification_id );
 			$notifications_[ $count ][ "notification_date" ] = date( "d-m-Y", strtotime( $notification_->notification_date ) );
@@ -848,8 +859,8 @@ class BROTHER {
 			$notifications_[ $count ][ "row_id" ] = $notification_->id;
 			$notifications_[ $count ][ "notification_body" ][ "notifier_avatar_url" ] = $this->get_user_avatar_url( $notification_->user_notifier_id );
 			$notifications_[ $count ][ "notification_body" ][ "notification_name" ] = get_field( "notification_name", $notification_->notification_id );
-			$notifications_[ $count ][ "notification_body" ][ "notification_link" ] = $this->convert_notification_url( get_field( "notification_url", $notification_->notification_id ), $notification_->user_notifier_id, $notification_->user_notified_id, $notification_->id );
-			$notifications_[ $count ][ "notification_body" ][ "notification_text" ] = $this->convert_notification_text( get_field( "notification_text", $notification_->notification_id ), $notification_->user_notifier_id, $notification_->user_notified_id, $notification_->id );
+			$notifications_[ $count ][ "notification_body" ][ "notification_link" ] = $this->convert_notification_url( get_field( "notification_url", $notification_->notification_id ), $notification_->user_notifier_id, $notification_->user_notified_id, $notification_->id, $notification_->notification_id );
+			$notifications_[ $count ][ "notification_body" ][ "notification_text" ] = $this->convert_notification_text( get_field( "notification_text", $notification_->notification_id ), $notification_->user_notifier_id, $notification_->user_notified_id, $notification_->id, $notification_->notification_id );
 			$notifications_[ $count ][ "notification_body" ][ "notification_icon" ] = get_field( "notification_icon_code", $notification_->notification_id );
 			$notifications_[ $count ][ "notification_body" ][ "notification_icon_background" ] = get_field( "notification_icon_background_code", $notification_->notification_id );
 			$notifications_[ $count ][ "notification_date" ] = date( "d-m-Y", strtotime( $notification_->notification_date ) );
@@ -868,34 +879,14 @@ class BROTHER {
 	*	Function purpose:
 	*	This function is used to convert generic notification URL to normal HTTP working address.
 	*/
-	function convert_notification_url( $url, $notifier_id, $notified_id, $notification_id ) {
-		$url = str_replace( "[notifier_archive_page]", get_author_posts_url( $notifier_id ), $url );
-		$url = str_replace( "[notified_archive_page]", get_author_posts_url( $notified_id ), $url );
+	function convert_notification_url( $url, $notifier_id, $notified_id, $notification_id, $notification_template_id ) {
+		$notification_converter_path = get_field( "notification_converter", $notification_id );
+		$notification_converter_path = !empty( $notification_converter_path ) && isset( $notification_converter_path ) && $notification_converter_path ? $notification_converter_path : get_template_directory() ."/notification-converters/". $notification_template_id .".php";
 
-		if ( strpos( $url, "company_request_preview" ) ) {
-			$request_id = $this->get_notification_meta( $notification_id, "company_joinrequest_id" );
-			$url = str_replace( "[company_request_preview]", get_permalink( 85 ) ."?request_id=". $request_id, $url );
-		}
-
-		if ( strpos( $url, "company_invite_preview" ) ) {
-			$request_id = $this->get_notification_meta( $notification_id, "company_inviterequest_id" );
-			$url = str_replace( "[company_invite_preview]", get_permalink( 85 ) ."?request_id=". $request_id, $url );
-		}
-
-		if ( strpos( $url, "single_view" ) ) {
-			$story_id = $this->get_notification_meta( $notification_id, "liked_story_id" );
-			$url = str_replace( "[single_view]", get_permalink( $story_id ), $url );
-		}
-
-		if ( strpos( $url, "single_view_to_comment" ) ) {
-			$story_id = $this->get_notification_meta( $notification_id, "commented_story_id" );
-			$comment_id = $this->get_notification_meta( $notification_id, "comment_id" );
-			//$url = str_replace( "[single_view_to_comment]", get_permalink( $story_id ) . "?comment_id=". $comment_id, $url );
-
-			$url = get_permalink( $story_id );
-		}
-
-		return $url;
+		if ( file_exists( $notification_converter_path ) ) {
+			include $notification_converter_path;
+			return $_CONVERTER_URL_( $url, $notifier_id, $notified_id, $notification_id, $this->get_notification_metas( $notification_id ) );
+		} else { return $url; }
 	}
 
 	/*
@@ -904,11 +895,14 @@ class BROTHER {
 	*	Function purpose:
 	*	This function is used to convert generic notification text to human readeble text.
 	*/
-	function convert_notification_text( $text, $notifier_id, $notified_id, $notificaiton_id ) {
-		$text = str_replace( "[notifier_first_name]", get_user_meta( $notifier_id, "first_name", true ), $text );
-		$text = str_replace( "[notifier_short_name]", get_user_meta( $notifier_id, "user_shortname", true ) ? get_user_meta( $notifier_id, "user_shortname", true ) : get_user_meta( $notifier_id, "first_name", true ) ." ". get_user_meta( $notifier_id, "last_name", true ), $text );
+	function convert_notification_text( $text, $notifier_id, $notified_id, $notificaiton_id, $notification_template_id ) {
+		$notification_converter_path = get_field( "notification_converter", $notification_id );
+		$notification_converter_path = !empty( $notification_converter_path ) && isset( $notification_converter_path ) && $notification_converter_path ? $notification_converter_path : get_template_directory() ."/notification-converters/". $notification_template_id .".php";
 
-		return $text;
+		if ( file_exists( $notification_converter_path ) ) {
+			include $notification_converter_path;
+			return $_CONVERTER_TXT_( $text, $notifier_id, $notified_id, $notification_id, $this->get_notification_metas( $notification_id ) );
+		} else { return $url; }
 	}
 
 	/*
@@ -1100,6 +1094,21 @@ class BROTHER {
 		return $result_[0]->meta_value;
 	}
 
+	function get_notification_metas( $notification_id ) {
+		global $wpdb;
+		$table_ = $wpdb->prefix ."user_notificationsmeta";
+
+		$sql_ = "SELECT meta_key, meta_value FROM $table_ WHERE notification_id='$notification_id'";
+		$results_ = $wpdb->get_results( $sql_, OBJECT );
+
+		$metas_ = array();
+		foreach ( $results_ as $_META ) {
+			$metas_[ $_META->meta_key ] = $_META->meta_value;
+		}
+
+		return (object) $metas_;
+	}
+
 	/*
 	*	Function name: draft_user_post
 	*	Function arguments: $data [ MIXED_OBJECT ] (required)
@@ -1110,6 +1119,8 @@ class BROTHER {
 	function draft_user_post( $data ) {
 		$attachment_id = is_numeric( $data->post_attachment_id ) == true ? $data->post_attachment_id : "";
 		$response = "";
+
+		$data->post_content = $this->convert_iframe_videos( $data->post_content );
 
 		$post_arr = array(
 			"ID" => $data->post_id,
@@ -1186,8 +1197,8 @@ class BROTHER {
 					$story_container = array();
 					$story_container[ "ID" ] = $post_->ID;
 					$story_container[ "title" ] = $post_->post_title;
-					$story_container[ "content" ] = $post_->post_content;
-					$story_container[ "excerpt" ] = wp_trim_words( $post_->post_content, 50, "..." );
+					$story_container[ "content" ] = $this->convert_iframe_videos( $post_->post_content, false );
+					$story_container[ "excerpt" ] = wp_trim_words( $this->convert_iframe_videos( $post_->post_content, false ), 50, "..." );
 					$story_container[ "banner" ][ "ID" ] = get_post_thumbnail_id( $post_->ID );
 					$story_container[ "banner" ][ "url" ] = $this->get_post_banner_url( $post_->ID );
 					$story_container[ "date" ] = $post_->post_date;
@@ -1227,7 +1238,7 @@ class BROTHER {
 						</div>
 						<div class='story'>
 							<h1 class='story-title'><?php echo $post_->post_title ?></h1>
-							<div class='story-excerpt'><?php echo wp_trim_words( $post_->post_content, 50, "..." ); ?></div>
+							<div class='story-excerpt'><?php echo wp_trim_words( $this->convert_iframe_videos( $post_->post_content, false ), 50, "..." ); ?></div>
 						</div>
 					</div>
 
@@ -1267,7 +1278,7 @@ class BROTHER {
 				$story_container = array();
 				$story_container[ "ID" ] = $post_->ID;
 				$story_container[ "title" ] = $post_->post_title;
-				$story_container[ "content" ] = $post_->post_content;
+				$story_container[ "content" ] = $this->convert_iframe_videos( $post_->post_content, false );
 				$story_container[ "banner" ][ "ID" ] = get_post_thumbnail_id( $post_->ID );
 				$story_container[ "banner" ][ "url" ] = $this->get_post_banner_url( $post_->ID );
 				$story_container[ "date" ] = $post_->post_date;
@@ -1308,8 +1319,8 @@ class BROTHER {
 			$post_ = get_post( $post_id );
 			$story_container[ "ID" ] = $post_id;
 			$story_container[ "title" ] = $post_->post_title;
-			$story_container[ "content" ] = $post_->post_content;
-			$story_container[ "excerpt" ] = wp_trim_words( $post_->post_content, 50, "..." );
+			$story_container[ "content" ] = $this->convert_iframe_videos( $post_->post_content, false );
+			$story_container[ "excerpt" ] = wp_trim_words( $this->convert_iframe_videos( $post_->post_content, false ), 50, "..." );
 			$story_container[ "banner" ][ "ID" ] = get_post_thumbnail_id( $post_id );
 			$story_container[ "banner" ][ "url" ] = $this->get_post_banner_url( $post_id );
 			$story_container[ "date" ] = $post_->post_date;
@@ -2299,6 +2310,87 @@ class BROTHER {
 		}
 
 		if ( isset( $data->is_ajax ) && $data->is_ajax == true ) { return $stories_container; }
+	}
+
+	/*
+	*	Function name: convert_iframe_videos
+	*	Function arguments: $content [ STRING ] (reqired), $sanitize [ BOOLEAN ] (optional)
+	*	Function purpose: This function is used to convert the <iframe> tag into [ev] tag for the DB (if $sanitize == true) and back to <iframe> (if $sanitize == false).
+	*/
+	function convert_iframe_videos( $content, $sanitize = true ) {
+		if ( $sanitize == true ) {
+			$content = str_replace( "<iframe", "[ev", $content );
+			$content = str_replace( "</iframe", "[/ev", $content );
+		} else {
+			$content = str_replace( "[ev", "<iframe", $content );
+			$content = str_replace( "[/ev", "</iframe", $content );
+		}
+
+		return $content;
+	}
+
+	/*
+	*	Function name: register_plugin_page
+	*	Function arguments: $plugin_base_name [ STRING ] (required), $page_title [ STRING ] (required), $page_slug [ STRING ] (required)
+	*	Function purpose: This function is used to create custom page related with specific plugin.
+	*/
+	function register_plugin_page( $plugin_base_name, $page_title, $page_slug ) {
+		$plugin_base_name = sanitize_text_field( $plugin_base_name );
+		$page_title = sanitize_text_field( $page_title );
+		$page_slug = sanitize_text_field( $page_slug );
+
+		$args = array(
+			"posts_per_page" => 1,
+			"post_type" => "page",
+			"name" => $page_slug,
+			"meta_key" => "plugin_base_name",
+			"meta_value" => $plugin_base_name,
+			"meta_compare" => "="
+		);
+
+		$page_ = get_posts( $args );
+
+		if ( isset( $page_ ) && !empty( $page_ ) ) { return $page_[ 0 ]; }
+		else {
+			$postarr = array(
+				"ID" => 0,
+				"author" => 4,
+				"post_title" => $page_title,
+				"post_name" => $page_slug,
+				"post_type" => "page",
+				"post_status" => "publish",
+				"meta_input" => array( "plugin_base_name" => $plugin_base_name )
+			);
+			$new_page = wp_insert_post( $postarr );
+
+			return $new_page;
+		}
+	}
+
+	/*
+	*	Function name: delete_plugin_page
+	*	Function arguments: $plugin_base_name [ STRING ] (required), $page_slug [ STRING ] (required)
+	*	Function purpose: This function is used to delete a specific page, created by the $plugin_base_name plugin.
+	*/
+	function delete_plugin_page( $plugin_base_name, $page_slug ) {
+		$plugin_base_name = sanitize_text_field( $plugin_base_name );
+		$page_slug = sanitize_text_field( $page_slug );
+
+		$args = array(
+			"posts_per_page" => 1,
+			"post_type" => "page",
+			"name" => $page_slug,
+			"meta_key" => "plugin_base_name",
+			"meta_value" => $plugin_base_name,
+			"meta_compare" => "="
+		);
+
+		$page_ = get_posts( $args );
+
+		if ( isset( $page_ ) && !empty( $page_ ) ) {
+			$page_id = $page_[ 0 ]->ID;
+			return wp_delete_post( $page_id, true );
+		} else { return false; }
 	}
 }
 

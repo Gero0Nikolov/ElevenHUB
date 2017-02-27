@@ -156,7 +156,8 @@ body {
       opacity: 1;
       background: none;
       margin: 0;
-      padding: 0 0 0 2em; }
+      padding: 0 0 0 2em;
+      display: none; }
       #mobile-menu-holder .menu .sub-menu li {
         border-color: #ddd; }
 
@@ -1236,7 +1237,7 @@ body {
     width: 100%;
     height: 6em;
     font-size: 4rem;
-    background: #34495e;
+    background-color: #34495e;
     background-size: cover;
     background-position: center;
     position: relative; }
@@ -1333,9 +1334,11 @@ body {
   z-index: 99999 !important; }
 
 /** STORIES **/
-.story-content .content-image {
+.story-content .content-image,
+.post-content .content-image {
   max-width: 90%; }
-.story-content .content-video {
+.story-content .content-video,
+.post-content .content-video {
   width: 90%;
   height: 6em;
   font-size: 6rem;
@@ -1377,7 +1380,8 @@ body {
     font-size: 4em;
     background-size: cover;
     background-repeat: no-repeat;
-    background-position: center; }
+    background-position: center;
+    background-color: #34495e; }
     .stories-container .story-container .story-banner .overlay {
       position: absolute;
       top: 0;
@@ -1734,7 +1738,7 @@ body {
     font-size: 6rem;
     background-size: cover;
     background-position: center;
-    margin: 0.15em;
+    margin: 0.2em;
     cursor: pointer;
     box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
     webkit-transition: all 0.25s ease-in-out;
@@ -2607,5 +2611,15 @@ body {
   padding: 0 0.25em; }
 .mobile .public-stories-container .story-container .story-content {
   padding: 0 0.75em; }
+.mobile .story-content .content-image,
+.mobile .post-content .content-image {
+  max-width: 100%; }
+.mobile .story-content .content-video,
+.mobile .post-content .content-video {
+  width: 100%;
+  height: 3em;
+  font-size: 6rem;
+  display: block;
+  margin: 0 auto; }
 
 /*# sourceMappingURL=style.css.map */

@@ -179,6 +179,7 @@ body { margin: 0 !important; padding: 0 !important; }
 		    background: none;
 		    margin: 0;
 		    padding: 0 0 0 2em;
+			display: none;
 
 		    li {
 		    	border-color: #ddd;
@@ -1489,7 +1490,7 @@ body { margin: 0 !important; padding: 0 !important; }
 		width: 100%;
 		height: 6em;
 		font-size: 4rem;
-		background: $wet_asphalt;
+		background-color: $wet_asphalt;
         background-size: cover;
         background-position: center;
 
@@ -1608,7 +1609,8 @@ body { margin: 0 !important; padding: 0 !important; }
 }
 
 /** STORIES **/
-.story-content {
+.story-content,
+.post-content {
 	.content-image { max-width: 90%; }
 	.content-video {
 		width: 90%;
@@ -1662,6 +1664,7 @@ body { margin: 0 !important; padding: 0 !important; }
 			background-size: cover;
 			background-repeat: no-repeat;
 			background-position: center;
+			background-color: $wet_asphalt;
 
 			.overlay {
 				position: absolute;
@@ -2092,7 +2095,7 @@ body { margin: 0 !important; padding: 0 !important; }
 	    font-size: 6rem;
 	    background-size: cover;
 	    background-position: center;
-	    margin: 0.15em;
+	    margin: 0.2em;
 		cursor: pointer;
 		box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
 
@@ -3180,6 +3183,18 @@ body { margin: 0 !important; padding: 0 !important; }
 		.story-container {
 			.story-title { padding: 0 0.25em; }
 			.story-content { padding: 0 0.75em; }
+		}
+	}
+
+	.story-content,
+	.post-content {
+		.content-image { max-width: 100%; }
+		.content-video {
+			width: 100%;
+			height: 3em;
+			font-size: 6rem;
+			display: block;
+			margin: 0 auto;
 		}
 	}
 }

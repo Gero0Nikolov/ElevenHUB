@@ -61,7 +61,14 @@ $user_id = get_current_user_id();
 	<div id="notifications-holder" class="animated">
 	</div>
 	<?php if ( wp_is_mobile() ) { ?>
-	<div id="mobile-menu-holder" class="animated"><?php wp_nav_menu( array( 'menu' => '4', 'menu_id' => '4' ) ); ?></div>
+	<div id="mobile-menu-holder" class="animated">
+		<?php wp_nav_menu( array( 'menu' => '4', 'menu_id' => '4', 'items_wrap' => '
+		<ul id="%1$s" class="%2$s">
+			%3$s
+			<li class="menu-item menu-item-type-custom menu-item-object-custom"><a rel="logout" href="#!">Logout</a></li>
+		</ul>
+		' ) ); ?>
+	</div>
 	<?php } ?>
 
 	<div id="content" class="site-content">

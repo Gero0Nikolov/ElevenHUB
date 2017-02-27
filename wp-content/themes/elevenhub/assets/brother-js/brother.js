@@ -1061,13 +1061,15 @@ var UserStory = function( userID = "" ) {
 	*/
 	this.autoSave = function() {
 		return setTimeout(function(){
-			if ( canSave == true ) {
+			title = jQuery( "#story-header").html().trim();
+			if ( canSave == true || ( canSave == false && title != "" && title !== undefined ) ) {
 				canSave = false;
 				bannerID = jQuery( "#story-featured-image" ).attr( "attachment-id" );
 				bannerID = bannerID !== undefined ? bannerID.split( "-" )[1] : false;
-				title = jQuery( "#story-header").html().trim();
 				content = tinyMCE.activeEditor.getContent();
 				postID = jQuery( "#story-composer" ).attr( "post-id" );
+
+				console.log( content );
 
 				if ( title != "" && title !== undefined ) {
 					generateAJAX({
@@ -1088,6 +1090,8 @@ var UserStory = function( userID = "" ) {
 						else { console.log( response ); }
 					} );
 				}
+			} else {
+				if ( title != "" && title !== undefined ) { canSave = true; }
 			}
 		}, 2000);
 	}
@@ -1116,7 +1120,7 @@ var UserStory = function( userID = "" ) {
 		   			}
 		   			else if ( url_.indexOf( "vimeo" ) >= 0 ) {
 		   				videoID = url_.split( "vimeo.com/" )[1];
-		   				markup_ = "<iframe src='https://player.vimeo.com/video/"+ videoID +"?marked' frameborder='0' webkitallowfullscreen mozallowfullscreen allowfullscreen class='content-video'></iframe>";
+		   				markup_ = "<iframe class='content-video' src='https://player.vimeo.com/video/"+ videoID +"?marked' frameborder='0' webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>";
 		   				tinyMCE.activeEditor.setContent( tinyMCE.activeEditor.getContent().replace( url_, markup_ ) );
 		   			}
 		   			else {

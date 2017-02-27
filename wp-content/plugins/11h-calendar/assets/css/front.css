@@ -1,0 +1,345 @@
+/* SCSS Variables set */
+.calendar-options-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin: 1em auto 0; }
+  .calendar-options-container .left-column,
+  .calendar-options-container .right-column {
+    display: inline-block;
+    vertical-align: middle; }
+    .calendar-options-container .left-column .option,
+    .calendar-options-container .right-column .option {
+      background: none;
+      box-shadow: none !important;
+      outline: 0 !important;
+      font-family: OpenSansRegular;
+      font-size: 0.85rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-shadow: none;
+      text-align: center;
+      padding: 0.85em;
+      width: 130px;
+      border: 1px solid;
+      border-radius: 100px;
+      color: #888;
+      webkit-transition: all 0.25s ease-in-out;
+      -moz-transition: all 0.25s ease-in-out;
+      -o-transition: all 0.25s ease-in-out;
+      transition: all 0.25s ease-in-out; }
+      .calendar-options-container .left-column .option.active,
+      .calendar-options-container .right-column .option.active {
+        color: #fff;
+        background: #2980b9;
+        border-color: #2980b9; }
+      .calendar-options-container .left-column .option:hover, .calendar-options-container .left-column .option:active,
+      .calendar-options-container .right-column .option:hover,
+      .calendar-options-container .right-column .option:active {
+        color: #fff;
+        background: #3498db;
+        border-color: #2980b9; }
+
+.events-container {
+  text-align: center; }
+  .events-container .green-bold-button {
+    width: 130px; }
+
+.event-picker-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.65);
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  transform: translateZ(0); }
+  .event-picker-container .event-picker-inner {
+    display: block;
+    width: 350px;
+    max-width: 98%;
+    text-align: center;
+    transform: translateZ(0); }
+    .event-picker-container .event-picker-inner .hidden {
+      display: none; }
+    .event-picker-container .event-picker-inner .step {
+      transform: translateZ(0);
+      background: transparent; }
+    .event-picker-container .event-picker-inner .date-picker {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      background: #fff;
+      border-radius: 5px; }
+      .event-picker-container .event-picker-inner .date-picker input {
+        display: inline-block;
+        vertical-align: middle;
+        border: none;
+        border-radius: 0;
+        color: #333;
+        font-family: OpenSansLight;
+        font-size: 1rem;
+        font-weight: normal;
+        padding: 0.5em;
+        background: transparent;
+        outline: 0 !important;
+        text-shadow: none; }
+        .event-picker-container .event-picker-inner .date-picker input.small {
+          width: 15%; }
+        .event-picker-container .event-picker-inner .date-picker input.medium {
+          width: 20%; }
+        .event-picker-container .event-picker-inner .date-picker input.large {
+          width: 75%; }
+        .event-picker-container .event-picker-inner .date-picker input.bordered {
+          border-right: 1px solid #ddd; }
+    .event-picker-container .event-picker-inner .event-box {
+      display: block;
+      width: 100%;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      margin: 2em auto;
+      padding: 2em 1em; }
+      .event-picker-container .event-picker-inner .event-box .event-title {
+        display: block;
+        font-family: OpenSansBOld;
+        font-size: 2.5rem;
+        font-weight: normal;
+        color: #333;
+        margin: 0 auto 0.85em; }
+      .event-picker-container .event-picker-inner .event-box .event-date {
+        display: block;
+        font-family: PlayFairRegular;
+        font-size: 1rem;
+        font-weight: normal;
+        color: #777;
+        letter-spacing: 1px; }
+      .event-picker-container .event-picker-inner .event-box.normal {
+        border-color: #ddd; }
+        .event-picker-container .event-picker-inner .event-box.normal .event-title {
+          color: #333; }
+        .event-picker-container .event-picker-inner .event-box.normal .event-date {
+          color: #777; }
+    .event-picker-container .event-picker-inner .color-picker {
+      display: block;
+      width: 100%;
+      padding: 0; }
+      .event-picker-container .event-picker-inner .color-picker .color-box {
+        display: inline-block;
+        vertical-align: middle;
+        margin: 0 0.25em;
+        width: 1.5em;
+        height: 1.5em;
+        font-size: 1rem;
+        padding: 0;
+        border: none;
+        border-radius: 100%;
+        background: transparent;
+        box-shadow: none !important;
+        outline: 0; }
+        .event-picker-container .event-picker-inner .color-picker .color-box.color-emerald {
+          background: #2ecc71; }
+        .event-picker-container .event-picker-inner .color-picker .color-box.color-peter_river {
+          background: #3498db; }
+        .event-picker-container .event-picker-inner .color-picker .color-box.color-amethyst {
+          background: #9b59b6; }
+        .event-picker-container .event-picker-inner .color-picker .color-box.color-wet_asphalt {
+          background: #34495e; }
+        .event-picker-container .event-picker-inner .color-picker .color-box.color-alizarin {
+          background: #e74c3c; }
+        .event-picker-container .event-picker-inner .color-picker .color-box.color-clouds {
+          background: #ecf0f1; }
+    .event-picker-container .event-picker-inner .event-button {
+      display: block;
+      width: 80%;
+      font-size: 1rem;
+      font-family: OpenSansRegular;
+      font-weight: normal;
+      color: #fff;
+      border: none;
+      padding: 0.75em;
+      letter-spacing: 1px;
+      border-radius: 100px;
+      margin: 2em auto 0.5em;
+      box-shadow: none !important;
+      background: #3498db;
+      text-shadow: none;
+      outline: 0;
+      webkit-transition: all 0.25s ease-in-out;
+      -moz-transition: all 0.25s ease-in-out;
+      -o-transition: all 0.25s ease-in-out;
+      transition: all 0.25s ease-in-out; }
+      .event-picker-container .event-picker-inner .event-button:hover, .event-picker-container .event-picker-inner .event-button:active {
+        background: #2980b9; }
+    .event-picker-container .event-picker-inner .simple-button {
+      display: block;
+      width: 80%;
+      font-size: 1rem;
+      font-family: OpenSansRegular;
+      font-weight: normal;
+      color: #fff;
+      border: none;
+      margin: 0 auto 1em !important;
+      padding: 0;
+      box-shadow: none !important;
+      background: none;
+      text-shadow: none;
+      outline: 0 !important;
+      webkit-transition: all 0.25s ease-in-out;
+      -moz-transition: all 0.25s ease-in-out;
+      -o-transition: all 0.25s ease-in-out;
+      transition: all 0.25s ease-in-out; }
+      .event-picker-container .event-picker-inner .simple-button:hover, .event-picker-container .event-picker-inner .simple-button:active {
+        color: #ddd; }
+    .event-picker-container .event-picker-inner .event-banner {
+      display: block;
+      width: 100%;
+      font-size: 2rem;
+      height: 6em;
+      background-color: #34495e;
+      background-size: cover;
+      background-position: center;
+      margin-bottom: 1em;
+      border-radius: 5px; }
+      .event-picker-container .event-picker-inner .event-banner .overlay {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.25);
+        color: #fff;
+        border-radius: 5px;
+        font-size: 1.5rem;
+        font-family: OpenSansRegular;
+        font-weight: normal;
+        letter-spacing: 1px;
+        cursor: pointer;
+        webkit-transition: all 0.25s ease-in-out;
+        -moz-transition: all 0.25s ease-in-out;
+        -o-transition: all 0.25s ease-in-out;
+        transition: all 0.25s ease-in-out; }
+        .event-picker-container .event-picker-inner .event-banner .overlay:hover, .event-picker-container .event-picker-inner .event-banner .overlay:active {
+          background: rgba(0, 0, 0, 0.5); }
+    .event-picker-container .event-picker-inner .event-info .event-title {
+      display: block;
+      text-align: left;
+      font-family: OpenSansBold;
+      font-size: 2.5rem;
+      font-weight: normal;
+      margin: 0 auto;
+      background: #fff;
+      border-bottom: 1px dashed #ddd;
+      padding: 0.15em 0.25em;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+      text-shadow: none;
+      outline: 0;
+      cursor: text; }
+    .event-picker-container .event-picker-inner .event-info .event-description {
+      display: block;
+      border: none;
+      border-radius: 0;
+      font-family: PlayFairRegular;
+      font-size: 1rem;
+      font-weight: normal;
+      letter-spacing: 1px;
+      padding: 0.75em;
+      color: #333;
+      resize: none;
+      border-bottom-left-radius: 5px;
+      border-bottom-right-radius: 5px;
+      height: 10em;
+      text-shadow: none;
+      outline: 0; }
+    .event-picker-container .event-picker-inner .event-participants {
+      display: flex;
+      flex-direction: row;
+      padding: 0;
+      margin: 1.5em 0 0;
+      justify-content: center;
+      align-items: center;
+      background: #fff;
+      padding: 0.35em;
+      border-radius: 5px; }
+      .event-picker-container .event-picker-inner .event-participants .participant {
+        display: inline-block;
+        vertical-align: middle;
+        margin: 0 0.5em;
+        background-color: #34495e;
+        background-position: center;
+        background-size: cover;
+        box-shadow: none !important;
+        border: none;
+        border-radius: 100%;
+        padding: 0;
+        width: 2em;
+        height: 2em;
+        font-size: 1rem;
+        outline: 0;
+        position: relative;
+        text-shadow: none; }
+        .event-picker-container .event-picker-inner .event-participants .participant:after {
+          content: "-";
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(231, 76, 60, 0.65);
+          color: #fff;
+          border-radius: 100%;
+          opacity: 0;
+          webkit-transition: all 0.25s ease-in-out;
+          -moz-transition: all 0.25s ease-in-out;
+          -o-transition: all 0.25s ease-in-out;
+          transition: all 0.25s ease-in-out; }
+      .event-picker-container .event-picker-inner .event-participants .participant:hover:after {
+        opacity: 1; }
+      .event-picker-container .event-picker-inner .event-participants .add-participants {
+        display: inline-block;
+        vertical-align: middle;
+        margin: 0 0.5em;
+        background-color: transparent;
+        background-position: center;
+        background-size: cover;
+        box-shadow: none !important;
+        color: #777;
+        border: 1px solid;
+        border-radius: 100%;
+        padding: 0;
+        width: 2em;
+        height: 2em;
+        font-size: 1rem;
+        outline: 0;
+        webkit-transition: all 0.25s ease-in-out;
+        -moz-transition: all 0.25s ease-in-out;
+        -o-transition: all 0.25s ease-in-out;
+        transition: all 0.25s ease-in-out; }
+        .event-picker-container .event-picker-inner .event-participants .add-participants:hover, .event-picker-container .event-picker-inner .event-participants .add-participants:active {
+          color: #2ecc71; }
+
+.mobile .calendar-options-container {
+  justify-content: center; }
+.mobile .event-picker-container {
+  padding: 2em 0;
+  justify-content: flex-start; }
+
+/*# sourceMappingURL=front.css.map */

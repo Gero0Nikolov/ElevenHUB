@@ -182,6 +182,11 @@ input::-moz-focus-inner {
 input {
   line-height: normal; }
 
+input,
+textarea,
+select {
+  transform: translateZ(0); }
+
 input[type="checkbox"],
 input[type="radio"] {
   box-sizing: border-box;

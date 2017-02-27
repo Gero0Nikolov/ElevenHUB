@@ -305,7 +305,7 @@ function get_public_stories( $offset = 0 ) {
 		if ( $brother_->is_company_public( $company_id ) ) {
 			$story_banner = $brother_->get_post_banner_url( $post_->ID );
 			$story_url = get_permalink( $post_->ID );
-			$story_excerpt = wp_trim_words( $post_->post_content, 55, "..." );
+			$story_excerpt = wp_trim_words( $brother_->convert_iframe_videos( $post_->post_content, false ), 55, "..." );
 			$author_avatar = $brother_->get_user_avatar_url( $post_->post_author );
 			$company_avatar = $brother_->get_user_avatar_url( $post_->post_author );
 
