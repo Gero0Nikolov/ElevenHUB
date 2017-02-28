@@ -2334,10 +2334,11 @@ class BROTHER {
 	*	Function arguments: $plugin_base_name [ STRING ] (required), $page_title [ STRING ] (required), $page_slug [ STRING ] (required)
 	*	Function purpose: This function is used to create custom page related with specific plugin.
 	*/
-	function register_plugin_page( $plugin_base_name, $page_title, $page_slug ) {
+	function register_plugin_page( $plugin_base_name, $page_title, $page_slug, $page_template ) {
 		$plugin_base_name = sanitize_text_field( $plugin_base_name );
 		$page_title = sanitize_text_field( $page_title );
 		$page_slug = sanitize_text_field( $page_slug );
+		$page_template = sanitize_text_field( $page_template );
 
 		$args = array(
 			"posts_per_page" => 1,
@@ -2359,7 +2360,10 @@ class BROTHER {
 				"post_name" => $page_slug,
 				"post_type" => "page",
 				"post_status" => "publish",
-				"meta_input" => array( "plugin_base_name" => $plugin_base_name )
+				"meta_input" => array(
+					"plugin_base_name" => $plugin_base_name,
+				 	"_wp_page_template" => $page_template
+				)
 			);
 			$new_page = wp_insert_post( $postarr );
 
@@ -2391,6 +2395,30 @@ class BROTHER {
 			$page_id = $page_[ 0 ]->ID;
 			return wp_delete_post( $page_id, true );
 		} else { return false; }
+	}
+
+	/*
+	*	Function name: get_plugin_page
+	*	Function arguments: $plugin_base_name [ STRING ] (required), $page_slug [ STRING ] (required)
+	*	Function purpose: This function is used to return page, registered by plugin.
+	*/
+	function get_plugin_page( $plugin_base_name, $page_slug ) {
+		$plugin_base_name = sanitize_text_field( $plugin_base_name );
+		$page_slug = sanitize_text_field( $page_slug );
+
+		$args = array(
+			"posts_per_page" => 1,
+			"post_type" => "page",
+			"name" => $page_slug,
+			"meta_key" => "plugin_base_name",
+			"meta_value" => $plugin_base_name,
+			"meta_compare" => "="
+		);
+
+		$page_ = get_posts( $args );
+
+		if ( isset( $page_ ) && !empty( $page_ ) ) { return $page_[ 0 ]; }
+		else { return false; }
 	}
 }
 
