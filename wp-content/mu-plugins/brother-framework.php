@@ -880,8 +880,8 @@ class BROTHER {
 	*	This function is used to convert generic notification URL to normal HTTP working address.
 	*/
 	function convert_notification_url( $url, $notifier_id, $notified_id, $notification_id, $notification_template_id ) {
-		$notification_converter_path = get_field( "notification_converter", $notification_id );
-		$notification_converter_path = !empty( $notification_converter_path ) && isset( $notification_converter_path ) && $notification_converter_path ? $notification_converter_path : get_template_directory() ."/notification-converters/". $notification_template_id .".php";
+		$notification_converter_path = get_field( "notification_converter", $notification_template_id );
+		$notification_converter_path = isset( $notification_converter_path ) && !empty( $notification_converter_path ) && $notification_converter_path !== false ? $notification_converter_path : get_template_directory() ."/notification-converters/". $notification_template_id .".php";
 
 		if ( file_exists( $notification_converter_path ) ) {
 			include $notification_converter_path;
@@ -896,7 +896,7 @@ class BROTHER {
 	*	This function is used to convert generic notification text to human readeble text.
 	*/
 	function convert_notification_text( $text, $notifier_id, $notified_id, $notificaiton_id, $notification_template_id ) {
-		$notification_converter_path = get_field( "notification_converter", $notification_id );
+		$notification_converter_path = get_field( "notification_converter", $notification_template_id );
 		$notification_converter_path = !empty( $notification_converter_path ) && isset( $notification_converter_path ) && $notification_converter_path ? $notification_converter_path : get_template_directory() ."/notification-converters/". $notification_template_id .".php";
 
 		if ( file_exists( $notification_converter_path ) ) {
@@ -1094,6 +1094,11 @@ class BROTHER {
 		return $result_[0]->meta_value;
 	}
 
+	/*
+	*	Function name: get_notification_metas
+	*	Function arguments: $notification_id [ INT ] (required)
+	*	Function purpose: This function is used to return all available metas for the specified Notification by $notification_id.
+	*/
 	function get_notification_metas( $notification_id ) {
 		global $wpdb;
 		$table_ = $wpdb->prefix ."user_notificationsmeta";
@@ -2330,23 +2335,24 @@ class BROTHER {
 	}
 
 	/*
-	*	Function name: register_plugin_page
-	*	Function arguments: $plugin_base_name [ STRING ] (required), $page_title [ STRING ] (required), $page_slug [ STRING ] (required)
-	*	Function purpose: This function is used to create custom page related with specific plugin.
+	*	Function name: register_notification
+	*	Function arguments: $notification_title [ STIRNG ] (required), $notification_slug [ STRING ] (required), $notification_name [ STRING ] (required), $notification_url [ STRING ] (required), $notificaiton_text [ STRING ] (required), $notification_icon_code [ STRING: FONTAWESOME fa-NAME ] (required), $notification_color_code [ STRING: HEX color code ] (required)
+	*	Function purpose: This function is used to create custom notificaiton template.
 	*/
-	function register_plugin_page( $plugin_base_name, $page_title, $page_slug, $page_template ) {
-		$plugin_base_name = sanitize_text_field( $plugin_base_name );
-		$page_title = sanitize_text_field( $page_title );
-		$page_slug = sanitize_text_field( $page_slug );
-		$page_template = sanitize_text_field( $page_template );
+	function register_notification( $notification_title, $notification_slug, $notification_name, $notification_url, $notification_text, $notification_icon_code, $notification_color_code, $notification_parser ) {
+		$notification_title = sanitize_text_field( $notification_title );
+		$notification_slug = sanitize_text_field( $notification_slug );
+		$notification_name = sanitize_text_field( $notification_name );
+		$notification_url = sanitize_text_field( $notification_url );
+		$notification_text = sanitize_text_field( $notification_text );
+		$notificaiton_icon_code = sanitize_text_field( $notification_icon_code );
+		$notification_color_code = sanitize_text_field( $notification_color_code );
+		$notification_parser = sanitize_text_field( $notification_parser );
 
 		$args = array(
 			"posts_per_page" => 1,
-			"post_type" => "page",
-			"name" => $page_slug,
-			"meta_key" => "plugin_base_name",
-			"meta_value" => $plugin_base_name,
-			"meta_compare" => "="
+			"post_type" => "notifications",
+			"name" => $notification_slug
 		);
 
 		$page_ = get_posts( $args );
@@ -2356,13 +2362,17 @@ class BROTHER {
 			$postarr = array(
 				"ID" => 0,
 				"author" => 4,
-				"post_title" => $page_title,
-				"post_name" => $page_slug,
-				"post_type" => "page",
+				"post_title" => $notification_title,
+				"post_name" => $notification_slug,
+				"post_type" => "notifications",
 				"post_status" => "publish",
 				"meta_input" => array(
-					"plugin_base_name" => $plugin_base_name,
-				 	"_wp_page_template" => $page_template
+					"notification_name" => $notification_name,
+					"notification_url" => $notification_url,
+					"notification_text" => $notification_text,
+					"notification_icon_code" => $notification_icon_code,
+					"notification_icon_background_code" => $notification_color_code,
+					"notification_converter" => $notification_parser
 				)
 			);
 			$new_page = wp_insert_post( $postarr );
@@ -2372,47 +2382,17 @@ class BROTHER {
 	}
 
 	/*
-	*	Function name: delete_plugin_page
-	*	Function arguments: $plugin_base_name [ STRING ] (required), $page_slug [ STRING ] (required)
-	*	Function purpose: This function is used to delete a specific page, created by the $plugin_base_name plugin.
+	*	Function name: get_notification_template
+	*	Function arguments: $notification_slug [ STRING ] (reuqired)
+	*	Function purpose: This function is used to return custom notificaiton template.
 	*/
-	function delete_plugin_page( $plugin_base_name, $page_slug ) {
-		$plugin_base_name = sanitize_text_field( $plugin_base_name );
-		$page_slug = sanitize_text_field( $page_slug );
+	function get_notification_template( $notification_slug ) {
+		$notification_slug = sanitize_text_field( $notification_slug );
 
 		$args = array(
 			"posts_per_page" => 1,
-			"post_type" => "page",
-			"name" => $page_slug,
-			"meta_key" => "plugin_base_name",
-			"meta_value" => $plugin_base_name,
-			"meta_compare" => "="
-		);
-
-		$page_ = get_posts( $args );
-
-		if ( isset( $page_ ) && !empty( $page_ ) ) {
-			$page_id = $page_[ 0 ]->ID;
-			return wp_delete_post( $page_id, true );
-		} else { return false; }
-	}
-
-	/*
-	*	Function name: get_plugin_page
-	*	Function arguments: $plugin_base_name [ STRING ] (required), $page_slug [ STRING ] (required)
-	*	Function purpose: This function is used to return page, registered by plugin.
-	*/
-	function get_plugin_page( $plugin_base_name, $page_slug ) {
-		$plugin_base_name = sanitize_text_field( $plugin_base_name );
-		$page_slug = sanitize_text_field( $page_slug );
-
-		$args = array(
-			"posts_per_page" => 1,
-			"post_type" => "page",
-			"name" => $page_slug,
-			"meta_key" => "plugin_base_name",
-			"meta_value" => $plugin_base_name,
-			"meta_compare" => "="
+			"post_type" => "notifications",
+			"name" => $notification_slug
 		);
 
 		$page_ = get_posts( $args );

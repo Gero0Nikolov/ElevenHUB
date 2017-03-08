@@ -760,6 +760,11 @@ object {
 /* CUSTOM PART */
 /* TOP MENU */
 .main-navigation {
+  display: -webkit-flex;
+  display: -webkit-box;
+  display: -moz-flex;
+  display: -moz-box;
+  display: -ms-flexbox;
   display: flex;
   position: fixed;
   top: 0;
@@ -1226,6 +1231,11 @@ a.skeleton-bold-button {
   color: #34495e; }
 
 .flex-container {
+  display: -webkit-flex;
+  display: -webkit-box;
+  display: -moz-flex;
+  display: -moz-box;
+  display: -ms-flexbox;
   display: flex;
   flex-direction: row;
   justify-content: space-between; }
@@ -1378,10 +1388,16 @@ a.skeleton-bold-button {
 
 /* POPUP */
 .popup-holder {
+  display: -webkit-flex;
+  display: -webkit-box;
+  display: -moz-flex;
+  display: -moz-box;
+  display: -ms-flexbox;
   display: flex;
   align-items: center;
   justify-content: center;
   position: fixed;
+  flex-direction: column;
   top: 0;
   left: 0;
   width: 100%;
@@ -1401,7 +1417,9 @@ a.skeleton-bold-button {
     font-family: OpenSansRegular;
     font-weight: normal;
     font-size: 1.25rem;
-    letter-spacing: 1px; }
+    letter-spacing: 1px;
+    top: calc(50% - 150px / 2);
+    left: calc(50% - 350px / 2); }
     .popup-holder #alert-box label {
       display: block;
       margin: 1em 1em 0.25em;

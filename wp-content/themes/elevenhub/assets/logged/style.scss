@@ -189,7 +189,12 @@ body { margin: 0 !important; padding: 0 !important; }
 }
 
 .profile-board {
-	display: flex;
+	display:-webkit-flex;
+    display:-webkit-box;
+    display:-moz-flex;
+    display:-moz-box;
+    display:-ms-flexbox;
+    display:flex;
 	width: 100%;
 	flex-direction: row;
 	align-items: flex-start;
@@ -401,7 +406,12 @@ body { margin: 0 !important; padding: 0 !important; }
 			}
 
 			.story-meta {
-				display: flex;
+				display:-webkit-flex;
+    display:-webkit-box;
+    display:-moz-flex;
+    display:-moz-box;
+    display:-ms-flexbox;
+    display:flex;
 				margin-top: 1em;
 				border-top: 1px solid #ddd;
 				padding: 1em 1em;
@@ -593,7 +603,12 @@ body { margin: 0 !important; padding: 0 !important; }
 
 /** PICKTURE PREVIEW POPUP **/
 .preview-popup {
-	display: flex;
+	display:-webkit-flex;
+    display:-webkit-box;
+    display:-moz-flex;
+    display:-moz-box;
+    display:-ms-flexbox;
+    display:flex;
 	flex-direction: column;
 	justify-content: center;
 	position: fixed;
@@ -628,7 +643,12 @@ body { margin: 0 !important; padding: 0 !important; }
 	width: 100%;
 	height: 100%;
 
-	display: flex;
+	display:-webkit-flex;
+    display:-webkit-box;
+    display:-moz-flex;
+    display:-moz-box;
+    display:-ms-flexbox;
+    display:flex;
 	flex-direction: column;
 	align-items: center;
     justify-content: center;
@@ -676,6 +696,8 @@ body { margin: 0 !important; padding: 0 !important; }
 		font-size: 1.25rem;
 		letter-spacing: 1px;
         z-index: 9;
+		top: calc(50% - 150px / 2);
+		left: calc(50% - 350px / 2);
 
 		#close-popup-button {
 			display: block;
@@ -882,7 +904,12 @@ body { margin: 0 !important; padding: 0 !important; }
 		}
 
 		.user-relations-header {
-			display: flex;
+			display:-webkit-flex;
+    display:-webkit-box;
+    display:-moz-flex;
+    display:-moz-box;
+    display:-ms-flexbox;
+    display:flex;
 			text-align: left;
 			flex-direction: row;
 			align-items: center;
@@ -1297,7 +1324,12 @@ body { margin: 0 !important; padding: 0 !important; }
 
 			.notification-meta {
 				margin: 0.75em 0 0;
-			    display: flex;
+			    display:-webkit-flex;
+    display:-webkit-box;
+    display:-moz-flex;
+    display:-moz-box;
+    display:-ms-flexbox;
+    display:flex;
 			    justify-content: space-between;
 
 			    .notification-icon {
@@ -1673,7 +1705,12 @@ body { margin: 0 !important; padding: 0 !important; }
 				width: 100%;
 				height: 100%;
 
-				display: flex;
+				display:-webkit-flex;
+    display:-webkit-box;
+    display:-moz-flex;
+    display:-moz-box;
+    display:-ms-flexbox;
+    display:flex;
 				flex-direction: column;
 				justify-content: center;
 				align-items: center;
@@ -1802,7 +1839,12 @@ body { margin: 0 !important; padding: 0 !important; }
 	height: 100%;
 	background-color: rgba(0, 0, 0, 0.5);
 	z-index: 9999;
-	display: flex;
+	display:-webkit-flex;
+    display:-webkit-box;
+    display:-moz-flex;
+    display:-moz-box;
+    display:-ms-flexbox;
+    display:flex;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
@@ -2007,7 +2049,12 @@ body { margin: 0 !important; padding: 0 !important; }
 			}
 
 			.comment-composer {
-				display: flex;
+				display:-webkit-flex;
+    display:-webkit-box;
+    display:-moz-flex;
+    display:-moz-box;
+    display:-ms-flexbox;
+    display:flex;
 				flex-direction: row;
 				justify-content: flex-start;
 				align-items: center;
@@ -2076,7 +2123,12 @@ body { margin: 0 !important; padding: 0 !important; }
 
 /** MEDIA **/
 .simple-controls {
-	display: flex;
+	display:-webkit-flex;
+    display:-webkit-box;
+    display:-moz-flex;
+    display:-moz-box;
+    display:-ms-flexbox;
+    display:flex;
 	flex-direction: row;
 	justify-content: space-between;
 
@@ -2442,7 +2494,12 @@ body { margin: 0 !important; padding: 0 !important; }
 
 /** SINGLE STORY VIEW **/
 .single-story-view {
-	display: flex;
+	display:-webkit-flex;
+    display:-webkit-box;
+    display:-moz-flex;
+    display:-moz-box;
+    display:-ms-flexbox;
+    display:flex;
 	flex-direction: row;
 	justify-content: center;
 	align-items: flex-start;
@@ -2717,7 +2774,12 @@ body { margin: 0 !important; padding: 0 !important; }
 			}
 
 			.comment-composer {
-				display: flex;
+				display:-webkit-flex;
+    display:-webkit-box;
+    display:-moz-flex;
+    display:-moz-box;
+    display:-ms-flexbox;
+    display:flex;
 				flex-direction: row;
 				justify-content: flex-start;
 				align-items: center;
@@ -2898,7 +2960,12 @@ body { margin: 0 !important; padding: 0 !important; }
 		}
 
 		.story-meta {
-			display: flex;
+			display:-webkit-flex;
+    display:-webkit-box;
+    display:-moz-flex;
+    display:-moz-box;
+    display:-ms-flexbox;
+    display:flex;
 			margin-top: 1em;
 			border-top: 1px solid #ddd;
 			padding: 1em 1em;

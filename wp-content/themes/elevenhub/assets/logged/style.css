@@ -162,6 +162,11 @@ body {
         border-color: #ddd; }
 
 .profile-board {
+  display: -webkit-flex;
+  display: -webkit-box;
+  display: -moz-flex;
+  display: -moz-box;
+  display: -ms-flexbox;
   display: flex;
   width: 100%;
   flex-direction: row;
@@ -337,6 +342,11 @@ body {
         line-height: 200%;
         text-align: justify; }
       .profile-board .stories-board .story-container .story-meta {
+        display: -webkit-flex;
+        display: -webkit-box;
+        display: -moz-flex;
+        display: -moz-box;
+        display: -ms-flexbox;
         display: flex;
         margin-top: 1em;
         border-top: 1px solid #ddd;
@@ -482,6 +492,11 @@ body {
 
 /** PICKTURE PREVIEW POPUP **/
 .preview-popup {
+  display: -webkit-flex;
+  display: -webkit-box;
+  display: -moz-flex;
+  display: -moz-box;
+  display: -ms-flexbox;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -511,6 +526,11 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
+  display: -webkit-flex;
+  display: -webkit-box;
+  display: -moz-flex;
+  display: -moz-box;
+  display: -ms-flexbox;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -548,7 +568,9 @@ body {
     font-weight: normal;
     font-size: 1.25rem;
     letter-spacing: 1px;
-    z-index: 9; }
+    z-index: 9;
+    top: calc(50% - 150px / 2);
+    left: calc(50% - 350px / 2); }
     .popup-container #alert-box #close-popup-button {
       display: block;
       width: 80%;
@@ -708,6 +730,11 @@ body {
       width: 250px;
       max-width: 90%; }
     .popup-container .popup-inner-container .user-relations-header {
+      display: -webkit-flex;
+      display: -webkit-box;
+      display: -moz-flex;
+      display: -moz-box;
+      display: -ms-flexbox;
       display: flex;
       text-align: left;
       flex-direction: row;
@@ -1089,6 +1116,11 @@ body {
         vertical-align: top; }
       #notifications-holder .notification-anchor .notification-holder .notification-meta {
         margin: 0.75em 0 0;
+        display: -webkit-flex;
+        display: -webkit-box;
+        display: -moz-flex;
+        display: -moz-box;
+        display: -ms-flexbox;
         display: flex;
         justify-content: space-between; }
         #notifications-holder .notification-anchor .notification-holder .notification-meta .notification-icon {
@@ -1388,6 +1420,11 @@ body {
       left: 0;
       width: 100%;
       height: 100%;
+      display: -webkit-flex;
+      display: -webkit-box;
+      display: -moz-flex;
+      display: -moz-box;
+      display: -ms-flexbox;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -1497,6 +1534,11 @@ body {
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 9999;
+  display: -webkit-flex;
+  display: -webkit-box;
+  display: -moz-flex;
+  display: -moz-box;
+  display: -ms-flexbox;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -1667,6 +1709,11 @@ body {
           .reader-popup .reader-inline-popup .story-comments .comment .comment-meta .edit-controller:hover {
             color: #3498db; }
       .reader-popup .reader-inline-popup .story-comments .comment-composer {
+        display: -webkit-flex;
+        display: -webkit-box;
+        display: -moz-flex;
+        display: -moz-box;
+        display: -ms-flexbox;
         display: flex;
         flex-direction: row;
         justify-content: flex-start;
@@ -1721,6 +1768,11 @@ body {
 
 /** MEDIA **/
 .simple-controls {
+  display: -webkit-flex;
+  display: -webkit-box;
+  display: -moz-flex;
+  display: -moz-box;
+  display: -ms-flexbox;
   display: flex;
   flex-direction: row;
   justify-content: space-between; }
@@ -2037,6 +2089,11 @@ body {
 
 /** SINGLE STORY VIEW **/
 .single-story-view {
+  display: -webkit-flex;
+  display: -webkit-box;
+  display: -moz-flex;
+  display: -moz-box;
+  display: -ms-flexbox;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -2261,6 +2318,11 @@ body {
           .single-story-view .story-container .post-comments .comment .comment-meta .edit-controller:hover {
             color: #3498db; }
       .single-story-view .story-container .post-comments .comment-composer {
+        display: -webkit-flex;
+        display: -webkit-box;
+        display: -moz-flex;
+        display: -moz-box;
+        display: -ms-flexbox;
         display: flex;
         flex-direction: row;
         justify-content: flex-start;
@@ -2412,6 +2474,11 @@ body {
     line-height: 200%;
     text-align: justify; }
   .public-stories-container .story-container .story-meta {
+    display: -webkit-flex;
+    display: -webkit-box;
+    display: -moz-flex;
+    display: -moz-box;
+    display: -ms-flexbox;
     display: flex;
     margin-top: 1em;
     border-top: 1px solid #ddd;

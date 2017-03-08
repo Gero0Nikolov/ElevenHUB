@@ -930,7 +930,12 @@ $asbestos: #7f8c8d;
 
 /* TOP MENU */
 .main-navigation {
-	display: flex;
+	display:-webkit-flex;
+    display:-webkit-box;
+    display:-moz-flex;
+    display:-moz-box;
+    display:-ms-flexbox;
+    display:flex;
     position: fixed;
     top: 0;
     left: 0;
@@ -1429,7 +1434,12 @@ a.skeleton-bold-button {
 .dark-highlithed { color: $wet_asphalt; }
 
 .flex-container {
-	display: flex;
+	display:-webkit-flex;
+    display:-webkit-box;
+    display:-moz-flex;
+    display:-moz-box;
+    display:-ms-flexbox;
+    display:flex;
     flex-direction: row;
     justify-content: space-between;
 
@@ -1603,10 +1613,16 @@ a.skeleton-bold-button {
 
 /* POPUP */
 .popup-holder {
-	display: flex;
+	display:-webkit-flex;
+    display:-webkit-box;
+    display:-moz-flex;
+    display:-moz-box;
+    display:-ms-flexbox;
+    display:flex;
 	align-items: center;
   	justify-content: center;
 	position: fixed;
+	flex-direction: column;
 	top: 0;
 	left: 0;
 	width: 100%;
@@ -1629,6 +1645,8 @@ a.skeleton-bold-button {
 	    font-weight: normal;
 	    font-size: 1.25rem;
 	    letter-spacing: 1px;
+		top: calc(50% - 150px / 2);
+		left: calc(50% - 350px / 2);
 
 		label {
 			display: block;

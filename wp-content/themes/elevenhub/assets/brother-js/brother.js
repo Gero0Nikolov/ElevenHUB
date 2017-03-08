@@ -730,6 +730,7 @@ var UserStory = function( userID = "" ) {
 									jQuery( "#media-popup-container #media-popup-fields #media-list .new" ).each(function(){
 										jQuery( this ).on("click", function(){
 											jQuery( "#story-featured-image" ).css( "background-image", "url("+ jQuery( this ).attr( "attachment_src" ) +")" );
+											jQuery( "#story-featured-image" ).attr( "attachment-id", jQuery( this ).attr( "id" ) );
 										});
 
 										jQuery( this ).removeClass( "new" );
