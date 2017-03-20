@@ -800,6 +800,26 @@ class BROTHER {
 	}
 
 	/*
+	*	Function name: generate_email_notification
+	*	Function arguments: $user_id [ INT ] (required), $notification_template [ STRING ] (required)
+	*	Function purpose: This function is used to send an email notification to the specified User by $user_id.
+	*/
+	function generate_email_notification( $user_id, $notification_template ) {
+		$email_notifications = get_user_meta( $user_id, "email_notifications", true );
+		if ( !isset( $email_notifications ) || empty( $email_notifications ) || $email_notifications == "true" ) {
+			$user = get_userdata( $user_id );
+			if ( isset( $user->user_email ) && !empty( $user->user_email ) ) {
+				wp_mail(
+					$user->user_email,
+					"11Hub Notification",
+					$notification_template,
+					array( "Content-Type: text/html; charset=UTF-8" )
+				);
+			}
+		}
+	}
+
+	/*
 	*	Functin name: get_user_notifications
 	*	Function arguments: $user_id [ INT ] (optional) (the ID of the desired user notifications).
 	*	Function purpose:
@@ -895,7 +915,7 @@ class BROTHER {
 	*	Function purpose:
 	*	This function is used to convert generic notification text to human readeble text.
 	*/
-	function convert_notification_text( $text, $notifier_id, $notified_id, $notificaiton_id, $notification_template_id ) {
+	function convert_notification_text( $text, $notifier_id, $notified_id, $notification_id, $notification_template_id ) {
 		$notification_converter_path = get_field( "notification_converter", $notification_template_id );
 		$notification_converter_path = !empty( $notification_converter_path ) && isset( $notification_converter_path ) && $notification_converter_path ? $notification_converter_path : get_template_directory() ."/notification-converters/". $notification_template_id .".php";
 
@@ -965,6 +985,11 @@ class BROTHER {
 				update_user_meta( $user_id, "user_biography", $data->biography, false );
 			}
 
+			if ( !empty( $data->notify_over_email ) && isset( $data->notify_over_email ) ) {
+				if ( empty( get_user_meta( $user_id, "email_notifications", false ) ) ) { add_user_meta( $user_id, "email_notifications", $data->notify_over_email ); }
+				else { update_user_meta( $user_id, "email_notifications", $data->notify_over_email ); }
+			}
+
 			// Logout user
 			wp_logout();
 
@@ -1006,6 +1031,11 @@ class BROTHER {
 
 			if ( empty( get_user_meta( $user_id, "company_media_uploads_permissions", false ) ) ) { add_user_meta( $user_id, "company_media_uploads_permissions", $data->company_media_uploads_permissions ); }
 			else { update_user_meta( $user_id, "company_media_uploads_permissions", $data->company_media_uploads_permissions ); }
+
+			if ( !empty( $data->notify_over_email ) && isset( $data->notify_over_email ) ) {
+				if ( empty( get_user_meta( $user_id, "email_notifications", false ) ) ) { add_user_meta( $user_id, "email_notifications", $data->notify_over_email ); }
+				else { update_user_meta( $user_id, "email_notifications", $data->notify_over_email ); }
+			}
 
 			// Logout user
 			wp_logout();
@@ -1341,6 +1371,7 @@ class BROTHER {
 			$story_container[ "meta" ][ "comments_count" ] = get_comments( array( "post_id" => $post_id, "count" => true ) );
 			$story_container[ "meta" ][ "is_liked" ] = $this->has_liked( get_current_user_id(), $post_id );
 			$story_container[ "meta" ][ "is_requester_employee" ] = $this->is_employee( $company_id, $user_id );
+			$story_container[ "meta" ][ "comments_allowed" ] = get_user_meta( $company_id, "company_publications_communication_permissions", true );
 			$story_container = (object)$story_container;
 		}
 

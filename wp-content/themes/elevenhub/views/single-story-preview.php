@@ -25,6 +25,7 @@ $company_first_name = get_user_meta( $company_id, "first_name", true );
 $company_last_name = get_user_meta( $company_id, "last_name", true );
 $company_short_name = get_user_meta( $company_id, "user_shortname", true );
 $company_url = get_author_posts_url( $company_id );
+$company_comments = get_user_meta( $company_id, "company_publications_communication_permissions", true );
 
 $author_avatar = $brother_->get_user_avatar_url( $author_id );
 $author_banner = $brother_->get_user_banner_url( $author_id );
@@ -56,8 +57,12 @@ $brother_->set_story_view( (object)array( "story_id" => $post_id ) );
 		<div class="post-content"><?php echo $brother_->convert_iframe_videos( $post_->post_content, false ); ?></div>
 		<div class="post-meta">
 			<button id="like-controller" class="fa <?php echo !$brother_->has_liked( "", $post_id ) ? "fa-heart-o" : "fa-heart" ; echo !$brother_->is_employee( $company_id, $author_id ) ? " inactive" : "" ; ?> control" story-id="<?php echo $post_id; ?>"><i class="numbers"><?php echo $post_likes; ?></i></button>
-			<button id="comment-controller" class="fa fa-comment <?php echo !$brother_->is_employee( $company_id, $author_id ) ? " inactive" : "" ; ?> control" story-id="<?php echo $post_id; ?>"><i class="numbers"><?php echo $post_comments_count; ?></i></button>
+			<?php
+			if ( $company_comments == "allow" ) { ?>
+				<button id="comment-controller" class="fa fa-comment <?php echo !$brother_->is_employee( $company_id, $author_id ) ? " inactive" : "" ; ?> control" story-id="<?php echo $post_id; ?>"><i class="numbers"><?php echo $post_comments_count; ?></i></button>
+			<?php } ?>
 		</div>
+		<?php if ( $company_comments == "allow" ) { ?>
 		<div id="comments-container" class="post-comments">
 			<div id="comments" class="comments-list">
 				<?php
@@ -93,6 +98,7 @@ $brother_->set_story_view( (object)array( "story_id" => $post_id ) );
 			</div>
 			<?php } ?>
 		</div>
+		<?php } ?>
 	</div>
 </div>
 
@@ -100,6 +106,7 @@ $brother_->set_story_view( (object)array( "story_id" => $post_id ) );
 initializeSingleStoryControls();
 
 jQuery( document ).ready(function(){
+	<?php if ( $company_comments == "allow" ) { ?>
 	jQuery( ".story-container .post-comments .comment" ).each(function(){
 		jQuery( this ).find( ".edit-controller" ).on( "click", function(){
 			storyController = new UserStory();
@@ -114,6 +121,7 @@ jQuery( document ).ready(function(){
 			} );
 		} );
 	});
+	<?php } ?>
 });
 </script>
 <?php else: ?> <h1 class='no-information-message'>This company isn't public <i class="fa fa-frown-o"></i></h1> <?php endif; ?>

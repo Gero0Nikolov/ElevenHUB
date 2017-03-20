@@ -20,6 +20,7 @@ $company_type = get_user_meta( $user_id, "company_type", true );
 $company_writing_permissions = get_user_meta( $user_id, "company_writing_permissions", true );
 $company_media_uploads_permissions = get_user_meta( $user_id, "company_media_uploads_permissions", true );
 $company_publications_communication_permissions = get_user_meta( $user_id, "company_publications_communication_permissions", true );
+$company_notify_over_email = get_user_meta( $user_id, "email_notifications", true );
 ?>
 <div id="user-meta-container">
 	<div class="user-meta-container">
@@ -51,6 +52,11 @@ $company_publications_communication_permissions = get_user_meta( $user_id, "comp
 			<option id="only-me" value="only-me">Only me</option>
 			<option id="everyone" value="everyone">Everyone</option>
 		</select>
+		<label for="notify_over_email">Email notification when somethig happens?</label>
+		<select id="notify_over_email">
+			<option id="true" value="true">Yes</option>
+			<option id="false" value="false">No</option>
+		</select>
 		<button id="save-company-meta" class="green-bold-button">Save</button>
 	</div>
 </div>
@@ -62,6 +68,7 @@ jQuery( document ).ready(function(){
 	jQuery( "#company-writing-permissions #<?php echo $company_writing_permissions; ?>" ).attr( "selected", "selected" );
 	jQuery( "#company-publications-communication-permissions #<?php echo $company_publications_communication_permissions; ?>" ).attr( "selected", "selected" );
 	jQuery( "#company-media-uploads-permissions #<?php echo $company_media_uploads_permissions; ?>" ).attr( "selected", "selected" );
+	jQuery( "#notify_over_email #<?php echo $company_notify_over_email; ?>" ).attr( "selected", "selected" );
 
 });
 </script>

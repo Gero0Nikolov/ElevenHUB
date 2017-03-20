@@ -519,6 +519,8 @@ var UserMeta = function( userID = "" ) {
 		new_password = jQuery( formID ).find( "#user-password" ).val().trim();
 		biography = jQuery( formID ).find( "#biography" ).val().trim();
 
+		notify_over_email = jQuery( formID ).find( "#notify_over_email option:selected" ).val().trim();
+
 		current_password = jQuery( passwordPromptID ).find( "#current-password" ).val().trim();
 
 		generateAJAX({
@@ -529,6 +531,7 @@ var UserMeta = function( userID = "" ) {
 					last_name: last_name,
 					new_password: new_password,
 					biography: biography,
+					notify_over_email: notify_over_email,
 					current_password: current_password
 				}
 			}, function( response ) { onSuccess( JSON.parse( response ) ); }
@@ -551,6 +554,8 @@ var UserMeta = function( userID = "" ) {
 		company_publications_communication_permissions = jQuery( formID ).find( "#company-publications-communication-permissions option:selected" ).val().trim();
 		company_media_uploads_permissions = jQuery( formID ).find( "#company-media-uploads-permissions option:selected" ).val().trim();
 
+		notify_over_email = jQuery( formID ).find( "#notify_over_email option:selected" ).val().trim();
+
 		current_password = jQuery( passwordPromptID ).find( "#current-password" ).val().trim();
 
 		generateAJAX({
@@ -565,6 +570,7 @@ var UserMeta = function( userID = "" ) {
 					company_writing_permissions: company_writing_permissions,
 					company_publications_communication_permissions: company_publications_communication_permissions,
 					company_media_uploads_permissions: company_media_uploads_permissions,
+					notify_over_email: notify_over_email,
 					current_password: current_password
 				}
 			}, function( response ) { onSuccess( JSON.parse( response ) ); }

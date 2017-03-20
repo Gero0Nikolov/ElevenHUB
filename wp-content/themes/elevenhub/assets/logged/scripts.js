@@ -609,7 +609,6 @@ function listenForNewUserNotifications( userID = "", listed_notifications_ids = 
 			if ( notification.notification_viewed == 0 ) {
 				notification_not_viewed_class = "unopened-notification";
 				unseen_notifications += 1;
-
 				notification.notification_body.notification_link += (notification.notification_body.notification_link.indexOf( "?" ) < 0 ? "?" : "&") + "read_notification=" + notification.row_id;
 			}
 
@@ -768,11 +767,16 @@ function openStoryReader( storyID, slideToComments = false ) {
 			<button id='story-like-controller' class='like-button fa "+ like_sign +" hvr-bounce-out' story-id='"+ storyID +"'><i class='numbers'>"+ story_.meta.likes.length +"</i></button>\
 			<button id='story-comments-controller' class='comment-button fa fa-comment hvr-bounce-out' story-id='"+ storyID +"'><i class='numbers'>"+ story_.meta.comments_count +"</i></button>\
 		</div>\
-		<div id='comments-container' class='story-comments'>\
-			<div id='comments'>"+ loading +"</div>\
-			"+ comment_composer +"\
-		</div>\
 		";
+
+		if ( story_.meta.comments_allowed == "allow" ) {
+			view += "\
+			<div id='comments-container' class='story-comments'>\
+				<div id='comments'>"+ loading +"</div>\
+				"+ comment_composer +"\
+			</div>\
+			";
+		}
 
 		jQuery( "#story-reader-popup #story-reader-inline #loader" ).remove();
 		jQuery( "#story-reader-popup #story-reader-inline" ).append( view );
@@ -788,19 +792,39 @@ function openStoryReader( storyID, slideToComments = false ) {
 				else if ( response.action == "dislike" ) { actionController.removeClass( "fa-heart" ).addClass( "fa-heart-o" ); }
 			} );
 		} );
-		jQuery( "#story-reader-popup #story-reader-inline .story-meta #story-comments-controller" ).on( "click", function(){
-			jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder" ).focus();
-		} );
 
-		jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder" ).on( "keydown", function( e ){
-			if ( e.keyCode == 13 ) {
+		if ( story_.meta.comments_allowed == "allow" ) {
+			jQuery( "#story-reader-popup #story-reader-inline .story-meta #story-comments-controller" ).on( "click", function(){
+				jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder" ).focus();
+			} );
+
+			jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder" ).on( "keydown", function( e ){
+				if ( e.keyCode == 13 ) {
+					storyID = jQuery( "#story-reader-popup #story-reader-inline .story-meta #story-comments-controller" ).attr( "story-id" );
+					commentID = jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder" ).attr( "comment-id" );
+					commentContent = jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder" ).val().trim();
+
+					var storyController = new UserStory();
+					storyController.publishComment( storyID, "", commentContent, commentID, function( response ){
+						jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder" ).val( "" ).removeAttr( "comment-id" );
+						storyController.getComments( storyID, "", function( response ) {
+							if ( Array.isArray( response ) ) {
+								jQuery( "#story-reader-popup #story-reader-inline .story-meta #story-comments-controller .numbers" ).html( response.length );
+								parseComments( response );
+							}
+						} );
+					} );
+				}
+			} );
+
+			jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-controller" ).on( "click", function(){
 				storyID = jQuery( "#story-reader-popup #story-reader-inline .story-meta #story-comments-controller" ).attr( "story-id" );
 				commentID = jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder" ).attr( "comment-id" );
 				commentContent = jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder" ).val().trim();
 
 				var storyController = new UserStory();
 				storyController.publishComment( storyID, "", commentContent, commentID, function( response ){
-					jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder" ).val( "" ).removeAttr( "comment-id" );
+					jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder" ).val( "" );
 					storyController.getComments( storyID, "", function( response ) {
 						if ( Array.isArray( response ) ) {
 							jQuery( "#story-reader-popup #story-reader-inline .story-meta #story-comments-controller .numbers" ).html( response.length );
@@ -808,36 +832,19 @@ function openStoryReader( storyID, slideToComments = false ) {
 						}
 					} );
 				} );
-			}
-		} );
-
-		jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-controller" ).on( "click", function(){
-			storyID = jQuery( "#story-reader-popup #story-reader-inline .story-meta #story-comments-controller" ).attr( "story-id" );
-			commentID = jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder" ).attr( "comment-id" );
-			commentContent = jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder" ).val().trim();
-
-			var storyController = new UserStory();
-			storyController.publishComment( storyID, "", commentContent, commentID, function( response ){
-				jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder" ).val( "" );
-				storyController.getComments( storyID, "", function( response ) {
-					if ( Array.isArray( response ) ) {
-						jQuery( "#story-reader-popup #story-reader-inline .story-meta #story-comments-controller .numbers" ).html( response.length );
-						parseComments( response );
-					}
-				} );
 			} );
-		} );
 
-		// Pull comments
-		storyController = new UserStory();
-		storyController.getComments( storyID, "", function( response ) { if ( Array.isArray( response ) ) { parseComments( response ); } } );
+			// Pull comments
+			storyController = new UserStory();
+			storyController.getComments( storyID, "", function( response ) { if ( Array.isArray( response ) ) { parseComments( response ); } } );
 
-		// Slide to comments - If needed
-		if ( slideToComments == true ) {
-			jQuery( "#story-reader-popup #story-reader-inline" ).animate({
-        		scrollTop: jQuery( "#story-reader-popup #story-reader-inline #comments-container").offset().top
-    		}, 2000);
-			jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder").focus();
+			// Slide to comments - If needed
+			if ( slideToComments == true ) {
+				jQuery( "#story-reader-popup #story-reader-inline" ).animate({
+	        		scrollTop: jQuery( "#story-reader-popup #story-reader-inline #comments-container").offset().top
+	    		}, 2000);
+				jQuery( "#story-reader-popup #story-reader-inline .comment-composer #comment-holder").focus();
+			}
 		}
 	});
 }
