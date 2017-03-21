@@ -50,9 +50,7 @@ var companyID = "<?php echo $v_user_id; ?>";
         <button id="composer-controller" class="green-bold-button">Compose</button>
         <span class="bull-separator">&bull;</span>
         <?php } ?>
-        <button id="events-controller" class="orange-bold-button">Events</button>
         <?php if ( $company_meta->media_uploads_permissions == "everyone" ) { ?>
-        <span class="bull-separator">&bull;</span>
         <a href="<?php echo get_permalink( 98 ) ."?company_id=". $v_user_id; ?>" id="media-conroller" class="grape-bold-button">Media</a>
         <?php } ?>
         <span class="bull-separator">&bull;</span>
