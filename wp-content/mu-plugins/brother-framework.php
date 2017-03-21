@@ -65,29 +65,31 @@ class BROTHER {
 	*/
 	function upload_user_media_files() {
 		$uploader_id = get_current_user_id();
-		$company_id = $_POST[ "company_id" ];
+		$company_id = intval( $_POST[ "company_id" ] );
 		$total = count( $_FILES[ "upload" ] );
 
-		if (
-			( isset( $company_id ) && !empty( $company_id ) ) &&
-			( isset( $_FILES[ "upload" ] ) && !empty( $_FILES[ "upload" ] ) && $total > 0 )
-	 	) {
-			for ( $count = 0; $count < $total; $count++ ) {
-				if ( !empty( $_FILES[ "upload" ][ "name" ][ $count ] ) && isset( $_FILES[ "upload" ][ "name" ][ $count ] ) ) {
-					$_FILE =  array();
-					$_FILE[ "name" ] = $_FILES[ "upload" ][ "name" ][ $count ];
-					$_FILE[ "type" ] = $_FILES[ "upload" ][ "type" ][ $count ];
-					$_FILE[ "tmp_name" ] = $_FILES[ "upload" ][ "tmp_name" ][ $count ];
-					$_FILE[ "error" ] = $_FILES[ "upload" ][ "error" ][ $count ];
-					$_FILE[ "size" ] = $_FILES[ "upload" ][ "size" ][ $count ];
+		if ( is_int( $company_id ) ) {
+			if (
+				( isset( $company_id ) && !empty( $company_id ) ) &&
+				( isset( $_FILES[ "upload" ] ) && !empty( $_FILES[ "upload" ] ) && $total > 0 )
+		 	) {
+				for ( $count = 0; $count < $total; $count++ ) {
+					if ( !empty( $_FILES[ "upload" ][ "name" ][ $count ] ) && isset( $_FILES[ "upload" ][ "name" ][ $count ] ) ) {
+						$_FILE =  array();
+						$_FILE[ "name" ] = $_FILES[ "upload" ][ "name" ][ $count ];
+						$_FILE[ "type" ] = $_FILES[ "upload" ][ "type" ][ $count ];
+						$_FILE[ "tmp_name" ] = $_FILES[ "upload" ][ "tmp_name" ][ $count ];
+						$_FILE[ "error" ] = $_FILES[ "upload" ][ "error" ][ $count ];
+						$_FILE[ "size" ] = $_FILES[ "upload" ][ "size" ][ $count ];
 
-					$upload_result = $this->upload_user_file( $_FILE, array( "owner_id" => $company_id, "uploader_id" => $uploader_id ) );
-					$upload_result = !$upload_result ? "&upload_result=false" : ( $upload_result == "Not enough space" ? "&upload_result=nes" : "" );
+						$upload_result = $this->upload_user_file( $_FILE, array( "owner_id" => $company_id, "uploader_id" => $uploader_id ) );
+						$upload_result = !$upload_result ? "&upload_result=false" : ( $upload_result == "Not enough space" ? "&upload_result=nes" : "" );
+					}
 				}
 			}
-		}
 
-		wp_redirect( get_permalink( 98 ) ."?company_id=". $company_id . $upload_result );
+			wp_redirect( get_permalink( 98 ) ."?company_id=". $company_id . $upload_result );
+		}
 	}
 
 	/*
@@ -421,28 +423,30 @@ class BROTHER {
 	*	Or if the $user_id is empty, the function will get the current logged user id.
 	*/
 	function get_user_followers( $user_id = "" ) {
-		$user_id = empty( $user_id ) ? get_current_user_id() : $user_id ;
+		$user_id = empty( $user_id ) ? get_current_user_id() : intval( $user_id );
 
-		$followers_holder = array();
+		if ( is_int( $user_id ) ) {
+			$followers_holder = array();
 
-		global $wpdb;
-		$table_ = $wpdb->prefix ."user_relations";
-		$sql_ = "SELECT * FROM $table_ WHERE user_followed_id=$user_id AND user_follower_id IS NOT NULL";
-		$followers = $wpdb->get_results( $sql_, OBJECT );
+			global $wpdb;
+			$table_ = $wpdb->prefix ."user_relations";
+			$sql_ = "SELECT * FROM $table_ WHERE user_followed_id=$user_id AND user_follower_id IS NOT NULL";
+			$followers = $wpdb->get_results( $sql_, OBJECT );
 
-		foreach ( $followers as $follower ) {
-			$follower_holder = array();
-			$follower_holder[ "row_id" ] = $follower->id;
-			$follower_holder[ "user_follower_body" ][ "user_id" ] = $follower->user_follower_id;
-			$follower_holder[ "user_follower_body" ][ "user_url" ] = get_author_posts_url( $follower->user_follower_id );
-			$follower_holder[ "user_follower_body" ][ "user_avatar_url" ] = $this->get_user_avatar_url( $follower->user_follower_id );
-			$follower_holder[ "user_follower_body" ][ "user_first_name" ] = get_user_meta( $follower->user_follower_id, "first_name", true );
-			$follower_holder[ "user_follower_body" ][ "user_last_name" ] = get_user_meta( $follower->user_follower_id, "last_name", true );
-			$follower_holder[ "user_follower_body" ][ "user_shortname" ] = get_user_meta( $follower->user_follower_id, "user_shortname", true );
-			array_push( $followers_holder, (object)$follower_holder );
-		}
+			foreach ( $followers as $follower ) {
+				$follower_holder = array();
+				$follower_holder[ "row_id" ] = $follower->id;
+				$follower_holder[ "user_follower_body" ][ "user_id" ] = $follower->user_follower_id;
+				$follower_holder[ "user_follower_body" ][ "user_url" ] = get_author_posts_url( $follower->user_follower_id );
+				$follower_holder[ "user_follower_body" ][ "user_avatar_url" ] = $this->get_user_avatar_url( $follower->user_follower_id );
+				$follower_holder[ "user_follower_body" ][ "user_first_name" ] = get_user_meta( $follower->user_follower_id, "first_name", true );
+				$follower_holder[ "user_follower_body" ][ "user_last_name" ] = get_user_meta( $follower->user_follower_id, "last_name", true );
+				$follower_holder[ "user_follower_body" ][ "user_shortname" ] = get_user_meta( $follower->user_follower_id, "user_shortname", true );
+				array_push( $followers_holder, (object)$follower_holder );
+			}
 
-		return $followers_holder;
+			return $followers_holder;
+		} else { return 0; }
 	}
 
 	/*
@@ -453,28 +457,30 @@ class BROTHER {
 	*	Or if the $user_id is empty, the function will get the current logged user id.
 	*/
 	function get_user_follows( $user_id = "" ) {
-		$user_id = empty( $user_id ) ? get_current_user_id() : $user_id ;
+		$user_id = empty( $user_id ) ? get_current_user_id() : intval( $user_id );
 
-		$follows_holder = array();
+		if ( is_int( $user_id ) ) {
+			$follows_holder = array();
 
-		global $wpdb;
-		$table_ = $wpdb->prefix ."user_relations";
-		$sql_ = "SELECT * FROM $table_ WHERE user_follower_id=$user_id AND user_followed_id IS NOT NULL";
-		$follows = $wpdb->get_results( $sql_, OBJECT );
+			global $wpdb;
+			$table_ = $wpdb->prefix ."user_relations";
+			$sql_ = "SELECT * FROM $table_ WHERE user_follower_id=$user_id AND user_followed_id IS NOT NULL";
+			$follows = $wpdb->get_results( $sql_, OBJECT );
 
-		foreach ( $follows as $follow ) {
-			$follow_holder = array();
-			$follow_holder[ "row_id" ] = $follow->id;
-			$follow_holder[ "user_follow_body" ][ "user_id" ] = $follow->user_follow_id;
-			$follow_holder[ "user_follow_body" ][ "user_url" ] = get_author_posts_url( $follow->user_followed_id );
-			$follow_holder[ "user_follow_body" ][ "user_avatar_url" ] = $this->get_user_avatar_url( $follow->user_followed_id );
-			$follow_holder[ "user_follow_body" ][ "user_first_name" ] = get_user_meta( $follow->user_followed_id, "first_name", true );
-			$follow_holder[ "user_follow_body" ][ "user_last_name" ] = get_user_meta( $follow->user_followed_id, "last_name", true );
-			$follow_holder[ "user_follow_body" ][ "user_shortname" ] = get_user_meta( $follow->user_followed_id, "user_shortname", true );
-			array_push( $follows_holder, (object)$follow_holder );
-		}
+			foreach ( $follows as $follow ) {
+				$follow_holder = array();
+				$follow_holder[ "row_id" ] = $follow->id;
+				$follow_holder[ "user_follow_body" ][ "user_id" ] = $follow->user_follow_id;
+				$follow_holder[ "user_follow_body" ][ "user_url" ] = get_author_posts_url( $follow->user_followed_id );
+				$follow_holder[ "user_follow_body" ][ "user_avatar_url" ] = $this->get_user_avatar_url( $follow->user_followed_id );
+				$follow_holder[ "user_follow_body" ][ "user_first_name" ] = get_user_meta( $follow->user_followed_id, "first_name", true );
+				$follow_holder[ "user_follow_body" ][ "user_last_name" ] = get_user_meta( $follow->user_followed_id, "last_name", true );
+				$follow_holder[ "user_follow_body" ][ "user_shortname" ] = get_user_meta( $follow->user_followed_id, "user_shortname", true );
+				array_push( $follows_holder, (object)$follow_holder );
+			}
 
-		return $follows_holder;
+			return $follows_holder;
+		} else { return 0; }
 	}
 
 	/*
@@ -485,27 +491,30 @@ class BROTHER {
 	*/
 	function get_user_employees( $user_id = "" ) {
 		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
+		else { $user_id = intval( $user_id ); }
 
-		$employees_holder = array();
+		if ( is_int( $user_id ) ) {
+			$employees_holder = array();
 
-		global $wpdb;
-		$table_ = $wpdb->prefix ."user_relations";
-		$sql_ = "SELECT * FROM $table_ WHERE user_employer_id=$user_id";
-		$employees = $wpdb->get_results( $sql_, OBJECT );
+			global $wpdb;
+			$table_ = $wpdb->prefix ."user_relations";
+			$sql_ = "SELECT * FROM $table_ WHERE user_employer_id=$user_id";
+			$employees = $wpdb->get_results( $sql_, OBJECT );
 
-		foreach ( $employees as $employee ) {
-			$employee_holder = array();
-			$employee_holder[ "row_id" ] = $employee->id;
-			$employee_holder[ "user_employee_body" ][ "user_id" ] = $employee->user_followed_id;
-			$employee_holder[ "user_employee_body" ][ "user_url"] = get_author_posts_url( $employee->user_followed_id );
-			$employee_holder[ "user_employee_body" ][ "user_avatar_url" ] = $this->get_user_avatar_url( $employee->user_followed_id );
-			$employee_holder[ "user_employee_body" ][ "user_first_name" ] = get_user_meta( $employee->user_followed_id, "first_name", true );
-			$employee_holder[ "user_employee_body" ][ "user_last_name" ] = get_user_meta( $employee->user_followed_id, "last_name", true );
-			$employee_holder[ "user_employee_body" ][ "user_shortname" ] = get_user_meta( $employee->user_followed_id, "user_shortname", true );
-			array_push( $employees_holder, (object)$employee_holder );
-		}
+			foreach ( $employees as $employee ) {
+				$employee_holder = array();
+				$employee_holder[ "row_id" ] = $employee->id;
+				$employee_holder[ "user_employee_body" ][ "user_id" ] = $employee->user_followed_id;
+				$employee_holder[ "user_employee_body" ][ "user_url"] = get_author_posts_url( $employee->user_followed_id );
+				$employee_holder[ "user_employee_body" ][ "user_avatar_url" ] = $this->get_user_avatar_url( $employee->user_followed_id );
+				$employee_holder[ "user_employee_body" ][ "user_first_name" ] = get_user_meta( $employee->user_followed_id, "first_name", true );
+				$employee_holder[ "user_employee_body" ][ "user_last_name" ] = get_user_meta( $employee->user_followed_id, "last_name", true );
+				$employee_holder[ "user_employee_body" ][ "user_shortname" ] = get_user_meta( $employee->user_followed_id, "user_shortname", true );
+				array_push( $employees_holder, (object)$employee_holder );
+			}
 
-		return $employees_holder;
+			return $employees_holder;
+		} else { return 0; }
 	}
 
 	/*
@@ -605,14 +614,18 @@ class BROTHER {
 	*	Function purpose: This function tells if the currently logged user follows a specific user by the $v_user_id argument.
 	*/
 	function is_follower( $v_user_id, $user_id = "" ) {
+		$v_user_id = intval( $v_user_id );
 		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
+		else { $user_id = intval( $user_id ); }
 
-		global $wpdb;
+		if ( is_int( $v_user_id ) && is_int( $user_id ) ) {
+			global $wpdb;
 
-		$table_ = $wpdb->prefix ."user_relations";
-		$sql_ = "SELECT * FROM $table_ WHERE user_followed_id=$v_user_id AND user_follower_id=$user_id";
+			$table_ = $wpdb->prefix ."user_relations";
+			$sql_ = "SELECT * FROM $table_ WHERE user_followed_id=$v_user_id AND user_follower_id=$user_id";
 
-		return !empty( $wpdb->get_results( $sql_, OBJECT ) ) ? true : false;
+			return !empty( $wpdb->get_results( $sql_, OBJECT ) ) ? true : false;
+		} else { return false; }
 	}
 
 	/*
@@ -621,17 +634,21 @@ class BROTHER {
 	*	Function purpose: This function tells if the currently logged user is employee of the specified company via the $v_user_id argument.
 	*/
 	function is_employee( $v_user_id, $user_id = "" ) {
+		$v_user_id = intval( $v_user_id );
 		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
+		else { $user_id = intval( $user_id ); }
 
-		if ( $v_user_id == $user_id ) { return true; }
-		else {
-			global $wpdb;
+		if ( is_int( $v_user_id ) && is_int( $user_id ) ) {
+			if ( $v_user_id == $user_id ) { return true; }
+			else {
+				global $wpdb;
 
-			$table_ = $wpdb->prefix ."user_relations";
-			$sql_ = "SELECT * FROM $table_ WHERE user_followed_id=$user_id AND user_employer_id=$v_user_id";
+				$table_ = $wpdb->prefix ."user_relations";
+				$sql_ = "SELECT * FROM $table_ WHERE user_followed_id=$user_id AND user_employer_id=$v_user_id";
 
-			return !empty( $wpdb->get_results( $sql_, OBJECT ) ) ? true : false;
-		}
+				return !empty( $wpdb->get_results( $sql_, OBJECT ) ) ? true : false;
+			}
+		} else { return false; }
 	}
 
 	/*
@@ -660,29 +677,31 @@ class BROTHER {
 	*	Function purpose: This function is used to generate user relation from TYPE: FOLLOW or UNFOLLOW
 	*/
 	function follow_or_unfollow_relation( $data ) {
-		$v_user_id = $data->v_user_id;
-		$user_id = $data->user_id;
+		$v_user_id = intval( $data->v_user_id );
+		$user_id = intval( $data->user_id );
 		$recalculate = $data->recalculate_followers;
 
-		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
-		$flag = "";
+		if ( is_int( $v_user_id ) && is_int( $user_id ) ) {
+			if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
+			$flag = "";
 
-		global $wpdb;
+			global $wpdb;
 
-		$table_ = $wpdb->prefix ."user_relations";
+			$table_ = $wpdb->prefix ."user_relations";
 
-		if ( $this->is_follower( $v_user_id ) ) {
-			$wpdb->delete( $table_, array( "user_followed_id" => $v_user_id, "user_follower_id" => $user_id ) );
-			$flag = "unfollowed";
-		} else {
-			$wpdb->insert( $table_, array( "user_followed_id" => $v_user_id, "user_follower_id" => $user_id ) );
-			$flag = "followed";
-			$this->generate_notification( 70, $v_user_id, $user_id );
-		}
+			if ( $this->is_follower( $v_user_id ) ) {
+				$wpdb->delete( $table_, array( "user_followed_id" => $v_user_id, "user_follower_id" => $user_id ) );
+				$flag = "unfollowed";
+			} else {
+				$wpdb->insert( $table_, array( "user_followed_id" => $v_user_id, "user_follower_id" => $user_id ) );
+				$flag = "followed";
+				$this->generate_notification( 70, $v_user_id, $user_id );
+			}
 
-		$flag = $data->recalculate_followers ? (object) array( "action_result" => $flag, "followers" => $this->get_user_followers( $v_user_id ) ) : $flag;
+			$flag = $data->recalculate_followers ? (object) array( "action_result" => $flag, "followers" => $this->get_user_followers( $v_user_id ) ) : $flag;
 
-		return $flag;
+			return $flag;
+		} else { return false; }
 	}
 
 	/*
