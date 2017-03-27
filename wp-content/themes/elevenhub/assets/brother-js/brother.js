@@ -1296,6 +1296,30 @@ var PublicLists = function() {
 	}
 }
 
+var Phubber = function() {
+	var classHolder = this;
+
+	this.updateUserPremium = function( userID = "", onSuccess ) {
+		generateAJAX({
+				functionName : "update_user_premium",
+				arguments : userID
+			}, function ( response ) { onSuccess( JSON.parse( JSON.parse( response ) ) ); }
+		);
+	}
+}
+
+var User = function() {
+	var classHolder = this;
+
+	this.getUserBadges = function( userID = "", onSuccess ) {
+		generateAJAX({
+				functionName : "get_user_badges",
+				arguments : userID
+			}, function ( response ) { onSuccess( JSON.parse( JSON.parse( response ) ) ); }
+		);
+	}
+}
+
 /*
 *	Function name: generateAJAX
 *	Function arguments: args [ JSON object ] (required), onSuccess [ FUNCTION ] (required) tells the function what to do after the response.

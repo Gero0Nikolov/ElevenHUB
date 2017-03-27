@@ -21,6 +21,10 @@ $company_writing_permissions = get_user_meta( $user_id, "company_writing_permiss
 $company_media_uploads_permissions = get_user_meta( $user_id, "company_media_uploads_permissions", true );
 $company_publications_communication_permissions = get_user_meta( $user_id, "company_publications_communication_permissions", true );
 $company_notify_over_email = get_user_meta( $user_id, "email_notifications", true );
+
+// Company premium
+$company_premium_end_int = get_user_meta( $user_id, "premium_end", true );
+$company_premium_end = !empty( $company_premium_end_int ) ? date( "d.m.Y", $company_premium_end_int ) : "";
 ?>
 <div id="user-meta-container">
 	<div class="user-meta-container">
@@ -57,6 +61,20 @@ $company_notify_over_email = get_user_meta( $user_id, "email_notifications", tru
 			<option id="true" value="true">Yes</option>
 			<option id="false" value="false">No</option>
 		</select>
+		<div id="premium-container" class="premium-container">
+			<p class="text">
+				<?php
+				if ( !empty( $company_premium_end ) ) { echo "Your premium will be active untill: ". $company_premium_end; }
+				else { echo "Your premium is not active yet"; }
+				?>
+			</p>
+			<a href="<?php echo get_permalink( 667 ); ?>" class="blue-bold-button">
+				<?php
+				if ( !empty( $company_premium_end ) ) { echo "Renew now"; }
+				else { echo "Activate it"; }
+				?>
+			</a>
+		</div>
 		<button id="save-company-meta" class="green-bold-button">Save</button>
 	</div>
 </div>

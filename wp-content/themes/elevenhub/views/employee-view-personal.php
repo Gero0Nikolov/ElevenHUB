@@ -32,6 +32,7 @@ $user_biography = get_user_meta( $user_id, "user_biography", true );
 				?>
 			</button>
 			<div class="user-text"><?php echo $user_biography; ?></div>
+			<div id="badges" class="badges"></div>
 		</div>
 	</div>
 	<div id="stories-board" class="stories-board">
@@ -56,4 +57,6 @@ jQuery( window ).scroll(function(){
 		lockStoriesLoad = true;
 	}
 });
+
+jQuery( document ).ready(function(){ getUserBadges(); });
 </script>

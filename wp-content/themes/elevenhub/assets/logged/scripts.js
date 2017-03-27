@@ -304,6 +304,80 @@ jQuery( document ).ready(function(){
 			jQuery( this ).on("click", function(){ openStoryReader( jQuery( this ).parent().attr( "id" ).split( "-" )[1] ); });
 		});
 	}
+
+	// Phubber payment method
+	if ( jQuery( "#phubber-page" ).length ) {
+		jQuery( "#phubber-page #get-phubber" ).on( "click", function(){
+			jQuery.ajax({
+				url : ajax_url,
+				type : 'post',
+				data : {
+					action : "get_paypal_settings"
+				},
+				success : function ( response ) {
+					paypal_settings = JSON.parse( response );
+					if ( paypal_settings.amount !== false ) {
+						// Create the PayPal button holder
+						if ( jQuery( "#phubber-page #paypal-button" ).length ) { jQuery( "#phubber-page #paypal-button" ).remove(); }
+						jQuery( "#phubber-page" ).append( "<div id='paypal-button'></div>" );
+
+						// Connect the button with PayPal
+						paypal.Button.render({
+
+					        env: paypal_settings.environment, // Optional: specify 'sandbox' environment
+
+					        client: {
+					            sandbox: paypal_settings.client_id_sandbox,
+					            production: paypal_settings.client_id_production
+					        },
+
+					        payment: function() {
+
+					            var env    = this.props.env;
+					            var client = this.props.client;
+
+					            return paypal.rest.payment.create(env, client, {
+					                transactions: [
+					                    {
+					                        amount: { total: paypal_settings.amount, currency: 'EUR' }
+					                    }
+					                ]
+					            });
+					        },
+
+					        commit: true, // Optional: show a 'Pay Now' button in the checkout flow
+
+					        onAuthorize: function(data, actions) {
+
+					            // Optional: display a confirmation page here
+
+					            return actions.payment.execute().then(function() {
+					                // Show a success page to the buyer
+									phubber_ = new Phubber;
+									phubber_.updateUserPremium( "", function( response ){
+										if ( response == null || response == "" ) {
+											view_ = "\
+											<div id='media-popup-container' class='popup-container animated fadeIn'>\
+												<div id='alert-box' class='animated bounceInDown'>Your premium account was activated!<button id='close-popup-button' onclick='removeAlertBox();'>Close</button></div>\
+											</div>\
+											";
+
+											jQuery( "body" ).append( view_ );
+											jQuery( "#media-popup-container" ).on("click", function( e ){ if( e.target == this ){ controller = new UserMedia(); controller.destroyMediaPopup(); } });
+											jQuery( "#media-popup-container #close-popup-button" ).on("click", function(){ controller = new UserMedia(); controller.destroyMediaPopup(); });
+										} else { console.log( response ); }
+									} );
+					            });
+					        }
+
+					    }, '#paypal-button');
+
+						jQuery( "#phubber-page #get-phubber" ).remove();
+					}
+				}
+			});
+		} );
+	}
 });
 
 /*
@@ -1051,4 +1125,8 @@ function keyPressedForms( e, form ) {
 function openComposer() {
 	userComposerController = new UserStory();
 	userComposerController.buildComposer();
+}
+
+function getUserBadges( userID = "" ) {
+	
 }

@@ -175,7 +175,7 @@ body {
   .profile-board .user-board {
     display: inline-block;
     width: 30%;
-    padding-right: 0.5em; }
+    padding-right: 1em; }
     .profile-board .user-board .user-container {
       display: block;
       background-size: cover;
@@ -303,7 +303,7 @@ body {
   .profile-board .stories-board {
     display: inline-block;
     width: 70%;
-    padding-left: 0.5em;
+    padding-left: 1em;
     border-left: 1px dashed #ddd; }
     .profile-board .stories-board .post-anchor {
       display: block;
@@ -960,6 +960,46 @@ body {
     .popup-container .user-relations-body .hidden.user-list {
       display: none; }
 
+/** PHUBBER PAGE **/
+.phubber-page {
+  width: 550px;
+  max-width: 100%;
+  margin: 0 auto;
+  text-align: center;
+  position: relative; }
+  .phubber-page .header {
+    font-family: OpenSansBold;
+    font-size: 3rem;
+    font-weight: normal;
+    color: #34495e;
+    margin: 1em auto 0.5em; }
+    .phubber-page .header .red-block {
+      color: #e74c3c; }
+  .phubber-page .sub-header {
+    display: block;
+    font-family: OpenSansBold;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #333;
+    background: none;
+    padding: 0.25em 0.5em;
+    border-radius: 5px;
+    margin: 1em auto 1em;
+    text-align: center;
+    text-transform: uppercase;
+    color: #8a8a8a; }
+  .phubber-page .content ul {
+    font-family: PlayFairREgular;
+    font-size: 1.5rem;
+    font-weight: normal;
+    margin: 0;
+    text-align: left;
+    line-height: 200%; }
+  .phubber-page button {
+    display: block;
+    margin: 2.75em auto;
+    width: 50%; }
+
 /** GLOBAL CLASSES **/
 .file-picker {
   display: block;
@@ -1028,6 +1068,12 @@ body {
   vertical-align: middle;
   margin: 0 1em;
   color: #bdc3c7; }
+
+#paypal-button {
+  display: block;
+  margin: 2.75em auto; }
+  #paypal-button iframe {
+    margin: 0 auto; }
 
 .notifications-controller {
   display: inline-block;
@@ -1204,6 +1250,20 @@ body {
     width: 50%;
     display: block;
     margin: 2em auto; }
+  #user-meta-container .user-meta-container .premium-container {
+    display: block;
+    text-align: center;
+    margin: 2em auto; }
+    #user-meta-container .user-meta-container .premium-container .text {
+      display: inline-block;
+      font-family: OpenSansRegular;
+      font-size: 1.25rem;
+      font-weight: normal;
+      color: #333;
+      margin: 0 0.5em;
+      vertical-align: middle; }
+    #user-meta-container .user-meta-container .premium-container a {
+      margin: 0.25em 0.5em; }
 
 .richtext {
   display: block;
@@ -2688,5 +2748,13 @@ body {
   font-size: 6rem;
   display: block;
   margin: 0 auto; }
+.mobile .phubber-page .header {
+  margin: 0.5em auto; }
+.mobile .phubber-page .content ul {
+  font-size: 1.35rem; }
+.mobile .phubber-page button {
+  margin: 2.5em auto;
+  width: 95%;
+  font-size: 1rem; }
 
 /*# sourceMappingURL=style.css.map */

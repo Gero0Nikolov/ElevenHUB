@@ -331,3 +331,22 @@ function get_public_stories( $offset = 0 ) {
 add_action( 'wp_ajax_nopriv_call_get_public_stories', 'call_get_public_stories' );
 add_action( 'wp_ajax_call_get_public_stories', 'call_get_public_stories' );
 function call_get_public_stories() { get_public_stories( $_POST[ "offset" ] ); die(); }
+
+add_action( 'wp_ajax_nopriv_get_paypal_settings', 'get_paypal_settings' );
+add_action( 'wp_ajax_get_paypal_settings', 'get_paypal_settings' );
+function get_paypal_settings() {
+	$user_id = isset( $_POST[ "user_id" ] ) && !empty( $_POST[ "user_id" ] ) ? intval( $_POST[ "user_id" ] ) : get_current_user_id();
+	$association_type = get_user_meta( $user_id, "account_association", true );
+
+	$phubber_metas = get_post_meta( 667 ); // Post ID = 667 is the ID of the Phubber page.
+
+	$paypal_settings = new stdClass;
+	$paypal_settings->environment = $phubber_metas[ "paypal_environment" ][ 0 ];
+	$paypal_settings->client_id_sandbox = $phubber_metas[ "paypal_client_id_sandbox" ][ 0 ];
+	$paypal_settings->client_id_production = $phubber_metas[ "paypal_client_id_production" ][ 0 ];
+	$paypal_settings->amount = $association_type == "company" ? explode( ";", $phubber_metas[ "company_price" ][ 0 ] )[ 1 ] : ( $association_type == "employee" ? explode( ";", $phubber_metas[ "employee_price" ][ 0 ] )[ 1 ] : false );
+
+	echo json_encode( $paypal_settings );
+
+	die( "" );
+}

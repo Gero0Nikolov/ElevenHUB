@@ -14,6 +14,10 @@ $user_first_name = get_user_meta( $user_id, "first_name", true );
 $user_last_name = get_user_meta( $user_id, "last_name", true );
 $user_notify_over_email = get_user_meta( $user_id, "email_notifications", true );
 $user_biography = get_user_meta( $user_id, "user_biography", true );
+
+// User premium
+$user_premium_end_int = get_user_meta( $user_id, "premium_end", true );
+$user_premium_end = !empty( $user_premium_end_int ) ? date( "d.m.Y", $user_premium_end_int ) : "";
 ?>
 <div id="user-meta-container">
 	<div class="user-meta-container">
@@ -30,6 +34,20 @@ $user_biography = get_user_meta( $user_id, "user_biography", true );
 		</select>
 		<label for="biography">About me:</label>
 		<textarea id="biography" class="richtext" placeholder="Who are you?"><?php echo $user_biography; ?></textarea>
+		<div id="premium-container" class="premium-container">
+			<p class="text">
+				<?php
+				if ( !empty( $company_premium_end ) ) { echo "Your premium will be active untill: ". $company_premium_end; }
+				else { echo "Your premium is not active yet"; }
+				?>
+			</p>
+			<a href="<?php echo get_permalink( 667 ); ?>" class="blue-bold-button">
+				<?php
+				if ( !empty( $company_premium_end ) ) { echo "Renew now"; }
+				else { echo "Activate it"; }
+				?>
+			</a>
+		</div>
 		<button id="save-user-meta" class="green-bold-button">Save</button>
 	</div>
 </div>
