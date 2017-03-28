@@ -361,6 +361,11 @@ var UserRelations = function( vUserID, userID = "" ) {
 		});
 	}
 
+	/*
+	*	Function name: buildCompanyLeaveDialog
+	*	Function arguments: NONE
+	*	Function purpose: This function is used to construct a dialog for company leave.
+	*/
 	this.buildCompanyLeaveDialog = function() {
 		view_ = "\
 		<div id='media-popup-container' class='popup-container animated fadeIn'>\
@@ -1281,9 +1286,19 @@ var UserStory = function( userID = "" ) {
 	}
 }
 
+/*
+*	Class name: PublicLists
+*	Class arguments: NONE
+*	Class purpose: This class is used to control the public lists (hubbers, companies) of the HUB project.
+*/
 var PublicLists = function() {
 	var classHolder = this;
 
+	/*
+	*	Function name: getMoreHubbers
+	*	Function arguments: usersOffset [ INT ] (required), onSuccess [ FUNCTION ] (required)
+	*	Function purpose: This function is used to retrieve more users from the Global DB of the HUB project.
+	*/
 	this.getMoreHubbers = function( usersOffset, onSuccess ) {
 		generateAJAX({
 				functionName : "get_hubbers",
@@ -1296,9 +1311,19 @@ var PublicLists = function() {
 	}
 }
 
+/*
+*	Class name: Phubber
+*	Class arguments: NONE
+*	Class purpose: This class is used to control the user premium part of the HUB project.
+*/
 var Phubber = function() {
 	var classHolder = this;
 
+	/*
+	*	Function name: updateUserPremium
+	*	Function arguments: userID [ INT ] (optional), onSuccess [ FUNCTION ]
+	*	Function purpose: This function is used update the Premium period of the specified user.
+	*/
 	this.updateUserPremium = function( userID = "", onSuccess ) {
 		generateAJAX({
 				functionName : "update_user_premium",
