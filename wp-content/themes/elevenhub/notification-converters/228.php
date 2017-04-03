@@ -6,7 +6,7 @@
 
 $_CONVERTER_URL_ = function( $url_, $notifier_id, $notified_id, $notification_id, $notification_meta = array() ){
 	$request_id = $notification_meta->company_joinrequest_id;
-	return str_replace( "[company_request_preview]", get_permalink( 85 ) ."?request_id=". $request_id, $url_ );
+	return str_replace( "[company_invite_preview]", get_permalink( 85 ) ."?request_id=". $request_id, $url_ );
 };
 
 $_CONVERTER_TXT_ = function( $text_, $notifier_id, $notified_id, $notificaiton_id, $notification_meta = array() ){

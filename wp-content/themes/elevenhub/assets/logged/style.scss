@@ -742,6 +742,17 @@ body { margin: 0 !important; padding: 0 !important; }
 		border-radius: 5px;
 	    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.25);
 
+		.popup-header {
+			display: block;
+		    margin: 0.25em auto 0;
+		    text-align: center;
+		    font-family: OpenSansRegular;
+		    font-size: 1.75rem;
+		    font-weight: normal;
+		    color: #333;
+		    letter-spacing: 1px;
+		}
+
 		.inline-media {
 			display: inline-block;
 		    width: 1.85em;
