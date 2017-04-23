@@ -518,6 +518,40 @@ class BROTHER {
 	}
 
 	/*
+	*	Function name: get_user_employers
+	*	Function arguments: $user_id [ INT ] (optional)
+	*	Function purpose:
+	*	This function is used to return the employers of the specified by $user_id , USER.
+	*/
+	function get_user_employers( $user_id = "" ) {
+		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
+		else { $user_id = intval( $user_id ); }
+
+		if ( is_int( $user_id ) && $user_id != 0 ) {
+			$employers_holder = array();
+
+			global $wpdb;
+			$table_ = $wpdb->prefix ."user_relations";
+			$sql_ = "SELECT * FROM $table_ WHERE user_followed_id=$user_id AND user_employer_id IS NOT NULL";
+			$employers = $wpdb->get_results( $sql_, OBJECT );
+
+			foreach ( $employers as $employer ) {
+				$employer_container = new stdClass;
+				$employer_container->row_id = $employer->id;
+				$employer_container->employer->user_id = $employer->user_employer_id;
+				$employer_container->employer->user_url = get_author_posts_url( $employer->user_employer_id );
+				$employer_container->employer->avatar_url = $this->get_user_avatar_url( $employer->user_employer_id );
+				$employer_container->employer->first_name = get_user_meta( $employer->user_employer_id, "first_name", true );
+				$employer_container->employer->last_name = get_user_meta( $employer->user_employer_id, "last_name", true );
+				$employer_container->employer->short_name = get_user_meta( $employer->user_employer_id, "user_shortname", true );
+				array_push( $employers_holder, $employer_container );
+			}
+
+			return $employers_holder;
+		} else { return 0; }
+	}
+
+	/*
 	*	Function name: get_search_results
 	*	Function arguments: $data [ MIXED_OBJECT ] (required) (contains the searched user:
 																			First Name,
@@ -530,13 +564,15 @@ class BROTHER {
 																			)
 	*	Function purpose:
 	*	This function is used to search for specific users or user group (Group relations).
-	*	It receives a MIXED_OBJECT from the front-end part which contains: $first_name [ STRING ], $last_name [ STRING ], $universal_name [ STRING ] && $relations [ ARRAY_STRING ].
+	*	It receives a MIXED_OBJECT from the front-end part which contains: $first_name [ STRING ], $last_name [ STRING ], $universal_name [ STRING ], $relations [ ARRAY_STRING ] && $user_id [ INT ].
 	*	It can be used for search in the _GLOBAL_ users of the HUB or just for a specific _GROUP_CASE_.
 	*/
 	function get_search_results( $data ) {
 		$data->first_name = sanitize_text_field( $data->first_name );
 		$data->last_name = sanitize_text_field( $data->last_name );
 		$data->universal_name = sanitize_text_field( $data->universal_name );
+
+		if ( empty( $data->user_id ) ) { $data->user_id = get_current_user_id(); }
 
 		global $wpdb;
 		$table_user_relations = $wpdb->prefix ."user_relations";
@@ -562,6 +598,10 @@ class BROTHER {
 
 					case "follows":
 						$sql_extension .= "usermeta.user_id IN ( SELECT user_followed_id FROM $table_user_relations WHERE user_follower_id = $data->user_id )";
+						break;
+
+					case "employers":
+						$sql_extension .= "usermeta.user_id IN ( SELECT user_employer_id FROM $table_user_relations WHERE user_followed_id = $data->user_id AND user_employer_id IS NOT NULL )";
 						break;
 
 					default:
@@ -745,61 +785,63 @@ class BROTHER {
 			$user_id = $user_id->user_id;
 		}
 
-		global $wpdb;
+		if ( is_int( $user_id ) ) {
+			global $wpdb;
 
-		$table_ = $wpdb->prefix ."user_relations";
-		$sql_ = !$is_company ? "SELECT * FROM $table_ WHERE ( user_followed_id=$user_id OR user_follower_id=$user_id ) AND user_follower_id IS NOT NULL" : "SELECT * FROM $table_ WHERE user_followed_id=$user_id OR user_employer_id=$user_id";
-		$results_ = $wpdb->get_results( $sql_, OBJECT );
+			$table_ = $wpdb->prefix ."user_relations";
+			$sql_ = !$is_company ? "SELECT * FROM $table_ WHERE ( user_followed_id=$user_id OR user_follower_id=$user_id ) AND user_follower_id IS NOT NULL" : "SELECT * FROM $table_ WHERE user_followed_id=$user_id OR user_employer_id=$user_id";
+			$results_ = $wpdb->get_results( $sql_, OBJECT );
 
-		$count_followers = 0;
-		if ( !$is_company ) { $count_follows = 0; } else { $count_employees = 0; }
+			$count_followers = 0;
+			if ( !$is_company ) { $count_follows = 0; } else { $count_employees = 0; }
 
-		$followers_ = array();
-		if ( !$is_company ) { $follows_ = array(); } else { $employees_ = array(); }
+			$followers_ = array();
+			if ( !$is_company ) { $follows_ = array(); } else { $employees_ = array(); }
 
-		foreach ( $results_ as $result_ ) {
-			if ( $result_->user_followed_id == $user_id ) { // Followers array
-				$followers_[ $count_followers ][ "row_id" ] = $result_->id;
-				$followers_[ $count_followers ][ "user_follower_body" ][ "user_id" ] = $result_->user_follower_id;
-				$followers_[ $count_followers ][ "user_follower_body" ][ "user_url" ] = get_author_posts_url( $result_->user_follower_id );
-				$followers_[ $count_followers ][ "user_follower_body" ][ "user_avatar_url" ] = $this->get_user_avatar_url( $result_->user_follower_id );
-				$followers_[ $count_followers ][ "user_follower_body" ][ "user_first_name" ] = get_user_meta( $result_->user_follower_id, "first_name", true );
-				$followers_[ $count_followers ][ "user_follower_body" ][ "user_last_name" ] = get_user_meta( $result_->user_follower_id, "last_name", true );
-				$followers_[ $count_followers ][ "user_follower_body" ][ "user_shortname" ] = get_user_meta( $result_->user_follower_id, "user_shortname", true );
+			foreach ( $results_ as $result_ ) {
+				if ( $result_->user_followed_id == $user_id ) { // Followers array
+					$followers_[ $count_followers ][ "row_id" ] = $result_->id;
+					$followers_[ $count_followers ][ "user_follower_body" ][ "user_id" ] = $result_->user_follower_id;
+					$followers_[ $count_followers ][ "user_follower_body" ][ "user_url" ] = get_author_posts_url( $result_->user_follower_id );
+					$followers_[ $count_followers ][ "user_follower_body" ][ "user_avatar_url" ] = $this->get_user_avatar_url( $result_->user_follower_id );
+					$followers_[ $count_followers ][ "user_follower_body" ][ "user_first_name" ] = get_user_meta( $result_->user_follower_id, "first_name", true );
+					$followers_[ $count_followers ][ "user_follower_body" ][ "user_last_name" ] = get_user_meta( $result_->user_follower_id, "last_name", true );
+					$followers_[ $count_followers ][ "user_follower_body" ][ "user_shortname" ] = get_user_meta( $result_->user_follower_id, "user_shortname", true );
 
-				$count_followers += 1;
-			} else { // Follows or Employees array
-				if ( !$is_company ) {
-					$follows_[ $count_follows ][ "row_id" ] = $result_->id;
-					$follows_[ $count_follows ][ "user_followed_body" ][ "user_id" ] = $result_->user_followed_id;
-					$follows_[ $count_follows ][ "user_followed_body" ][ "user_url" ] = get_author_posts_url( $result_->user_followed_id );
-					$follows_[ $count_follows ][ "user_followed_body" ][ "user_avatar_url" ] = $this->get_user_avatar_url( $result_->user_followed_id );
-					$follows_[ $count_follows ][ "user_followed_body" ][ "user_first_name" ] = get_user_meta( $result_->user_followed_id, "first_name", true );
-					$follows_[ $count_follows ][ "user_followed_body" ][ "user_last_name" ] = get_user_meta( $result_->user_followed_id, "last_name", true );
-					$follows_[ $count_follows ][ "user_followed_body" ][ "user_shortname" ] = get_user_meta( $result_->user_followed_id, "user_shortname", true );
+					$count_followers += 1;
+				} else { // Follows or Employees array
+					if ( !$is_company ) {
+						$follows_[ $count_follows ][ "row_id" ] = $result_->id;
+						$follows_[ $count_follows ][ "user_followed_body" ][ "user_id" ] = $result_->user_followed_id;
+						$follows_[ $count_follows ][ "user_followed_body" ][ "user_url" ] = get_author_posts_url( $result_->user_followed_id );
+						$follows_[ $count_follows ][ "user_followed_body" ][ "user_avatar_url" ] = $this->get_user_avatar_url( $result_->user_followed_id );
+						$follows_[ $count_follows ][ "user_followed_body" ][ "user_first_name" ] = get_user_meta( $result_->user_followed_id, "first_name", true );
+						$follows_[ $count_follows ][ "user_followed_body" ][ "user_last_name" ] = get_user_meta( $result_->user_followed_id, "last_name", true );
+						$follows_[ $count_follows ][ "user_followed_body" ][ "user_shortname" ] = get_user_meta( $result_->user_followed_id, "user_shortname", true );
 
-					$count_follows += 1;
-				} else {
-					$employees_[ $count_employees ][ "row_id" ] = $result_->id;
-					$employees_[ $count_employees ][ "user_employee_body" ][ "user_id" ] = $result_->user_followed_id;
-					$employees_[ $count_employees ][ "user_employee_body" ][ "user_url" ] = get_author_posts_url( $result_->user_followed_id );
-					$employees_[ $count_employees ][ "user_employee_body" ][ "user_avatar_url" ] = $this->get_user_avatar_url( $result_->user_followed_id );
-					$employees_[ $count_employees ][ "user_employee_body" ][ "user_first_name" ] = get_user_meta( $result_->user_followed_id, "first_name", true );
-					$employees_[ $count_employees ][ "user_employee_body" ][ "user_last_name" ] = get_user_meta( $result_->user_followed_id, "last_name", true );
-					$employees_[ $count_employees ][ "user_employee_body" ][ "user_shortname" ] = get_user_meta( $result_->user_shortname, "user_shortname", true );
+						$count_follows += 1;
+					} else {
+						$employees_[ $count_employees ][ "row_id" ] = $result_->id;
+						$employees_[ $count_employees ][ "user_employee_body" ][ "user_id" ] = $result_->user_followed_id;
+						$employees_[ $count_employees ][ "user_employee_body" ][ "user_url" ] = get_author_posts_url( $result_->user_followed_id );
+						$employees_[ $count_employees ][ "user_employee_body" ][ "user_avatar_url" ] = $this->get_user_avatar_url( $result_->user_followed_id );
+						$employees_[ $count_employees ][ "user_employee_body" ][ "user_first_name" ] = get_user_meta( $result_->user_followed_id, "first_name", true );
+						$employees_[ $count_employees ][ "user_employee_body" ][ "user_last_name" ] = get_user_meta( $result_->user_followed_id, "last_name", true );
+						$employees_[ $count_employees ][ "user_employee_body" ][ "user_shortname" ] = get_user_meta( $result_->user_shortname, "user_shortname", true );
 
-					$count_employees += 1;
+						$count_employees += 1;
+					}
 				}
 			}
-		}
 
-		$relations_ = array( "followers" => (object) $followers_ );
-		if ( !$is_company ) { $relations_ = array_merge( $relations_, array( "follows" => (object) $follows_ ) ); }
-		else { $relations_ = array_merge( $relations_, array( "employees" => (object) $employees_ ) ); }
+			$relations_ = array( "followers" => (object) $followers_ );
+			if ( !$is_company ) { $relations_ = array_merge( $relations_, array( "follows" => (object) $follows_ ) ); }
+			else { $relations_ = array_merge( $relations_, array( "employees" => (object) $employees_ ) ); }
 
-		$relations_ = json_encode( $relations_ );
+			$relations_ = json_encode( $relations_ );
 
-		return $relations_;
+			return $relations_;
+		} else { return false; }
 	}
 
 	/*
@@ -809,13 +851,18 @@ class BROTHER {
 	*/
 	function generate_notification( $notification_id, $v_user_id, $user_id = "" ) {
 		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
+		else { $user_id = intval( $user_id ); }
+		$v_user_id = intval( $v_user_id );
+		$notification_id = intval( $notification_id );
 
-		global $wpdb;
+		if ( is_int( $v_user_id ) && is_int( $user_id ) && is_int( $notification_id ) ) {
+			global $wpdb;
 
-		$table_ = $wpdb->prefix ."user_notifications";
-		$wpdb->insert( $table_, array( "notification_id" => $notification_id, "user_notified_id" => $v_user_id, "user_notifier_id" => $user_id ) );
+			$table_ = $wpdb->prefix ."user_notifications";
+			$wpdb->insert( $table_, array( "notification_id" => $notification_id, "user_notified_id" => $v_user_id, "user_notifier_id" => $user_id ) );
 
-		return $wpdb->insert_id;
+			return $wpdb->insert_id;
+		} else { return false; }
 	}
 
 	/*
@@ -2449,6 +2496,72 @@ class BROTHER {
 
 		if ( isset( $page_ ) && !empty( $page_ ) ) { return $page_[ 0 ]; }
 		else { return false; }
+	}
+
+	/*
+	*	Function name: is_phubber
+	*	Function arguments: $user_id [ INT ] (optional)
+	*	Function purpose: This function is used to check if used has activated his premium account.
+	*/
+	function is_phubber( $user_id = "" ) {
+		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
+		else { $user_id = intval( $user_id ); }
+
+		if ( is_int( $user_id ) ) {
+			$today_date_int = strtotime( date( "d-M-Y" ) );
+
+			$hubber_premium_start_int = get_user_meta( $user_id, "premium_start", true );
+			if ( empty( $hubber_premium_end_int ) ) { $hubber_premium_start_int = 0; }
+
+			$hubber_premium_end_int = get_user_meta( $user_id, "premium_end", true );
+			if ( empty( $hubber_premium_end_int ) ) { $hubber_premium_end_int = 0; }
+
+			return $today_date_int >= $hubber_premium_start_int && $today_date_int < $hubber_premium_end_int ? true : false;
+		}
+	}
+
+	/*
+	*	Function name: get_post_meta_data
+	*	Function arguments: $post_id [ INT ] (required)
+	*	Function purpose: This function is used to return all meta keys for specified $post_id by AJAX or normal Server call.
+	*/
+	function get_post_meta_data( $post_id ) {
+		$post_id = isset( $post_id ) && !empty( $post_id ) ? intval( $post_id ) : false;
+		return is_int( $post_id ) && $post_id != 0 ? get_post_meta( $post_id ) : false;
+	}
+
+	/*
+	*	Function name: update_user_premium
+	*	Function arguments: $user_id [ INT ] (optional)
+	*	Function purpose: This function is used to Add / Update user premium.
+	*/
+	function update_user_premium( $user_id = "" ) {
+		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
+		else { $user_id = intval( $user_id ); }
+
+		if ( is_int( $user_id ) && $user_id != 0 ) {
+			$today_date_int = strtotime( date( "Y-m-d" ) );
+
+			$hubber_premium_start_int = get_user_meta( $user_id, "premium_start", false );
+			if ( empty( $hubber_premium_start_int ) ) { add_user_meta( $user_id, "premium_start", $today_date_int ); }
+			elseif ( empty( $hubber_premium_start_int[ 0 ] ) ) { update_user_meta( $user_id, "premium_start", $today_date_int ); }
+
+			$hubber_premium_end_int = get_user_meta( $user_id, "premium_end", false );
+			if ( empty( $hubber_premium_end_int ) ) { add_user_meta( $user_id, "premium_end", strtotime( "+1 month", $today_date_int ) ); }
+			else {
+				$hubber_premium_end_int = !empty( $hubber_premium_end_int[ 0 ] ) ? intval( $hubber_premium_end_int[ 0 ] ) : $today_date_int;
+				update_user_meta( $user_id, "premium_end", strtotime( "+1 month", $hubber_premium_end_int ) );
+			}
+		}
+	}
+
+	function get_user_badges( $user_id = "" ) {
+		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
+		else { $user_id = intval( $user_id ); }
+
+		if ( is_int( $user_id ) && $user_id != 0 ) {
+			require_once get_template_directory() ."/badges/phubber.php";
+		}
 	}
 }
 
