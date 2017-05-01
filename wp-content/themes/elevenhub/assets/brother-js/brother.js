@@ -284,10 +284,19 @@ var UserRelations = function( vUserID, userID = "" ) {
 	/*
 	*	Function name: getUserFollowers
 	*	Function arguments: userID [ INT ] (optional) (the ID of the current logged user), onSuccess [ FUNCTION ] (required) tells the method what to do after the response, userID [ INT ] (optional) (the user ID of the currently logged in user).
-	*	Function purpose: This function is used to return JSON objects for the user with userID with company employees.
+	*	Function purpose: This function is used to return JSON objects for the user with userIDs of company employees.
 	*/
 	this.getUserEmployees = function( userID = "", onSuccess ) {
 		generateAJAX( { functionName : "get_user_employees", arguments : userID }, function ( response ) { onSuccess( JSON.parse( response ) ); } );
+	}
+
+	/*
+	*	Function name: getUserEmployers
+	*	Function arguments: userID [ INT ] (optional) (the ID of the current logged user), onSuccess [ FUNCTION ] (required) tells the method what to do after the response, userID [ INT ] (optional) (the user ID of the currently logged in user).
+	*	Function purpose: This function is used to return JSON objects for the user with userIDs of company employers.
+	*/
+	this.getUserEmployers = function( userID = "", onSuccess ) {
+		generateAJAX( { functionName : "get_user_employers", arguments : userID }, function ( response ) { onSuccess( JSON.parse( response ) ); } );
 	}
 
 	/*
