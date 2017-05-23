@@ -52,8 +52,8 @@ var companyID = "<?php echo $v_user_id; ?>";
         <?php } ?>
         <?php if ( $company_meta->media_uploads_permissions == "everyone" ) { ?>
         <a href="<?php echo get_permalink( 98 ) ."?company_id=". $v_user_id; ?>" id="media-conroller" class="grape-bold-button">Media</a>
-        <?php } ?>
-        <span class="bull-separator">&bull;</span>
+		<span class="bull-separator">&bull;</span>
+		<?php } ?>
         <button id="leave-company-controller" class="skeleton-bold-button" company="true">Leave</button>
 	</div>
 </div>

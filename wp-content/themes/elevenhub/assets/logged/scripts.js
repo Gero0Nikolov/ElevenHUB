@@ -112,49 +112,55 @@ jQuery( document ).ready(function(){
 		});
 	}
 
-	if ( jQuery( "#load-more-controller" ).length ) {
-		jQuery( "#load-more-controller" ).on("click", function(){
-			jQuery( "#medias-container" ).append( loading );
+	if ( jQuery( "#medias-container" ).length ) {
+		if ( jQuery( "#medias-container .media-container" ).length ) {
+			jQuery( ".site-content" ).append( '<button id="load-more-controller" class="blue-skeleton-bold-button display-block mh-auto mt-1em">Load more</button>' );
 
-			mediaController = new UserMedia();
-			mediaController.getUserMedia( companyID, mediaOffset, function( response ){
-				jQuery( "#medias-container #loader" ).remove();
+			if ( jQuery( "#load-more-controller" ).length ) {
+				jQuery( "#load-more-controller" ).on("click", function(){
+					jQuery( "#medias-container" ).append( loading );
 
-				response = JSON.parse( JSON.parse( response ) );
+					mediaController = new UserMedia();
+					mediaController.getUserMedia( companyID, mediaOffset, function( response ){
+						jQuery( "#medias-container #loader" ).remove();
 
-				if ( response != "You don't have any media." ) {
-					mediaOffset += 20;
-					for ( count = 0; count < response.length; count++ ) {
-						if ( response[ count ].TYPE.split( "/" )[0] == "image" ) { view_ = "<div id='media-"+ response[ count ].ID +"' class='media-container animated bounceIn new' style='background-image: url("+ response[ count ].URL +");' media-type='"+ response[ count ].TYPE +"'><button id='marker'></button></div>"; }
-						else if ( response[ count ].TYPE.split( "/" )[0] == "video" ) { view_ = "<div id='media-"+ response[ count ].ID +"' class='media-container animated bounceIn new' media-type='"+ response[ count ].TYPE +"'><button id='marker'></button><video autoplay='true' muted='true' loop='true'><source src='"+ response[ count ].URL +"' type='"+ response[ count ].TYPE +"'></video><div class='overlay'></div></div>"; }
+						response = JSON.parse( JSON.parse( response ) );
 
-						jQuery( "#medias-container" ).append( view_ );
-					}
+						if ( response != "You don't have any media." ) {
+							mediaOffset += 20;
+							for ( count = 0; count < response.length; count++ ) {
+								if ( response[ count ].TYPE.split( "/" )[0] == "image" ) { view_ = "<div id='media-"+ response[ count ].ID +"' class='media-container animated bounceIn new' style='background-image: url("+ response[ count ].URL +");' media-type='"+ response[ count ].TYPE +"'><button id='marker'></button></div>"; }
+								else if ( response[ count ].TYPE.split( "/" )[0] == "video" ) { view_ = "<div id='media-"+ response[ count ].ID +"' class='media-container animated bounceIn new' media-type='"+ response[ count ].TYPE +"'><button id='marker'></button><video autoplay='true' muted='true' loop='true'><source src='"+ response[ count ].URL +"' type='"+ response[ count ].TYPE +"'></video><div class='overlay'></div></div>"; }
 
-					jQuery( "#medias-container .new" ).each(function(){
-						jQuery( this ).on("click", function( e ){
-							if( e.target == this ) { openMediaHandler( jQuery( this ) ); }
-						});
-
-						jQuery( this ).children( "#marker" ).on("click", function( e ){
-							if ( e.target == this ) {
-								if ( jQuery( this ).hasClass( "marked" ) ) {
-									selectedElements.splice( selectedElements.indexOf( jQuery( this ).parent().attr( "id" ) ), 1 );
-									jQuery( this ).removeClass( "marked" );
-								} else {
-									selectedElements.push( jQuery( this ).parent().attr( "id" ) );
-									jQuery( this ).addClass( "marked" );
-								}
+								jQuery( "#medias-container" ).append( view_ );
 							}
-						});
 
-						jQuery( this ).removeClass( "new" );
-					});
-				} else {
-					jQuery( "#load-more-controller" ).remove();
-				}
-			} );
-		});
+							jQuery( "#medias-container .new" ).each(function(){
+								jQuery( this ).on("click", function( e ){
+									if( e.target == this ) { openMediaHandler( jQuery( this ) ); }
+								});
+
+								jQuery( this ).children( "#marker" ).on("click", function( e ){
+									if ( e.target == this ) {
+										if ( jQuery( this ).hasClass( "marked" ) ) {
+											selectedElements.splice( selectedElements.indexOf( jQuery( this ).parent().attr( "id" ) ), 1 );
+											jQuery( this ).removeClass( "marked" );
+										} else {
+											selectedElements.push( jQuery( this ).parent().attr( "id" ) );
+											jQuery( this ).addClass( "marked" );
+										}
+									}
+								});
+
+								jQuery( this ).removeClass( "new" );
+							});
+						} else {
+							jQuery( "#load-more-controller" ).remove();
+						}
+					} );
+				});
+			}
+		}
 	}
 
 	/* COMPANY PUBLIC CONTROLLERS */
@@ -1128,5 +1134,5 @@ function openComposer() {
 }
 
 function getUserBadges( userID = "" ) {
-	
+
 }

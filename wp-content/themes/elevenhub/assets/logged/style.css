@@ -615,6 +615,16 @@ body {
       font-weight: normal;
       color: #333;
       letter-spacing: 1px; }
+    .popup-container .popup-inner-container .inline-message {
+      font-family: OpenSansRegular;
+      font-size: 1.5rem;
+      font-weight: normal;
+      color: #333;
+      letter-spacing: 1px;
+      padding: 0.5em;
+      margin: 0;
+      word-wrap: break-word;
+      position: relative; }
     .popup-container .popup-inner-container .inline-media {
       display: inline-block;
       width: 1.85em;
@@ -2253,7 +2263,8 @@ body {
           background-size: cover;
           background-position: center;
           vertical-align: middle;
-          margin-left: 0.5em; }
+          margin-left: 0.5em;
+          border-radius: 100%; }
   .single-story-view .story-container {
     width: 70%;
     border-left: 1px dashed #ddd;

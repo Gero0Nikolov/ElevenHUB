@@ -31,9 +31,9 @@ if ( isset( $company_id ) && !empty( $company_id ) ) {
 		</form>
 	</div>
 	<div id="medias-container">
-		<?php echo $brother_->get_user_media( (object)array( "user_id" => $company_id, "is_ajax" => false ) ); ?>
+		<?php $brother_->get_user_media( (object)array( "user_id" => $company_id, "is_ajax" => false ) ); ?>
 	</div>
-	<button id="load-more-controller" class="blue-skeleton-bold-button display-block mh-auto mt-1em">Load more</button>
+	<!-- <button id="load-more-controller" class="blue-skeleton-bold-button display-block mh-auto mt-1em">Load more</button> -->
 	<?php
 }
 ?>

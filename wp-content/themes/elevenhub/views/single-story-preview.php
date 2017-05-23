@@ -9,12 +9,14 @@
 
 $brother_ = new BROTHER;
 
+$user_id = get_current_user_id();
+
 $post_id = get_the_ID();
 $post_ = get_post( $post_id );
 $company_id = get_post_meta( $post_id, "related_company_id", true );
 $author_id = $post_->post_author;
 
-if ( $brother_->is_company_public( $company_id ) ) :
+if ( $brother_->is_company_public( $company_id ) || $brother_->is_employee( $company_id, $user_id ) ) :
 $post_banner = $brother_->get_post_banner_url( $post_id );
 $post_likes = count( $brother_->get_story_likes( $post_id ) );
 $post_comments = $brother_->get_story_comments( (object)array( "story_id" => $post_id ) );
@@ -91,7 +93,7 @@ $brother_->set_story_view( (object)array( "story_id" => $post_id ) );
 				?>
 			</div>
 
-			<?php if ( $brother_->is_employee( $company_id, $author_id ) ) { ?>
+			<?php if ( $brother_->is_employee( $company_id, $user_id ) ) { ?>
 			<div class="comment-composer">
 				<input type="text" id="comment-holder">
 				<button id="comment-controller" class="fa fa-paper-plane"></button>

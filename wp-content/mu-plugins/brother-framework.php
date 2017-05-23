@@ -1859,11 +1859,6 @@ class BROTHER {
 					"key" => "account_association",
 					"value" => "company",
 					"compare" => "="
-				),
-				array(
-					"key" => "company_type",
-					"value" => "public",
-					"compare" => "="
 				)
 			),
 			"orderby" => !empty( $data->orderby ) ? $data->orderby : "ID",
@@ -1884,7 +1879,9 @@ class BROTHER {
 				$user_short_name = get_user_meta( $user_id, "user_shortname", true );
 				$user_avatar = $this->get_user_avatar_url( $user_id );
 				$user_banner = $this->get_user_banner_url( $user_id );
+				$user_type = get_user_meta( $user_id, "company_type", true );
 
+				if ( $user_type == "public" || ( $user_type == "private" && $this->is_employee( $user_id, get_current_user_id() ) ) )
 				if ( empty( $data->is_ajax ) || !$data->is_ajax ) {
 					?>
 					<a href="<?php echo get_author_posts_url( $user_id ); ?>" id='company-anchor-<?php echo $user_id; ?>' class='company-anchor'>
@@ -2457,8 +2454,7 @@ class BROTHER {
 		if ( isset( $page_ ) && !empty( $page_ ) ) { return $page_[ 0 ]; }
 		else {
 			$postarr = array(
-				"ID" => 0,
-				"author" => 4,
+				"ID" => 0,				
 				"post_title" => $notification_title,
 				"post_name" => $notification_slug,
 				"post_type" => "notifications",

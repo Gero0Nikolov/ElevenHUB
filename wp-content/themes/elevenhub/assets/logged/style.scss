@@ -753,6 +753,18 @@ body { margin: 0 !important; padding: 0 !important; }
 		    letter-spacing: 1px;
 		}
 
+		.inline-message {
+			font-family: OpenSansRegular;
+			font-size: 1.5rem;
+			font-weight: normal;
+			color: #333;
+			letter-spacing: 1px;
+			padding: 0.5em;
+			margin: 0;
+			word-wrap: break-word;
+			position: relative;
+		}
+
 		.inline-media {
 			display: inline-block;
 		    width: 1.85em;
@@ -2694,6 +2706,7 @@ body { margin: 0 !important; padding: 0 !important; }
 					background-position: center;
 					vertical-align: middle;
 					margin-left: 0.5em;
+					border-radius: 100%;
 				}
 			}
 		}

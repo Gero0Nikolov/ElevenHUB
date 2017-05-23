@@ -253,12 +253,18 @@ function logout_user() {
 add_action( 'wp_ajax_nopriv_add_profile_association', 'add_profile_association' );
 add_action( 'wp_ajax_add_profile_association', 'add_profile_association' );
 function add_profile_association() {
-	$association_type = strtolower( trim( $_POST[ "type" ] ) );
-	if ( !empty( $association_type ) ) {
-		if ( !get_user_meta( get_current_user_id(), "account_association", true ) ) {
-			add_user_meta( get_current_user_id(), "account_association", $association_type, false );
-		} else {
-			update_user_meta( get_current_user_id(), "account_association", $association_type, false );
+	if ( isset( $_POST[ "type" ] ) && !empty( $_POST[ "type" ] ) ) {
+		$association_type = strtolower( trim( $_POST[ "type" ] ) );
+		if ( $association_type == "employee" || $association_type == "company" ) {
+			if ( !get_user_meta( get_current_user_id(), "account_association", true ) ) {
+				add_user_meta( get_current_user_id(), "account_association", $association_type, false );
+			} else {
+				update_user_meta( get_current_user_id(), "account_association", $association_type, false );
+			}
+
+			if ( $association_type == "company" ) {
+				update_user_meta( get_current_user_id(), "company_type", "public" );
+			}
 		}
 	}
 
@@ -307,7 +313,7 @@ function get_public_stories( $offset = 0 ) {
 			$story_url = get_permalink( $post_->ID );
 			$story_excerpt = wp_trim_words( $brother_->convert_iframe_videos( $post_->post_content, false ), 55, "..." );
 			$author_avatar = $brother_->get_user_avatar_url( $post_->post_author );
-			$company_avatar = $brother_->get_user_avatar_url( $post_->post_author );
+			$company_avatar = $brother_->get_user_avatar_url( $company_id );
 
 			?>
 
