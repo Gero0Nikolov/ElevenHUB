@@ -2345,22 +2345,30 @@ body { margin: 0 !important; padding: 0 !important; }
 
 #companies-list,
 #hubbers-list {
+	margin-top: 1em;
+	text-align: center;
+
 	.company-anchor,
     .user-anchor {
-		display: block;
+		display: inline-block;
 		text-decoration: none;
 		text-shadow: none;
 		outline: 0 !important;
         vertical-align: middle;
-        margin: 0 0 2em;
+		margin: 0 0.13em 0.42em;
+		width: 10em;
+		height: 15em;
+		text-align: center;
+		vertical-align: top;
 
 		.list-item {
 			display: block;
 			width: 100%;
+			height: 100%;
 			font-size: 1rem;
 			position: relative;
             border-radius: 0px;
-			text-align: left;
+			text-align: center;
 
 			background-size: cover;
 			background-position: center;
@@ -2372,7 +2380,10 @@ body { margin: 0 !important; padding: 0 !important; }
 			transition: all 0.25s ease-in-out;
 
 			.overlay {
-                display: block;
+                display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
                 width: 100%;
                 height: 100%;
                 position: relative;
@@ -2401,14 +2412,14 @@ body { margin: 0 !important; padding: 0 !important; }
 
 			.company-brand,
             .user-brand {
-				display: inline-block;
+				display: block;
 				vertical-align: middle;
 				font-family: OpenSansLight;
 				font-weight: normal;
-				font-size: 2.5rem;
+				font-size: 1.5rem;
 				padding: 0;
 				color: #fff;
-                margin: 0 auto 0 0.5em;
+                margin: 0 auto;
                 text-align: center;
 				letter-spacing: 1px;
 			}
@@ -3213,12 +3224,11 @@ body { margin: 0 !important; padding: 0 !important; }
 
 	#companies-list,
     #hubbers-list {
+		.user-anchor,
+		.company-anchor { width: 11em; }
+
 		.list-item {
 			max-width: 100%;
-
-			.company-brand { font-size: 2.25rem; }
-
-            .user-brand { font-size: 1.5rem;}
 		}
 	}
 

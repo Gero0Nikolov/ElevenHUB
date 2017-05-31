@@ -2454,7 +2454,7 @@ class BROTHER {
 		if ( isset( $page_ ) && !empty( $page_ ) ) { return $page_[ 0 ]; }
 		else {
 			$postarr = array(
-				"ID" => 0,				
+				"ID" => 0,
 				"post_title" => $notification_title,
 				"post_name" => $notification_slug,
 				"post_type" => "notifications",
@@ -2538,16 +2538,8 @@ class BROTHER {
 		if ( is_int( $user_id ) && $user_id != 0 ) {
 			$today_date_int = strtotime( date( "Y-m-d" ) );
 
-			$hubber_premium_start_int = get_user_meta( $user_id, "premium_start", false );
-			if ( empty( $hubber_premium_start_int ) ) { add_user_meta( $user_id, "premium_start", $today_date_int ); }
-			elseif ( empty( $hubber_premium_start_int[ 0 ] ) ) { update_user_meta( $user_id, "premium_start", $today_date_int ); }
-
-			$hubber_premium_end_int = get_user_meta( $user_id, "premium_end", false );
-			if ( empty( $hubber_premium_end_int ) ) { add_user_meta( $user_id, "premium_end", strtotime( "+1 month", $today_date_int ) ); }
-			else {
-				$hubber_premium_end_int = !empty( $hubber_premium_end_int[ 0 ] ) ? intval( $hubber_premium_end_int[ 0 ] ) : $today_date_int;
-				update_user_meta( $user_id, "premium_end", strtotime( "+1 month", $hubber_premium_end_int ) );
-			}
+			update_user_meta( $user_id, "premium_start", $today_date_int );
+			update_user_meta( $user_id, "premium_end", strtotime( "+1 month", $today_date_int ) );
 		}
 	}
 

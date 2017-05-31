@@ -205,7 +205,7 @@ function register_user() {
 			"ID" => $wp_registration_result,
 			"first_name" => $first_name,
 			"last_name" => $last_name,
-			"role" => "Subscriber"
+			"role" => "subscriber"
 		);
 		$wp_update_result = wp_update_user( $args );
 
