@@ -37,13 +37,13 @@ $user_premium_end = !empty( $user_premium_end_int ) ? date( "d.m.Y", $user_premi
 		<div id="premium-container" class="premium-container">
 			<p class="text">
 				<?php
-				if ( !empty( $company_premium_end ) ) { echo "Your premium will be active untill: ". $company_premium_end; }
+				if ( !empty( $user_premium_end ) ) { echo "Your premium will be active untill: ". $user_premium_end; }
 				else { echo "Your premium is not active yet"; }
 				?>
 			</p>
 			<a href="<?php echo get_permalink( 667 ); ?>" class="blue-bold-button">
 				<?php
-				if ( !empty( $company_premium_end ) ) { echo "Renew now"; }
+				if ( !empty( $user_premium_end ) ) { echo "Renew now"; }
 				else { echo "Activate it"; }
 				?>
 			</a>
