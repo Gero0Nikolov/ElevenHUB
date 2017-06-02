@@ -875,10 +875,27 @@ class BROTHER {
 		if ( !isset( $email_notifications ) || empty( $email_notifications ) || $email_notifications == "true" ) {
 			$user = get_userdata( $user_id );
 			if ( isset( $user->user_email ) && !empty( $user->user_email ) ) {
+				$notification_markup = file_get_contents( get_template_directory() ."/assets/emails/notification.html" );
+				$notification_markup = str_ireplace( "[elevenhub-link]", get_site_url(), $notification_markup );
+				$notification_markup = str_replace( "[elevenhub-logo]", get_site_icon_url(), $notification_markup );
+				$notification_markup = str_replace( "[email-date]", date( "d M Y" ), $notification_markup );
+				$notification_markup = str_replace( "[email-text]", $notification_template, $notification_markup );
+
+				$args = array(
+					"posts_per_page" => 1,
+					"post_type" => "quote",
+					"post_status" => "publish",
+					"orderby" => "rand",
+					"order" => "DESC"
+				);
+				$quotes_ = get_posts( $args );
+
+				$notification_markup = str_replace( "[email-quote]", $quotes_[0]->post_content, $notification_markup );
+
 				wp_mail(
 					$user->user_email,
 					"11Hub Notification",
-					$notification_template,
+					$notification_markup,
 					array( "Content-Type: text/html; charset=UTF-8" )
 				);
 			}
