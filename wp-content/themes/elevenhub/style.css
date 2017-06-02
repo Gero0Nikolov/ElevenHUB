@@ -1354,6 +1354,45 @@ a.skeleton-bold-button {
   color: #fff;
   border-color: #2ecc71; }
 
+.story-anchor {
+  display: inline-block;
+  width: 28%;
+  margin: 1% 1% 0;
+  text-decoration: none;
+  outline: 0; }
+  .story-anchor:hover .story-container .overlay, .story-anchor:active .story-container .overlay, .story-anchor:focus .story-container .overlay {
+    background: rgba(0, 0, 0, 0.85); }
+  .story-anchor .story-container {
+    display: block;
+    width: 100%;
+    height: 5em;
+    font-size: 4.5rem;
+    position: relative; }
+    .story-anchor .story-container .overlay {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      webkit-transition: all 0.25s ease-in-out;
+      -moz-transition: all 0.25s ease-in-out;
+      -o-transition: all 0.25s ease-in-out;
+      transition: all 0.25s ease-in-out; }
+      .story-anchor .story-container .overlay .title {
+        display: block;
+        font-family: OpenSansRegular;
+        font-size: 3rem;
+        font-weight: normal;
+        letter-spacing: 1px;
+        line-height: 125%;
+        color: #fff;
+        margin: 0; }
+
 /* MOBILE */
 .mobile .main-navigation {
   padding: 1em !important; }
@@ -1382,6 +1421,10 @@ a.skeleton-bold-button {
   padding: 1.5em 2.75em; }
   .mobile .site-footer .footer-link, .mobile .site-footer a {
     display: block; }
+.mobile .story-anchor {
+  display: block;
+  width: 100%;
+  margin: 3em 0 0; }
 
 .page-template-employee-company.mobile .site-content {
   padding: 0 1em !important; }

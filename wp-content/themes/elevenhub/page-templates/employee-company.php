@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
 
 *	Template Name: Employee or Company template
@@ -6,6 +6,7 @@
 *	@package eleven hub
 
 */
+if ( !is_user_logged_in() ) { wp_redirect( get_site_url() ); }
 
 get_header();
 ?>

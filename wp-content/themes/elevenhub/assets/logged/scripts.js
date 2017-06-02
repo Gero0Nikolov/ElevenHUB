@@ -337,6 +337,13 @@ jQuery( document ).ready(function(){
 					            production: paypal_settings.client_id_production
 					        },
 
+							style: {
+					            size: 'medium',
+					            color: 'gold',
+					            shape: 'pill',
+					            label: 'checkout'
+					        },
+
 					        payment: function() {
 
 					            var env    = this.props.env;
@@ -345,7 +352,7 @@ jQuery( document ).ready(function(){
 					            return paypal.rest.payment.create(env, client, {
 					                transactions: [
 					                    {
-					                        amount: { total: paypal_settings.amount, currency: 'EUR' }
+					                        amount: { total: paypal_settings.amount, currency: 'EUR' }											
 					                    }
 					                ]
 					            });

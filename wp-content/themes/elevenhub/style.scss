@@ -1564,6 +1564,61 @@ a.skeleton-bold-button {
 .user-type-container.orange-type:hover { background: $orange; color: #fff; border-color: $orange; }
 .user-type-container.green-type:hover { background-color: $emerald; color: #fff; border-color: $emerald; }
 
+.story-anchor {
+	display: inline-block;
+	width: 28%;
+	margin: 1% 1% 0;
+	text-decoration: none;
+	outline: 0;
+
+	&:hover,
+	&:active,
+	&:focus {
+		.story-container {
+			.overlay {
+				background: rgba(0, 0, 0, 0.85);
+			}
+		}
+	}
+
+	.story-container {
+		display: block;
+		width: 100%;
+		height: 5em;
+		font-size: 4.5rem;
+		position: relative;
+
+		.overlay {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(0, 0, 0, 0.5);
+
+			webkit-transition: all 0.25s ease-in-out;
+		    -moz-transition: all 0.25s ease-in-out;
+		    -o-transition: all 0.25s ease-in-out;
+		    transition: all 0.25s ease-in-out;
+
+			.title {
+				display: block;
+				font-family: OpenSansRegular;
+				font-size: 3rem;
+				font-weight: normal;
+				letter-spacing: 1px;
+				line-height: 125%;
+				color: #fff;
+				margin: 0;
+			}
+		}
+	}
+}
+
 /* MOBILE */
 .mobile {
 	.main-navigation { padding: 1em !important; }
@@ -1605,6 +1660,8 @@ a.skeleton-bold-button {
 		padding: 1.5em 2.75em;
 		.footer-link, a { display: block; }
 	}
+
+	.story-anchor { display: block; width: 100%; margin: 3em 0 0; }
 }
 
 .page-template-employee-company.mobile {

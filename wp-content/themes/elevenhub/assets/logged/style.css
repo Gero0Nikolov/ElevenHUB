@@ -2022,7 +2022,7 @@ body {
         background-color: #eee;
         border-radius: 100%;
         vertical-align: middle;
-        margin: 0 auto; }
+        margin: 0 auto 0.25em; }
       #companies-list .company-anchor .list-item .company-brand,
       #companies-list .company-anchor .list-item .user-brand,
       #companies-list .user-anchor .list-item .company-brand,
