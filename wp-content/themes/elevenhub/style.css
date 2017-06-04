@@ -1367,7 +1367,9 @@ a.skeleton-bold-button {
     width: 100%;
     height: 5em;
     font-size: 4.5rem;
-    position: relative; }
+    position: relative;
+    background-size: cover;
+    background-position: center; }
     .story-anchor .story-container .overlay {
       display: flex;
       flex-direction: column;
@@ -1392,6 +1394,59 @@ a.skeleton-bold-button {
         line-height: 125%;
         color: #fff;
         margin: 0; }
+
+.public-story #banner-container {
+  display: block;
+  width: 100%;
+  height: 25em;
+  background-size: cover;
+  background-position: center;
+  position: relative; }
+  .public-story #banner-container .overlay {
+    display: flex;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5); }
+    .public-story #banner-container .overlay .title {
+      display: block;
+      text-align: center;
+      color: #fff;
+      font-family: OpenSansBold;
+      font-size: 3rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+      margin: 0;
+      line-height: 125%; }
+.public-story .text {
+  display: block;
+  margin: 1em 0;
+  font-family: PlayFairRegular;
+  font-size: 1.25rem;
+  font-weight: normal;
+  color: #333;
+  letter-spacing: 1px;
+  line-height: 200%;
+  text-align: justify; }
+  .public-story .text a {
+    display: inline-block;
+    font-size: 1.5rem;
+    font-weight: normal;
+    color: #3498db;
+    text-decoration: none; }
+    .public-story .text a:hover, .public-story .text a:focus, .public-story .text a:active {
+      color: #2980b9; }
+  .public-story .text blockquote {
+    display: block;
+    padding: 0.5em 1em;
+    margin: 0;
+    border-left: 3px solid #e74c3c;
+    font-size: 2rem; }
 
 /* MOBILE */
 .mobile .main-navigation {
@@ -1425,6 +1480,8 @@ a.skeleton-bold-button {
   display: block;
   width: 100%;
   margin: 3em 0 0; }
+.mobile .public-story .text {
+  padding: 0 1em; }
 
 .page-template-employee-company.mobile .site-content {
   padding: 0 1em !important; }

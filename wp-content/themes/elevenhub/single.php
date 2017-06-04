@@ -16,6 +16,7 @@ if ( is_user_logged_in() ) {
 	else if ( $association_type == "company" ) { get_header( "company" ); }
 	require_once get_template_directory() ."/views/single-story-preview.php";
 } else {
-	/* Load public view */
-	wp_redirect( get_site_url() );
+	get_header();
+	require_once get_template_directory() ."/views/single-story-public-preview.php";
+	get_footer();
 }

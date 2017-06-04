@@ -199,25 +199,36 @@ function register_user() {
 			echo $response = ( email_exists( $email ) ? "This email is already in use!" : ( !is_alphabetical( array( $first_name, $last_name ) ) ? "Use only alphabetical characters in your name!" : ( empty( $password ) ? "Choose your password!" : "Something wrong happens here!" ) ) );
 			die();
 		}
-	} else {
-		// Update the new user
-		$args = array(
-			"ID" => $wp_registration_result,
-			"first_name" => $first_name,
-			"last_name" => $last_name,
-			"role" => "subscriber"
-		);
-		$wp_update_result = wp_update_user( $args );
-
-		// Add needed user meta
-		add_user_meta( get_current_user_id(), "account_premium", "-1", false );
-		add_user_meta( get_current_user_id(), "account_tutorial", "0", false );
-
-		// Prepare Hello mail
-		$subject = "Welcome to 11hub!";
-		$content = "Welcome onboard!<br/><br/>We hope to see you <a href='". get_site_url() ."' target='_blank' style='color: #3498db; text-decoration: underline;'>hubbing soon</a>!<br/><br/>Cheers!";
-		wp_mail( $email, $subject, $content, array( "From: Gero Nikolov <vtm.sunrise@gmail.com>", "Content-type: text/html" ) );
 	}
+
+	// Update the new user
+	$args = array(
+		"ID" => $wp_registration_result,
+		"first_name" => $first_name,
+		"last_name" => $last_name,
+		"role" => "subscriber"
+	);
+	$wp_update_result = wp_update_user( $args );
+
+	$user_id = $wp_registration_result;
+
+	// Add needed user meta
+	add_user_meta( $user_id, "account_tutorial", "0", false );
+
+	// Get registration controller settings
+	$registration_controller = get_page_by_path( "registration-controller" );
+	$free_premium = get_field( "free_premium", $registration_controller->ID );
+
+	if ( !empty( $free_premium ) && $free_premium == "yes" ) {
+		$today_date_int = strtotime( date( "Y-m-d" ) );
+		update_user_meta( $user_id, "premium_start", $today_date_int );
+		update_user_meta( $user_id, "premium_end", strtotime( "+7 day", $today_date_int ) );
+	}
+
+	// Prepare Hello mail
+	$subject = "Welcome to 11hub!";
+	$content = "Welcome onboard!<br/><br/>We hope to see you <a href='". get_site_url() ."' target='_blank' style='color: #3498db; text-decoration: underline;'>hubbing soon</a>!<br/><br/>Cheers!";
+	wp_mail( $email, $subject, $content, array( "From: Gero Nikolov <vtm.sunrise@gmail.com>", "Content-type: text/html" ) );
 
 
 	die();

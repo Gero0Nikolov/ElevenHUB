@@ -137,7 +137,7 @@ function signOnUser() {
 			if ( response != "" ) {
 				alert_box = "<div id='alert-box' class='animated bounceInDown'>"+ response +"<button id='close-popup-button' onclick='removeAlertBox();'>Close</button></div>";
 				jQuery( "#login-form-holder" ).append( alert_box );
-			} else { window.location.reload( true ); }
+			} else { window.location = window.location.origin; }
 		}
 	});
 }

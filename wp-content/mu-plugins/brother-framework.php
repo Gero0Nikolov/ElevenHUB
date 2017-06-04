@@ -2554,7 +2554,6 @@ class BROTHER {
 
 		if ( is_int( $user_id ) && $user_id != 0 ) {
 			$today_date_int = strtotime( date( "Y-m-d" ) );
-
 			update_user_meta( $user_id, "premium_start", $today_date_int );
 			update_user_meta( $user_id, "premium_end", strtotime( "+1 month", $today_date_int ) );
 		}

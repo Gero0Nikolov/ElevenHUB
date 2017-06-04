@@ -403,15 +403,17 @@ body { margin: 0 !important; padding: 0 !important; }
 				letter-spacing: 1px;
 				line-height: 200%;
 				text-align: justify;
+				word-wrap: break-word;
+				word-break: break-word;
 			}
 
 			.story-meta {
 				display:-webkit-flex;
-    display:-webkit-box;
-    display:-moz-flex;
-    display:-moz-box;
-    display:-ms-flexbox;
-    display:flex;
+			    display:-webkit-box;
+			    display:-moz-flex;
+			    display:-moz-box;
+			    display:-ms-flexbox;
+			    display:flex;
 				margin-top: 1em;
 				border-top: 1px solid #ddd;
 				padding: 1em 1em;
@@ -1682,6 +1684,8 @@ body { margin: 0 !important; padding: 0 !important; }
 
 		outline: 0 !important;
 		cursor: text;
+		word-wrap: break-word;
+		word-break: break-word;
 
 		h2 {
 			font-family: OpenSansRegular;
@@ -2024,6 +2028,8 @@ body { margin: 0 !important; padding: 0 !important; }
 					letter-spacing: 1px;
 					line-height: 200%;
 					color: #333;
+					word-wrap: break-word;
+					word-break: break-word;
 
 					p { margin: 0 0 1em; }
 					.content-video { width: 100%; }
@@ -3068,15 +3074,17 @@ body { margin: 0 !important; padding: 0 !important; }
 			letter-spacing: 1px;
 			line-height: 200%;
 			text-align: justify;
+			word-wrap: break-word;
+			word-break: break-word;
 		}
 
 		.story-meta {
 			display:-webkit-flex;
-    display:-webkit-box;
-    display:-moz-flex;
-    display:-moz-box;
-    display:-ms-flexbox;
-    display:flex;
+		    display:-webkit-box;
+		    display:-moz-flex;
+		    display:-moz-box;
+		    display:-ms-flexbox;
+		    display:flex;
 			margin-top: 1em;
 			border-top: 1px solid #ddd;
 			padding: 1em 1em;
@@ -3225,7 +3233,7 @@ body { margin: 0 !important; padding: 0 !important; }
 	#companies-list,
     #hubbers-list {
 		.user-anchor,
-		.company-anchor { width: 11em; }
+		.company-anchor { width: 10em; }
 
 		.list-item {
 			max-width: 100%;
