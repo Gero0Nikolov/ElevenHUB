@@ -14,7 +14,7 @@ $args = array(
 	"post_type" => "story",
 	"post_status" => "publish",
 	"orderby" => "ID",
-	"order" => "DESC"
+	"order" => "ASC"
 );
 $stories_ = get_posts( $args );
 
@@ -32,6 +32,4 @@ foreach ( $stories_ as $story_ ) {
 
 	<?php
 }
-
-get_footer();
 ?>

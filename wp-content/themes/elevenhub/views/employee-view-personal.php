@@ -31,7 +31,7 @@ $user_biography = get_user_meta( $user_id, "user_biography", true );
 				echo $user_followers_num == 1 ? $user_followers_num ." follower" : $user_followers_num ." followers";
 				?>
 			</button>
-			<div class="user-text"><?php echo $user_biography; ?></div>
+			<div class="user-text"><?php echo nl2br( $user_biography ); ?></div>
 			<div id="badges" class="badges"></div>
 		</div>
 	</div>

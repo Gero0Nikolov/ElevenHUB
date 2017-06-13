@@ -352,7 +352,7 @@ jQuery( document ).ready(function(){
 					            return paypal.rest.payment.create(env, client, {
 					                transactions: [
 					                    {
-					                        amount: { total: paypal_settings.amount, currency: 'EUR' }											
+					                        amount: { total: paypal_settings.amount, currency: 'EUR' }
 					                    }
 					                ]
 					            });
@@ -367,7 +367,7 @@ jQuery( document ).ready(function(){
 					            return actions.payment.execute().then(function() {
 					                // Show a success page to the buyer
 									phubber_ = new Phubber;
-									phubber_.updateUserPremium( "", function( response ){
+									phubber_.updateUserPremium( "", data.paymentID, function( response ){										
 										if ( response == null || response == "" ) {
 											view_ = "\
 											<div id='media-popup-container' class='popup-container animated fadeIn'>\

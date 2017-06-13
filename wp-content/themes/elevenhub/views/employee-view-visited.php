@@ -46,7 +46,7 @@ $v_user_biography = get_user_meta( $v_user_id, "user_biography", true );
 				echo $v_user_followers_num == 1 ? $v_user_followers_num ." follower" : $v_user_followers_num ." followers";
 				?>
 			</div>
-			<div class="user-text"><?php echo $v_user_biography; ?></div>
+			<div class="user-text"><?php echo nl2br( $v_user_biography ); ?></div>
 		</div>
 	</div>
 	<div id="stories-board" class="stories-board">

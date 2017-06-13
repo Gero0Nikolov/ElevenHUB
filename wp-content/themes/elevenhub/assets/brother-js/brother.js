@@ -1337,10 +1337,13 @@ var Phubber = function() {
 	*	Function arguments: userID [ INT ] (optional), onSuccess [ FUNCTION ]
 	*	Function purpose: This function is used update the Premium period of the specified user.
 	*/
-	this.updateUserPremium = function( userID = "", onSuccess ) {
+	this.updateUserPremium = function( userID = "", paymentID, onSuccess ) {
 		generateAJAX({
 				functionName : "update_user_premium",
-				arguments : userID
+				arguments : {
+					user_id : userID,
+					payment_id : paymentID
+				}
 			}, function ( response ) { onSuccess( JSON.parse( JSON.parse( response ) ) ); }
 		);
 	}

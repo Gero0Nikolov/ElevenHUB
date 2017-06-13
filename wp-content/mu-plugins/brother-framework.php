@@ -2548,14 +2548,40 @@ class BROTHER {
 	*	Function arguments: $user_id [ INT ] (optional)
 	*	Function purpose: This function is used to Add / Update user premium.
 	*/
-	function update_user_premium( $user_id = "" ) {
-		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
-		else { $user_id = intval( $user_id ); }
+	function update_user_premium( $args_ ) {
+		$user_id = isset( $args_->user_id ) && !empty( $args_->user_id ) ? intval( $args_->user_id ) : get_current_user_id();
+		$payment_id = isset( $args_->payment_id ) && !empty( $args_->payment_id ) ? $args_->payment_id : false;
 
-		if ( is_int( $user_id ) && $user_id != 0 ) {
-			$today_date_int = strtotime( date( "Y-m-d" ) );
-			update_user_meta( $user_id, "premium_start", $today_date_int );
-			update_user_meta( $user_id, "premium_end", strtotime( "+1 month", $today_date_int ) );
+		if ( $payment_id !== false ) {
+			$phubber_page = get_page_by_path( "phubber" );
+
+			$environment = get_field( "paypal_environment", $phubber_page->ID );
+
+			$url = $environment == "sandbox" ? "https://api.sandbox.paypal.com/v1/payments/payment/" : "https://api.paypal.com/v1/payments/payment/";
+			$client_id = $environment == "sandbox" ? get_field( "paypal_client_id_sandbox", $phubber_page->ID ) : get_field( "paypal_client_id_production", $phubber_page->ID );
+			$client_secret = $environment == "sandbox" ? get_field( "paypal_client_secret_sandbox", $phubber_page->ID ) : get_field( "paypal_client_secret_production", $phubber_page->ID );
+
+			$curl = curl_init();
+			curl_setopt_array($curl, array(
+			    CURLOPT_RETURNTRANSFER => 1,
+			    CURLOPT_URL => $url . $payment_id,
+				CURLOPT_HTTPHEADER => array(
+					"Content-Type: application/json",
+				),
+				CURLOPT_USERPWD => $client_id .":". $client_secret
+			));
+			$resp = curl_exec($curl);
+			curl_close( $curl );
+
+			$result_ = json_encode( $resp );
+
+			if ( isset( $result_->cart ) && !empty( $result_->cart ) ) {
+				if ( is_int( $user_id ) && $user_id != 0 ) {
+					$today_date_int = strtotime( date( "Y-m-d" ) );
+					update_user_meta( $user_id, "premium_start", $today_date_int );
+					update_user_meta( $user_id, "premium_end", strtotime( "+1 month", $today_date_int ) );
+				}
+			}
 		}
 	}
 
