@@ -24,6 +24,9 @@ body {
 .before-icon-exit:before {
   content: "\f08b"; }
 
+.before-icon-lemon:before {
+  content: "\f094"; }
+
 .inline-block {
   display: inline-block !important; }
 
@@ -680,6 +683,7 @@ body {
       border: none;
       box-shadow: none;
       outline: 0;
+      z-index: 9;
       position: absolute;
       top: 0;
       right: 0;
@@ -697,15 +701,16 @@ body {
       color: #c0392b; }
     .popup-container .popup-inner-container label {
       display: block;
-      margin: 1em 1em 0.25em;
+      margin: 1em 0.75em 0.25em;
       font-family: OpenSansRegular;
       font-size: 1rem;
       font-weight: normal;
       letter-spacing: 1px;
       color: #333; }
-    .popup-container .popup-inner-container input {
+    .popup-container .popup-inner-container input,
+    .popup-container .popup-inner-container textarea {
       display: block;
-      margin: 0 1em;
+      margin: 0 auto;
       padding: 0.25em;
       width: calc(100% - 1.25em);
       border: 1px solid #ddd;
@@ -718,8 +723,11 @@ body {
       letter-spacing: 1px;
       box-shadow: none;
       text-shadow: none; }
-    .popup-container .popup-inner-container input:focus {
-      border-color: #3498db; }
+      .popup-container .popup-inner-container input:focus,
+      .popup-container .popup-inner-container textarea:focus {
+        border-color: #3498db; }
+    .popup-container .popup-inner-container textarea {
+      resize: vertical; }
     .popup-container .popup-inner-container #submit-button {
       display: block;
       width: 50%;

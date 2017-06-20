@@ -35,6 +35,7 @@ body { margin: 0 !important; padding: 0 !important; }
 .before-icon:before { font-family: FontAwesome; display: inline-block; vertical-align: middle; margin-right: 5px; }
 .before-icon-user-circle:before { content: "\f0ad"; }
 .before-icon-exit:before { content: "\f08b"; }
+.before-icon-lemon:before { content: "\f094"; }
 
 .inline-block { display: inline-block !important; }
 
@@ -833,6 +834,7 @@ body { margin: 0 !important; padding: 0 !important; }
 			border: none;
 			box-shadow: none;
 			outline: 0;
+			z-index: 9;
 
 			position: absolute;
 			top: 0;
@@ -857,7 +859,7 @@ body { margin: 0 !important; padding: 0 !important; }
 
 		label {
 			display: block;
-			margin: 1em 1em 0.25em;
+			margin: 1em 0.75em 0.25em;
 
 			font-family: OpenSansRegular;
 			font-size: 1rem;
@@ -867,10 +869,11 @@ body { margin: 0 !important; padding: 0 !important; }
 			color: #333;
 		}
 
-		input {
+		input,
+		textarea {
 			display: block;
 
-			margin: 0 1em;
+			margin: 0 auto;
 			padding: 0.25em;
 
 			width: calc(100% - 1.25em);
@@ -887,8 +890,11 @@ body { margin: 0 !important; padding: 0 !important; }
 
 			box-shadow: none;
 			text-shadow: none;
+
+			&:focus { border-color: $peter_river; }
 		}
-		input:focus { border-color: $peter_river; }
+
+		textarea { resize: vertical; }
 
 		#submit-button {
 			display: block;

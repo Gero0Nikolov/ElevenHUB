@@ -367,3 +367,33 @@ function get_paypal_settings() {
 
 	die( "" );
 }
+
+add_action( 'wp_ajax_nopriv_submit_bug_report', 'submit_bug_report' );
+add_action( 'wp_ajax_submit_bug_report', 'submit_bug_report' );
+function submit_bug_report() {
+	if ( isset( $_POST[ "args" ] ) && !empty( $_POST[ "args" ] ) ) {
+		$args = (object)$_POST[ "args" ];
+		$args->position = isset( $args->position ) && !empty( $args->position ) ? sanitize_text_field( $args->position ) : "";
+		$args->type = isset( $args->type ) && !empty( $args->type ) ? sanitize_text_field( $args->type ) : "";
+		$args->description = isset( $args->description ) && !empty( $args->description ) ? sanitize_text_field( $args->description ) : "";
+
+		if ( !empty( $args->position ) && !empty( $args->type ) && !empty( $args->description ) ) {
+			$user_id = get_current_user_id();
+
+			$post_arr = array(
+				"ID" => 0,
+				"post_title" => $args->type ."-". $user_id,
+				"post_name" => sanitize_title_with_dashes( $args->type ."-". $user_id ),
+				"post_status" => "draft",
+				"post_type" => "bug_report",
+				"post_content" => $args->description,
+				"meta_input" => array(
+					"bug_position" => $args->position
+				)
+			);
+			$post_id = wp_insert_post( $post_arr );
+		}
+	}
+
+	die( "" );
+}

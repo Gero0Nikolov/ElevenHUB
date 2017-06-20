@@ -14,7 +14,7 @@ get_header();
 	<h1 class="banner-text">The <span class="red-highlithed">hub</span> where your company stays connected!</h1>
 </div>
 
-<div class="flex-container mt-8em">
+<div class="flex-container mt-5em">
 	<div class="left-side">
 		<h1 class="section-header">What is the <span class="dark-highlithed">hub</span>?</h1>
 		<div class="section-content">
@@ -22,7 +22,7 @@ get_header();
 			And exactly like it's explanation 11hub is connecting your employees!
 			<div class="separator"></div>
 			It works just like a social media, but that which makes us different from the rest is the <strong>productivity</strong>.
-			We are connecting your company members and keeping their productivity to up <strong>99.9%</strong>!
+			We are connecting your company members and keeping their productivity to up <strong>99%</strong>!
 		</div>
 	</div>
 	<div class="right-side">
@@ -31,7 +31,7 @@ get_header();
 	</div>
 </div>
 
-<div class="flex-container mt-8em">
+<div class="flex-container mt-5em">
 	<div class="left-side">
 		<div class="full-size-banner" style="background-image: url('<?php echo get_template_directory_uri(); ?>/assets/images/banner_2.jpg');">
 		</div>
@@ -47,7 +47,7 @@ get_header();
 	</div>
 </div>
 
-<div class="flex-container mt-8em">
+<div class="flex-container mt-5em">
 	<div class="left-side">
 		<h1 class="section-header">How it <span class="dark-highlithed">works</span>?</h1>
 		<div class="section-content">

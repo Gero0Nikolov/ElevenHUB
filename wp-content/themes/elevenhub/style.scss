@@ -1387,6 +1387,7 @@ a.skeleton-bold-button {
 	border: none;
 	box-shadow: none !important;
 	outline: 0;
+	z-index: 9;
 
 	position: absolute;
 	top: 0;
@@ -1466,6 +1467,7 @@ a.skeleton-bold-button {
 }
 
 .mt-2em { margin-top: 2em !important; }
+.mt-5em { margin-top: 5em !important; }
 .mt-8em { margin-top: 8em !important; }
 
 .mb-1em { margin-bottom: 1em !important; }
@@ -1625,7 +1627,7 @@ a.skeleton-bold-button {
 	#banner-container {
 		display: block;
 		width: 100%;
-		height: 25em;
+		height: 30em;
 		background-size: cover;
 		background-position: center;
 		position: relative;
@@ -1656,6 +1658,8 @@ a.skeleton-bold-button {
 		}
 	}
 
+	p { margin: 0.5em 0; }
+
 	.text {
 		display: block;
 		margin: 1em 0;
@@ -1681,10 +1685,27 @@ a.skeleton-bold-button {
 
 		blockquote {
 			display: block;
-			padding: 0.5em 1em;
-			margin: 0;
-			border-left: 3px solid $alizarin;
-			font-size: 2rem;
+		    padding: 0 1em;
+		    margin: 2em auto;
+		    border-left: none;
+		    font-size: 2rem;
+		    text-align: center;
+		  	position: relative;
+
+			&:before {
+			  content: "\275d";
+			  display: inline-block;
+			  position: absolute;
+			  left: 0;
+			  color: #999;
+			}
+			&:after {
+			  content: "\275e";
+			  display: inline-block;
+			  position: absolute;
+			  right: 0;
+			  color: #999;
+			}
 		}
 	}
 }
@@ -1731,7 +1752,14 @@ a.skeleton-bold-button {
 		.footer-link, a { display: block; }
 	}
 
-	.story-anchor { display: block; width: 100%; margin: 3em 0 0; }
+	.story-anchor {
+		display: block;
+		width: 100%;
+
+		margin: 1em 0 0;
+
+		&:first-of-type { margin: 3em 0 0; }
+	}
 
 	.public-story {
 		.text { padding: 0 1em; }
@@ -1910,6 +1938,7 @@ a.skeleton-bold-button {
 			border: none;
 			box-shadow: none !important;
 			outline: 0;
+			z-index: 9;
 
 			position: absolute;
 			top: 0;

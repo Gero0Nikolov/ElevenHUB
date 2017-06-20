@@ -9,5 +9,5 @@ $post_featured_image = get_the_post_thumbnail_url( $post_id );
 			<h1 class="title"><?php echo $post_->post_title; ?></h1>
 		</div>
 	</div>
-	<div class="text"><?php echo $post_->post_content; ?></div>
+	<div class="text"><?php echo wpautop( $post_->post_content ); ?></div>
 </div>

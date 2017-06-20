@@ -2573,7 +2573,7 @@ class BROTHER {
 			$resp = curl_exec($curl);
 			curl_close( $curl );
 
-			$result_ = json_encode( $resp );
+			$result_ = json_decode( $resp );
 
 			if ( isset( $result_->cart ) && !empty( $result_->cart ) ) {
 				if ( is_int( $user_id ) && $user_id != 0 ) {

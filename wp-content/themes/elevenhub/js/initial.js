@@ -5,6 +5,12 @@ jQuery( document ).ready(function(){
 		if ( jQuery( "#login-form-holder" ).length ) { destroyLoginForm(); }
 		else { buildLoginForm(); }
 	});
+
+	jQuery( ".login-anchor" ).each( function(){
+		jQuery( this ).on( "click", function(){
+			buildLoginForm();
+		} );
+	} );
 });
 
 function buildLoginForm() {

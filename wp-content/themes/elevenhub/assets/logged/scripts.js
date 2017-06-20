@@ -4,6 +4,54 @@
 jQuery( document ).ready(function(){
 	jQuery( "[rel='logout']" ).each(function(){ jQuery( this ).on("click", function(){ logOutUser(); }); });
 
+	jQuery( "[rel='bug-report']" ).on( "click", function(){
+		bug_report_view = "\
+		<div id='bug-report-popup-container' class='popup-container animated fadeIn'>\
+			<div id='bug-report-popup-fields' class='popup-inner-container'>\
+				<button id='close-button' class='close-button fa fa-close'></button>\
+				<label for='bug-position'>Where do you find the problem?</label>\
+				<input type='text' id='bug-position'>\
+				<label for='bug-position'>What is the type of the problem?</label>\
+				<input type='text' id='bug-type'>\
+				<label for='bug-position'>Describe the problem?</label>\
+				<textarea id='bug-description'></textarea>\
+				<button id='submit-button' class='green-bold-button'>Send</button>\
+			</div>\
+		</div>\
+		";
+
+		jQuery( "body" ).append( bug_report_view );
+
+		jQuery( "#bug-report-popup-container" ).on("click", function( e ){ if( e.target == this ){ jQuery( "#bug-report-popup-container" ).removeClass( "fadeIn" ).addClass( "fadeOut" ); setTimeout(function(){ jQuery( "#bug-report-popup-container" ).remove(); }, 750); } });
+		jQuery( "#bug-report-popup-container #bug-report-popup-fields #close-button" ).on("click", function(){ jQuery( "#bug-report-popup-container" ).removeClass( "fadeIn" ).addClass( "fadeOut" ); setTimeout(function(){ jQuery( "#bug-report-popup-container" ).remove(); }, 750); });
+
+		jQuery( "#bug-report-popup-container #bug-report-popup-fields #submit-button" ).on("click", function(){
+			jQuery( "#bug-report-popup-container #bug-report-popup-fields" ).append( loading );
+
+			position = jQuery( "#bug-report-popup-container #bug-report-popup-fields #bug-position" ).val().trim();
+			type = jQuery( "#bug-report-popup-container #bug-report-popup-fields #bug-type" ).val().trim();
+			description = jQuery( "#bug-report-popup-container #bug-report-popup-fields #bug-description" ).val().trim();
+
+			jQuery.ajax( {
+				url : ajax_url,
+				type : "POST",
+				data : {
+					action : "submit_bug_report",
+					args : {
+						position : position,
+						type : type,
+						description : description
+					}
+				},
+				success : function( response ) {
+					if ( response == "" || response == null ) {
+						jQuery( "#bug-report-popup-container" ).removeClass( "fadeIn" ).addClass( "fadeOut" ); setTimeout(function(){ jQuery( "#bug-report-popup-container" ).remove(); }, 750);
+					}
+				}
+			} );
+		});
+	} );
+
 	if ( jQuery( "#menu-controller" ).length ) {
 		jQuery( "#menu-controller" ).on("click", function(){
 			if ( jQuery( "#mobile-menu-holder" ).hasClass( "slideInDown" ) ) { jQuery( "#mobile-menu-holder" ).removeClass( "slideInDown" ).addClass( "slideOutUp" ); }
@@ -367,7 +415,7 @@ jQuery( document ).ready(function(){
 					            return actions.payment.execute().then(function() {
 					                // Show a success page to the buyer
 									phubber_ = new Phubber;
-									phubber_.updateUserPremium( "", data.paymentID, function( response ){										
+									phubber_.updateUserPremium( "", data.paymentID, function( response ){
 										if ( response == null || response == "" ) {
 											view_ = "\
 											<div id='media-popup-container' class='popup-container animated fadeIn'>\
