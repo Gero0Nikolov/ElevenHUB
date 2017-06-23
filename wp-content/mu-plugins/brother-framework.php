@@ -175,6 +175,7 @@ class BROTHER {
 	*	If the table exists the function will return TRUE if not the result will be FALSE.
 	*/
 	function is_table_exists( $table_name ) {
+		$table_name = sanitize_text_field( $table_name );
 		global $wpdb;
 		$table_name = $wpdb->prefix . $table_name;
 		return $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) == $table_name ? true : false;
@@ -186,7 +187,7 @@ class BROTHER {
 	*	Function purpose: This function returns the URL to the avatar picture of the specified user
 	*/
 	function get_user_avatar_url( $user_id = "" ) {
-		return !empty( $user_id ) ? get_user_meta( $user_id, "user_avatar_url", true ) : get_user_meta( get_current_user_id(), "user_avatar_url", true );
+		return !empty( $user_id ) && intval( $user_id ) > 0 ? get_user_meta( $user_id, "user_avatar_url", true ) : get_user_meta( get_current_user_id(), "user_avatar_url", true );
 	}
 
 	/*
@@ -196,12 +197,15 @@ class BROTHER {
 	*/
 	function get_user_avatar( $user_id = "" ) {
 		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
+		else { $user_id = intval( $user_id ); }
 
-		$user_avatar = (object) array(
-			"avatar_id" => get_user_meta( $user_id, "user_avatar_id", true ),
-			"avatar_url" => get_user_meta( $user_id, "user_avatar_url", true ),
-			"avatar_path" => get_user_meta( $user_id, "user_avatar_path", true )
-		);
+		if ( $user_id > 0 ) {
+			$user_avatar = (object) array(
+				"avatar_id" => get_user_meta( $user_id, "user_avatar_id", true ),
+				"avatar_url" => get_user_meta( $user_id, "user_avatar_url", true ),
+				"avatar_path" => get_user_meta( $user_id, "user_avatar_path", true )
+			);
+		} else { $user_avatar = false; }
 
 		return $user_avatar;
 	}
@@ -212,7 +216,7 @@ class BROTHER {
 	*	Function purpose: This function returns the URL to the banner picture of the specified user
 	*/
 	function get_user_banner_url( $user_id = "" ) {
-		return !empty( $user_id ) ? get_user_meta( $user_id, "user_banner_url", true ) : get_user_meta( get_current_user_id(), "user_banner_url", true );
+		return !empty( $user_id ) && intval( $user_id ) > 0 ? get_user_meta( $user_id, "user_banner_url", true ) : get_user_meta( get_current_user_id(), "user_banner_url", true );
 	}
 
 	/*
@@ -222,12 +226,15 @@ class BROTHER {
 	*/
 	function get_user_banner( $user_id = "" ) {
 		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
+		else { $user_id = intval( $user_id ); }
 
-		$user_banner = (object) array(
-			"banner_id" => get_user_meta( $user_id, "user_banner_id", true ),
-			"banner_url" => get_user_meta( $user_id, "user_banner_url", true ),
-			"banner_path" => get_user_meta( $user_id, "user_banner_path", true )
-		);
+		if ( $user_id > 0 ) {
+			$user_banner = (object) array(
+				"banner_id" => get_user_meta( $user_id, "user_banner_id", true ),
+				"banner_url" => get_user_meta( $user_id, "user_banner_url", true ),
+				"banner_path" => get_user_meta( $user_id, "user_banner_path", true )
+			);
+		} else { $user_banner = false; }
 
 		return $user_banner;
 	}
@@ -425,7 +432,7 @@ class BROTHER {
 	function get_user_followers( $user_id = "" ) {
 		$user_id = empty( $user_id ) ? get_current_user_id() : intval( $user_id );
 
-		if ( is_int( $user_id ) ) {
+		if ( $user_id > 0 ) {
 			$followers_holder = array();
 
 			global $wpdb;
@@ -459,7 +466,7 @@ class BROTHER {
 	function get_user_follows( $user_id = "" ) {
 		$user_id = empty( $user_id ) ? get_current_user_id() : intval( $user_id );
 
-		if ( is_int( $user_id ) ) {
+		if ( $user_id > 0 ) {
 			$follows_holder = array();
 
 			global $wpdb;
@@ -493,7 +500,7 @@ class BROTHER {
 		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
 		else { $user_id = intval( $user_id ); }
 
-		if ( is_int( $user_id ) ) {
+		if ( $user_id > 0 ) {
 			$employees_holder = array();
 
 			global $wpdb;
@@ -527,7 +534,7 @@ class BROTHER {
 		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
 		else { $user_id = intval( $user_id ); }
 
-		if ( is_int( $user_id ) && $user_id != 0 ) {
+		if ( $user_id > 0 ) {
 			$employers_holder = array();
 
 			global $wpdb;
@@ -573,6 +580,7 @@ class BROTHER {
 		$data->universal_name = sanitize_text_field( $data->universal_name );
 
 		if ( empty( $data->user_id ) ) { $data->user_id = get_current_user_id(); }
+		else { $data->user_id = intval( $data->user_id ); }
 
 		global $wpdb;
 		$table_user_relations = $wpdb->prefix ."user_relations";
@@ -658,7 +666,7 @@ class BROTHER {
 		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
 		else { $user_id = intval( $user_id ); }
 
-		if ( is_int( $v_user_id ) && is_int( $user_id ) ) {
+		if ( $v_user_id > 0 && $user_id > 0 ) {
 			global $wpdb;
 
 			$table_ = $wpdb->prefix ."user_relations";
@@ -678,7 +686,7 @@ class BROTHER {
 		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
 		else { $user_id = intval( $user_id ); }
 
-		if ( is_int( $v_user_id ) && is_int( $user_id ) ) {
+		if ( $v_user_id > 0 && $user_id > 0 ) {
 			if ( $v_user_id == $user_id ) { return true; }
 			else {
 				global $wpdb;
@@ -697,7 +705,7 @@ class BROTHER {
 	*	Function purpose: This function tells if the company is public or not.
 	*/
 	function is_company_public( $user_id ) {
-		return get_user_meta( $user_id, "company_type", true ) == "public" ? true : false;
+		return intval( $user_id ) > 0 && get_user_meta( $user_id, "company_type", true ) == "public" ? true : false;
 	}
 
 	/*
@@ -707,8 +715,12 @@ class BROTHER {
 	*/
 	function get_user_association( $user_id = "" ) {
 		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
-		$association_type = get_user_meta( $user_id, "account_association", true );
-		return $association_type;
+		else { $user_id = intval( $user_id ); }
+
+		if ( $user_id > 0 ) {
+			$association_type = get_user_meta( $user_id, "account_association", true );
+			return $association_type;
+		} else { return false; }
 	}
 
 	/*
@@ -718,10 +730,10 @@ class BROTHER {
 	*/
 	function follow_or_unfollow_relation( $data ) {
 		$v_user_id = intval( $data->v_user_id );
-		$user_id = intval( $data->user_id );
+		$user_id = isset( $user_id ) && !empty( $user_id ) ? intval( $data->user_id ) : get_current_user_id();
 		$recalculate = $data->recalculate_followers;
 
-		if ( is_int( $v_user_id ) && is_int( $user_id ) ) {
+		if ( $v_user_id > 0 && $user_id > 0 && ( $recalculate == true || $recalculate == false ) ) {
 			if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
 			$flag = "";
 
@@ -738,7 +750,7 @@ class BROTHER {
 				$this->generate_notification( 70, $v_user_id, $user_id );
 			}
 
-			$flag = $data->recalculate_followers ? (object) array( "action_result" => $flag, "followers" => $this->get_user_followers( $v_user_id ) ) : $flag;
+			$flag = $recalculate ? (object) array( "action_result" => $flag, "followers" => $this->get_user_followers( $v_user_id ) ) : $flag;
 
 			return $flag;
 		} else { return false; }
@@ -750,12 +762,12 @@ class BROTHER {
 	*	Function purpose: This function is used to generate Hire or Fire relation between User && Company.
 	*/
 	function hire_or_fire_relation( $data ) {
-		$user_id = $data->user_id;
-		$company_id = $data->company_id;
+		$user_id = intval( $data->user_id );
+		$company_id = intval( $data->company_id );
 
 		$result = false;
 
-		if ( !empty( $user_id ) && isset( $user_id ) && !empty( $company_id ) && isset( $company_id ) ) {
+		if ( !empty( $user_id ) && isset( $user_id ) && $user_id > 0 && !empty( $company_id ) && isset( $company_id ) && $company_id > 0 ) {
 			global $wpdb;
 			$table_ = $wpdb->prefix ."user_relations";
 
@@ -785,7 +797,7 @@ class BROTHER {
 			$user_id = $user_id->user_id;
 		}
 
-		if ( is_int( $user_id ) ) {
+		if ( $user_id > 0 ) {
 			global $wpdb;
 
 			$table_ = $wpdb->prefix ."user_relations";
@@ -855,7 +867,7 @@ class BROTHER {
 		$v_user_id = intval( $v_user_id );
 		$notification_id = intval( $notification_id );
 
-		if ( is_int( $v_user_id ) && is_int( $user_id ) && is_int( $notification_id ) ) {
+		if ( $v_user_id > 0 && $user_id > 0 && $notification_id > 0 ) {
 			global $wpdb;
 
 			$table_ = $wpdb->prefix ."user_notifications";
@@ -871,33 +883,36 @@ class BROTHER {
 	*	Function purpose: This function is used to send an email notification to the specified User by $user_id.
 	*/
 	function generate_email_notification( $user_id, $notification_template ) {
-		$email_notifications = get_user_meta( $user_id, "email_notifications", true );
-		if ( !isset( $email_notifications ) || empty( $email_notifications ) || $email_notifications == "true" ) {
-			$user = get_userdata( $user_id );
-			if ( isset( $user->user_email ) && !empty( $user->user_email ) ) {
-				$notification_markup = file_get_contents( get_template_directory() ."/assets/emails/notification.html" );
-				$notification_markup = str_ireplace( "[elevenhub-link]", get_site_url(), $notification_markup );
-				$notification_markup = str_replace( "[elevenhub-logo]", get_site_icon_url(), $notification_markup );
-				$notification_markup = str_replace( "[email-date]", date( "d M Y" ), $notification_markup );
-				$notification_markup = str_replace( "[email-text]", $notification_template, $notification_markup );
+		$user_id = intval( $user_id );
+		if ( $user_id > 0 ) {
+			$email_notifications = get_user_meta( $user_id, "email_notifications", true );
+			if ( !isset( $email_notifications ) || empty( $email_notifications ) || $email_notifications == "true" ) {
+				$user = get_userdata( $user_id );
+				if ( isset( $user->user_email ) && !empty( $user->user_email ) ) {
+					$notification_markup = file_get_contents( get_template_directory() ."/assets/emails/notification.html" );
+					$notification_markup = str_ireplace( "[elevenhub-link]", get_site_url(), $notification_markup );
+					$notification_markup = str_replace( "[elevenhub-logo]", get_site_icon_url(), $notification_markup );
+					$notification_markup = str_replace( "[email-date]", date( "d M Y" ), $notification_markup );
+					$notification_markup = str_replace( "[email-text]", $notification_template, $notification_markup );
 
-				$args = array(
-					"posts_per_page" => 1,
-					"post_type" => "quote",
-					"post_status" => "publish",
-					"orderby" => "rand",
-					"order" => "DESC"
-				);
-				$quotes_ = get_posts( $args );
+					$args = array(
+						"posts_per_page" => 1,
+						"post_type" => "quote",
+						"post_status" => "publish",
+						"orderby" => "rand",
+						"order" => "DESC"
+					);
+					$quotes_ = get_posts( $args );
 
-				$notification_markup = str_replace( "[email-quote]", $quotes_[0]->post_content, $notification_markup );
+					$notification_markup = str_replace( "[email-quote]", $quotes_[0]->post_content, $notification_markup );
 
-				wp_mail(
-					$user->user_email,
-					"11Hub Notification",
-					$notification_markup,
-					array( "Content-Type: text/html; charset=UTF-8" )
-				);
+					wp_mail(
+						$user->user_email,
+						"11Hub Notification",
+						$notification_markup,
+						array( "Content-Type: text/html; charset=UTF-8" )
+					);
+				}
 			}
 		}
 	}
@@ -911,31 +926,34 @@ class BROTHER {
 	*/
 	function get_user_notifications( $user_id = "" ) {
 		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
+		else { $user_id = intval( $user_id ); }
 
-		global $wpdb;
+		if ( $user_id > 0 ) {
+			global $wpdb;
 
-		$table_ = $wpdb->prefix ."user_notifications";
-		$sql_ = "SELECT * FROM $table_ WHERE user_notified_id=$user_id ORDER BY id ASC LIMIT 100";
-		$results_ = $wpdb->get_results( $sql_, OBJECT );
+			$table_ = $wpdb->prefix ."user_notifications";
+			$sql_ = "SELECT * FROM $table_ WHERE user_notified_id=$user_id ORDER BY id ASC LIMIT 100";
+			$results_ = $wpdb->get_results( $sql_, OBJECT );
 
-		$count = 0;
-		$notifications_ = array();
-		foreach ( $results_ as $notification_ ) {
-			$notifications_[ $count ][ "row_id" ] = $notification_->id;
-			$notifications_[ $count ][ "notification_body" ][ "notifier_avatar_url" ] = $this->get_user_avatar_url( $notification_->user_notifier_id );
-			$notifications_[ $count ][ "notification_body" ][ "notification_name" ] = get_field( "notification_name", $notification_->notification_id );
-			$notifications_[ $count ][ "notification_body" ][ "notification_link" ] = $this->convert_notification_url( get_field( "notification_url", $notification_->notification_id ), $notification_->user_notifier_id, $notification_->user_notified_id, $notification_->id, $notification_->notification_id );
-			$notifications_[ $count ][ "notification_body" ][ "notification_text" ] = $this->convert_notification_text( get_field( "notification_text", $notification_->notification_id ), $notification_->user_notifier_id, $notification_->user_notified_id, $notification_->id, $notification_->notification_id );
-			$notifications_[ $count ][ "notification_body" ][ "notification_icon" ] = get_field( "notification_icon_code", $notification_->notification_id );
-			$notifications_[ $count ][ "notification_body" ][ "notification_icon_background" ] = get_field( "notification_icon_background_code", $notification_->notification_id );
-			$notifications_[ $count ][ "notification_date" ] = date( "d-m-Y", strtotime( $notification_->notification_date ) );
-			$notifications_[ $count ][ "notification_viewed" ] = $notification_->notification_viewed;
-			$count += 1;
-		}
+			$count = 0;
+			$notifications_ = array();
+			foreach ( $results_ as $notification_ ) {
+				$notifications_[ $count ][ "row_id" ] = $notification_->id;
+				$notifications_[ $count ][ "notification_body" ][ "notifier_avatar_url" ] = $this->get_user_avatar_url( $notification_->user_notifier_id );
+				$notifications_[ $count ][ "notification_body" ][ "notification_name" ] = get_field( "notification_name", $notification_->notification_id );
+				$notifications_[ $count ][ "notification_body" ][ "notification_link" ] = $this->convert_notification_url( get_field( "notification_url", $notification_->notification_id ), $notification_->user_notifier_id, $notification_->user_notified_id, $notification_->id, $notification_->notification_id );
+				$notifications_[ $count ][ "notification_body" ][ "notification_text" ] = $this->convert_notification_text( get_field( "notification_text", $notification_->notification_id ), $notification_->user_notifier_id, $notification_->user_notified_id, $notification_->id, $notification_->notification_id );
+				$notifications_[ $count ][ "notification_body" ][ "notification_icon" ] = get_field( "notification_icon_code", $notification_->notification_id );
+				$notifications_[ $count ][ "notification_body" ][ "notification_icon_background" ] = get_field( "notification_icon_background_code", $notification_->notification_id );
+				$notifications_[ $count ][ "notification_date" ] = date( "d-m-Y", strtotime( $notification_->notification_date ) );
+				$notifications_[ $count ][ "notification_viewed" ] = $notification_->notification_viewed;
+				$count += 1;
+			}
 
-		$notifications_ = json_encode( (object) $notifications_ );
+			$notifications_ = json_encode( (object) $notifications_ );
 
-		return $notifications_;
+			return $notifications_;
+		} else { return array(); }
 	}
 
 	/*
@@ -947,33 +965,35 @@ class BROTHER {
 	*	Good usage example can be found in the scripts.js file at the buildAndPullUserNotifications() method which includes the listenForNewUserNotifications() method.
 	*/
 	function get_user_unseen_notifications( $data ) {
-		$user_id = !empty( $data->user_id ) ? $data->user_id : get_current_user_id();
+		$user_id = !empty( $data->user_id ) ? intval( $data->user_id ) : get_current_user_id();
 		$listed_notifications = "'". implode( "','", $data->listed_notifications ) ."'";
 
-		global $wpdb;
+		if ( $user_id > 0 ) {
+			global $wpdb;
 
-		$table_ = $wpdb->prefix ."user_notifications";
-		$sql_ = "SELECT * FROM $table_ WHERE user_notified_id=$user_id AND id NOT IN ($listed_notifications) ORDER BY id ASC";
-		$results_ = $wpdb->get_results( $sql_, OBJECT );
+			$table_ = $wpdb->prefix ."user_notifications";
+			$sql_ = "SELECT * FROM $table_ WHERE user_notified_id=$user_id AND id NOT IN ($listed_notifications) ORDER BY id ASC";
+			$results_ = $wpdb->get_results( $sql_, OBJECT );
 
-		$count = 0;
-		$notifications_ = array();
-		foreach ( $results_ as $notification_ ) {
-			$notifications_[ $count ][ "row_id" ] = $notification_->id;
-			$notifications_[ $count ][ "notification_body" ][ "notifier_avatar_url" ] = $this->get_user_avatar_url( $notification_->user_notifier_id );
-			$notifications_[ $count ][ "notification_body" ][ "notification_name" ] = get_field( "notification_name", $notification_->notification_id );
-			$notifications_[ $count ][ "notification_body" ][ "notification_link" ] = $this->convert_notification_url( get_field( "notification_url", $notification_->notification_id ), $notification_->user_notifier_id, $notification_->user_notified_id, $notification_->id, $notification_->notification_id );
-			$notifications_[ $count ][ "notification_body" ][ "notification_text" ] = $this->convert_notification_text( get_field( "notification_text", $notification_->notification_id ), $notification_->user_notifier_id, $notification_->user_notified_id, $notification_->id, $notification_->notification_id );
-			$notifications_[ $count ][ "notification_body" ][ "notification_icon" ] = get_field( "notification_icon_code", $notification_->notification_id );
-			$notifications_[ $count ][ "notification_body" ][ "notification_icon_background" ] = get_field( "notification_icon_background_code", $notification_->notification_id );
-			$notifications_[ $count ][ "notification_date" ] = date( "d-m-Y", strtotime( $notification_->notification_date ) );
-			$notifications_[ $count ][ "notification_viewed" ] = $notification_->notification_viewed;
-			$count += 1;
-		}
+			$count = 0;
+			$notifications_ = array();
+			foreach ( $results_ as $notification_ ) {
+				$notifications_[ $count ][ "row_id" ] = $notification_->id;
+				$notifications_[ $count ][ "notification_body" ][ "notifier_avatar_url" ] = $this->get_user_avatar_url( $notification_->user_notifier_id );
+				$notifications_[ $count ][ "notification_body" ][ "notification_name" ] = get_field( "notification_name", $notification_->notification_id );
+				$notifications_[ $count ][ "notification_body" ][ "notification_link" ] = $this->convert_notification_url( get_field( "notification_url", $notification_->notification_id ), $notification_->user_notifier_id, $notification_->user_notified_id, $notification_->id, $notification_->notification_id );
+				$notifications_[ $count ][ "notification_body" ][ "notification_text" ] = $this->convert_notification_text( get_field( "notification_text", $notification_->notification_id ), $notification_->user_notifier_id, $notification_->user_notified_id, $notification_->id, $notification_->notification_id );
+				$notifications_[ $count ][ "notification_body" ][ "notification_icon" ] = get_field( "notification_icon_code", $notification_->notification_id );
+				$notifications_[ $count ][ "notification_body" ][ "notification_icon_background" ] = get_field( "notification_icon_background_code", $notification_->notification_id );
+				$notifications_[ $count ][ "notification_date" ] = date( "d-m-Y", strtotime( $notification_->notification_date ) );
+				$notifications_[ $count ][ "notification_viewed" ] = $notification_->notification_viewed;
+				$count += 1;
+			}
 
-		$notifications_ = json_encode( (object) $notifications_ );
+			$notifications_ = json_encode( (object) $notifications_ );
 
-		return $notifications_;
+			return $notifications_;
+		} else { return array(); }
 	}
 
 	/*
@@ -1014,9 +1034,12 @@ class BROTHER {
 	*	Function purpose: This function is used to mark notification as viewed in the DB.
 	*/
 	function read_notification( $notification_row_id ) {
-		global $wpdb;
-		$table_ = $wpdb->prefix ."user_notifications";
-		$wpdb->update( $table_, array( "notification_viewed" => 1 ), array( "id" => $notification_row_id ) );
+		$notification_row_id = intval( $notification_row_id );
+		if ( $notification_row_id > 0 ) {
+			global $wpdb;
+			$table_ = $wpdb->prefix ."user_notifications";
+			$wpdb->update( $table_, array( "notification_viewed" => 1 ), array( "id" => $notification_row_id ) );
+		}
 	}
 
 	/*
@@ -1054,36 +1077,39 @@ class BROTHER {
 	*	Function purpose: This function is used to update the user meta information via passed by the front-end brother.js method var UserMeta.updateUserMeta MIXED_OBJECT.
 	*/
 	function update_user_meta( $data ) {
-		$user_id = !empty( $data->user_id ) ? $data->user_id : get_current_user_id();
-		$user_ = get_user_by( "ID", $user_id );
+		$user_id = !empty( $data->user_id ) ? intval( $data->user_id ) : get_current_user_id();
 
-		if ( $user_ && wp_check_password( $data->current_password, $user_->data->user_pass, $user_id ) ) {
-			if ( !empty( $data->first_name ) && isset( $data->first_name ) && $this->is_alphabetical( $data->first_name ) ) { update_user_meta( $user_id, "first_name", ucfirst( strtolower( $data->first_name ) ) ); }
-			if ( !empty( $data->last_name ) && isset( $data->last_name ) && $this->is_alphabetical( $data->last_name ) ) { update_user_meta( $user_id, "last_name", ucfirst( strtolower( $data->last_name ) ) ); }
-			if ( !empty( $data->new_password ) && isset( $data->new_password ) ) { wp_set_password( $data->new_password, $user_id ); }
+		if ( $user_id > 0 ) {
+			$user_ = get_user_by( "ID", $user_id );
 
-			if ( !get_user_meta( $user_id, "user_biography", false ) ) {
-				add_user_meta( $user_id, "user_biography", $data->biography, false );
-			} else {
-				update_user_meta( $user_id, "user_biography", $data->biography, false );
-			}
+			if ( $user_ && wp_check_password( $data->current_password, $user_->data->user_pass, $user_id ) ) {
+				if ( !empty( $data->first_name ) && isset( $data->first_name ) && $this->is_alphabetical( $data->first_name ) ) { update_user_meta( $user_id, "first_name", ucfirst( strtolower( $data->first_name ) ) ); }
+				if ( !empty( $data->last_name ) && isset( $data->last_name ) && $this->is_alphabetical( $data->last_name ) ) { update_user_meta( $user_id, "last_name", ucfirst( strtolower( $data->last_name ) ) ); }
+				if ( !empty( $data->new_password ) && isset( $data->new_password ) ) { wp_set_password( $data->new_password, $user_id ); }
 
-			if ( !empty( $data->notify_over_email ) && isset( $data->notify_over_email ) ) {
-				if ( empty( get_user_meta( $user_id, "email_notifications", false ) ) ) { add_user_meta( $user_id, "email_notifications", $data->notify_over_email ); }
-				else { update_user_meta( $user_id, "email_notifications", $data->notify_over_email ); }
-			}
+				if ( !get_user_meta( $user_id, "user_biography", false ) ) {
+					add_user_meta( $user_id, "user_biography", $data->biography, false );
+				} else {
+					update_user_meta( $user_id, "user_biography", $data->biography, false );
+				}
 
-			// Logout user
-			wp_logout();
+				if ( !empty( $data->notify_over_email ) && isset( $data->notify_over_email ) ) {
+					if ( empty( get_user_meta( $user_id, "email_notifications", false ) ) ) { add_user_meta( $user_id, "email_notifications", $data->notify_over_email ); }
+					else { update_user_meta( $user_id, "email_notifications", $data->notify_over_email ); }
+				}
 
-			// Login user
-			$res_ = wp_signon( array(
-				"user_login" => $user_->data->user_login,
-				"user_password" => !empty( $data->new_password ) ? $data->new_password : $data->current_password
-			), false );
+				// Logout user
+				wp_logout();
 
-			return "updated";
-		} else { return "Wrong password!"; }
+				// Login user
+				$res_ = wp_signon( array(
+					"user_login" => $user_->data->user_login,
+					"user_password" => !empty( $data->new_password ) ? $data->new_password : $data->current_password
+				), false );
+
+				return "updated";
+			} else { return "Wrong password!"; }
+		}
 	}
 
 	/*
@@ -1092,45 +1118,48 @@ class BROTHER {
 	*	Function purpose: This function is used to update the company meta information.
 	*/
 	function update_company_meta( $data ) {
-		$user_id = !empty( $data->user_id ) ? $data->user_id : get_current_user_id();
-		$user_ = get_user_by( "ID", $user_id );
+		$user_id = !empty( $data->user_id ) ? intval( $data->user_id ) : get_current_user_id();
 
-		if ( $user_ && wp_check_password( $data->current_password, $user_->data->user_pass, $user_id ) ) {
-			if ( !empty( $data->first_name ) && isset( $data->first_name ) && $this->is_alphabetical( $data->first_name ) ) { update_user_meta( $user_id, "first_name", ucfirst( strtolower( $data->first_name ) ) ); }
-			if ( !empty( $data->last_name ) && isset( $data->last_nae ) && $this->is_alphabetical( $data->last_name ) ) { update_user_meta( $user_id, "last_name", ucfirst( strtolower( $data->last_name ) ) ); }
-			if ( !empty( $data->new_password ) && isset( $data->new_password ) ) { wp_set_password( $data->new_password, $user_id ); }
-			if ( empty( get_user_meta( $user_id, "user_shortname", false ) ) ) { add_user_meta( $user_id, "user_shortname", $data->short_name ); }
-			else { update_user_meta( $user_id, "user_shortname", $data->short_name ); }
+		if ( $user_id > 0 ) {
+			$user_ = get_user_by( "ID", $user_id );
 
-			// Company meta data
-			if ( empty( get_user_meta( $user_id, "company_type", false ) ) ) { add_user_meta( $user_id, "company_type", $data->company_type ); }
-			else { update_user_meta( $user_id, "company_type", $data->company_type ); }
+			if ( $user_ && wp_check_password( $data->current_password, $user_->data->user_pass, $user_id ) ) {
+				if ( !empty( $data->first_name ) && isset( $data->first_name ) && $this->is_alphabetical( $data->first_name ) ) { update_user_meta( $user_id, "first_name", ucfirst( strtolower( $data->first_name ) ) ); }
+				if ( !empty( $data->last_name ) && isset( $data->last_nae ) && $this->is_alphabetical( $data->last_name ) ) { update_user_meta( $user_id, "last_name", ucfirst( strtolower( $data->last_name ) ) ); }
+				if ( !empty( $data->new_password ) && isset( $data->new_password ) ) { wp_set_password( $data->new_password, $user_id ); }
+				if ( empty( get_user_meta( $user_id, "user_shortname", false ) ) ) { add_user_meta( $user_id, "user_shortname", $data->short_name ); }
+				else { update_user_meta( $user_id, "user_shortname", $data->short_name ); }
 
-			if ( empty( get_user_meta( $user_id, "company_writing_permissions", false ) ) ) { add_user_meta( $user_id, "company_writing_permissions", $data->company_writing_permissions ); }
-			else { update_user_meta( $user_id, "company_writing_permissions", $data->company_writing_permissions ); }
+				// Company meta data
+				if ( empty( get_user_meta( $user_id, "company_type", false ) ) ) { add_user_meta( $user_id, "company_type", $data->company_type ); }
+				else { update_user_meta( $user_id, "company_type", $data->company_type ); }
 
-			if ( empty( get_user_meta( $user_id, "company_publications_communication_permissions", false ) ) ) { add_user_meta( $user_id, "company_publications_communication_permissions", $data->company_publications_communication_permissions ); }
-			else { update_user_meta( $user_id, "company_publications_communication_permissions", $data->company_publications_communication_permissions ); }
+				if ( empty( get_user_meta( $user_id, "company_writing_permissions", false ) ) ) { add_user_meta( $user_id, "company_writing_permissions", $data->company_writing_permissions ); }
+				else { update_user_meta( $user_id, "company_writing_permissions", $data->company_writing_permissions ); }
 
-			if ( empty( get_user_meta( $user_id, "company_media_uploads_permissions", false ) ) ) { add_user_meta( $user_id, "company_media_uploads_permissions", $data->company_media_uploads_permissions ); }
-			else { update_user_meta( $user_id, "company_media_uploads_permissions", $data->company_media_uploads_permissions ); }
+				if ( empty( get_user_meta( $user_id, "company_publications_communication_permissions", false ) ) ) { add_user_meta( $user_id, "company_publications_communication_permissions", $data->company_publications_communication_permissions ); }
+				else { update_user_meta( $user_id, "company_publications_communication_permissions", $data->company_publications_communication_permissions ); }
 
-			if ( !empty( $data->notify_over_email ) && isset( $data->notify_over_email ) ) {
-				if ( empty( get_user_meta( $user_id, "email_notifications", false ) ) ) { add_user_meta( $user_id, "email_notifications", $data->notify_over_email ); }
-				else { update_user_meta( $user_id, "email_notifications", $data->notify_over_email ); }
-			}
+				if ( empty( get_user_meta( $user_id, "company_media_uploads_permissions", false ) ) ) { add_user_meta( $user_id, "company_media_uploads_permissions", $data->company_media_uploads_permissions ); }
+				else { update_user_meta( $user_id, "company_media_uploads_permissions", $data->company_media_uploads_permissions ); }
 
-			// Logout user
-			wp_logout();
+				if ( !empty( $data->notify_over_email ) && isset( $data->notify_over_email ) ) {
+					if ( empty( get_user_meta( $user_id, "email_notifications", false ) ) ) { add_user_meta( $user_id, "email_notifications", $data->notify_over_email ); }
+					else { update_user_meta( $user_id, "email_notifications", $data->notify_over_email ); }
+				}
 
-			// Login user
-			$res_ = wp_signon( array(
-				"user_login" => $user_->data->user_login,
-				"user_password" => !empty( $data->new_password ) ? $data->new_password : $data->current_password
-			), false );
+				// Logout user
+				wp_logout();
 
-			return "updated";
-		} else { return "Wrong password!"; }
+				// Login user
+				$res_ = wp_signon( array(
+					"user_login" => $user_->data->user_login,
+					"user_password" => !empty( $data->new_password ) ? $data->new_password : $data->current_password
+				), false );
+
+				return "updated";
+			} else { return "Wrong password!"; }
+		}
 	}
 
 	/*
@@ -1140,18 +1169,21 @@ class BROTHER {
 	*/
 	function get_company_meta( $company_id = "" ) {
 		if ( empty( $company_id ) ) { $company_id = get_current_user_id(); }
+		else { $company_id = intval( $company_id ); }
 
-		$meta_ = array();
-		$meta_[ "first_name" ] = get_user_meta( $company_id, "first_name", true );
-		$meta_[ "last_name" ] = get_user_meta( $company_id, "last_name", true );
-		$meta_[ "short_name" ] = get_user_meta( $company_id, "user_shortname", true );
-		$meta_[ "company_type" ] = get_user_meta( $company_id, "company_type", true );
-		$meta_[ "writing_permissions" ] = get_user_meta( $company_id, "company_writing_permissions", true );
-		$meta_[ "publications_communication_permissions" ] = get_user_meta( $company_id, "company_publications_communication_permissions", true );
-		$meta_[ "media_uploads_permissions" ] = get_user_meta( $company_id, "company_media_uploads_permissions", true );
-		$meta_ = (object)$meta_;
+		if ( $company_id > 0 ) {
+			$meta_ = array();
+			$meta_[ "first_name" ] = get_user_meta( $company_id, "first_name", true );
+			$meta_[ "last_name" ] = get_user_meta( $company_id, "last_name", true );
+			$meta_[ "short_name" ] = get_user_meta( $company_id, "user_shortname", true );
+			$meta_[ "company_type" ] = get_user_meta( $company_id, "company_type", true );
+			$meta_[ "writing_permissions" ] = get_user_meta( $company_id, "company_writing_permissions", true );
+			$meta_[ "publications_communication_permissions" ] = get_user_meta( $company_id, "company_publications_communication_permissions", true );
+			$meta_[ "media_uploads_permissions" ] = get_user_meta( $company_id, "company_media_uploads_permissions", true );
+			$meta_ = (object)$meta_;
 
-		return $meta_;
+			return $meta_;
+		}
 	}
 
 	/*
@@ -1160,35 +1192,41 @@ class BROTHER {
 	*	Function purpose: This function is used to save custom meta information for the specified Notification.
 	*/
 	function generate_notification_meta( $notification_id, $meta_key, $meta_value ) {
-		global $wpdb;
-		$table_ = $wpdb->prefix ."user_notificationsmeta";
+		$notification_id = intval( $notification_id );
+		$meta_key = sanitize_text_field( $meta_key );
+		$meta_value = sanitize_text_field( $meta_value );
 
-		$sql_ = "SELECT * FROM $table_ WHERE notification_id='$notification_id' AND meta_key='$meta_key' AND meta_value='$meta_value'";
-		$result_ = $wpdb->get_results( $sql_, OBJECT );
+		if ( $notification_id > 0 ) {
+			global $wpdb;
+			$table_ = $wpdb->prefix ."user_notificationsmeta";
 
-		if ( count( $result_ ) == 0 ) { // Insert method
-			$wpdb->insert(
-				$table_,
-				array(
-					"notification_id" => $notification_id,
-					"meta_key" => $meta_key,
-					"meta_value" => $meta_value
-				)
-			);
-		} else { // Update method
-			$wpdb->update(
-				$table_,
-				array(
-					"notification_id" => $notification_id,
-					"meta_key" => $meta_key,
-					"meta_value" => $meta_value
-				),
-				array (
-					"notification_id" => $notification_id,
-					"meta_key" => $meta_key,
-					"meta_value" => $meta_value
-				)
-			);
+			$sql_ = "SELECT * FROM $table_ WHERE notification_id='$notification_id' AND meta_key='$meta_key' AND meta_value='$meta_value'";
+			$result_ = $wpdb->get_results( $sql_, OBJECT );
+
+			if ( count( $result_ ) == 0 ) { // Insert method
+				$wpdb->insert(
+					$table_,
+					array(
+						"notification_id" => $notification_id,
+						"meta_key" => $meta_key,
+						"meta_value" => $meta_value
+					)
+				);
+			} else { // Update method
+				$wpdb->update(
+					$table_,
+					array(
+						"notification_id" => $notification_id,
+						"meta_key" => $meta_key,
+						"meta_value" => $meta_value
+					),
+					array (
+						"notification_id" => $notification_id,
+						"meta_key" => $meta_key,
+						"meta_value" => $meta_value
+					)
+				);
+			}
 		}
 	}
 
@@ -1198,13 +1236,18 @@ class BROTHER {
 	*	Function purpose: This function is used to get the custom meta information for the specified Notification.
 	*/
 	function get_notification_meta( $notification_id, $meta_key ) {
-		global $wpdb;
-		$table_ = $wpdb->prefix ."user_notificationsmeta";
+		$notification_id = intval( $notification_id );
+		$meta_key = sanitize_text_field( $meta_key );
 
-		$sql_ = "SELECT meta_value FROM $table_ WHERE notification_id='$notification_id' AND meta_key='$meta_key'";
-		$result_ = $wpdb->get_results( $sql_, OBJECT );
+		if ( $notification_id > 0 ) {
+			global $wpdb;
+			$table_ = $wpdb->prefix ."user_notificationsmeta";
 
-		return $result_[0]->meta_value;
+			$sql_ = "SELECT meta_value FROM $table_ WHERE notification_id='$notification_id' AND meta_key='$meta_key'";
+			$result_ = $wpdb->get_results( $sql_, OBJECT );
+
+			return $result_[0]->meta_value;
+		} else { return false; }
 	}
 
 	/*
@@ -1213,18 +1256,22 @@ class BROTHER {
 	*	Function purpose: This function is used to return all available metas for the specified Notification by $notification_id.
 	*/
 	function get_notification_metas( $notification_id ) {
-		global $wpdb;
-		$table_ = $wpdb->prefix ."user_notificationsmeta";
+		$notification_id = intval( $notification_id );
 
-		$sql_ = "SELECT meta_key, meta_value FROM $table_ WHERE notification_id='$notification_id'";
-		$results_ = $wpdb->get_results( $sql_, OBJECT );
+		if ( $notification_id > 0 ) {
+			global $wpdb;
+			$table_ = $wpdb->prefix ."user_notificationsmeta";
 
-		$metas_ = array();
-		foreach ( $results_ as $_META ) {
-			$metas_[ $_META->meta_key ] = $_META->meta_value;
-		}
+			$sql_ = "SELECT meta_key, meta_value FROM $table_ WHERE notification_id='$notification_id'";
+			$results_ = $wpdb->get_results( $sql_, OBJECT );
 
-		return (object) $metas_;
+			$metas_ = array();
+			foreach ( $results_ as $_META ) {
+				$metas_[ $_META->meta_key ] = $_META->meta_value;
+			}
+
+			return (object) $metas_;
+		} else { return false; }
 	}
 
 	/*
@@ -1261,8 +1308,8 @@ class BROTHER {
 	*	This function is used to publish specified user post.
 	*/
 	function publish_user_story( $data ) {
-		if ( !empty( $data->post_id ) ) {
-			if ( !empty( $data->company_id ) ) {
+		if ( !empty( $data->post_id ) && intval( $data->post_id ) > 0 ) {
+			if ( !empty( $data->company_id ) && intval( $data->company_id ) > 0 ) {
 				wp_publish_post( $data->post_id );
 				return true;
 			} else { return "ERROR: Company ID is not set."; }
@@ -1275,8 +1322,8 @@ class BROTHER {
 	*	Function purpose: This function is used to delete specified Post by the $post_id.
 	*/
 	function delete_user_story( $data ) {
-		if ( !empty( $data->post_id ) ) {
-			if ( !empty( $data->company_id ) ) {
+		if ( !empty( $data->post_id ) && intval( $data->post_id ) > 0 ) {
+			if ( !empty( $data->company_id ) && intval( $data->company_id ) > 0 ) {
 				wp_delete_post( $data->post_id, false );
 				return $data->post_id;
 			} else { return "ERROR: Company ID is not set."; }
@@ -1293,8 +1340,11 @@ class BROTHER {
 	function get_company_stories( $data ) {
 		if ( isset( $data->is_ajax ) && $data->is_ajax == true ) { $drafts_container = array(); }
 		if ( !isset( $data->requester_id ) || empty( $data->requester_id ) ) { $data->requester_id = get_current_user_id(); }
+		else { $data->requester_id = intval( $data->requester_id ); }
 
-		if ( !empty( $data->company_id ) ) {
+		$data->company_id = isset( $data->company_id ) && !empty( $data->company_id ) ? intval( $data->company_id ) : 0;
+
+		if ( $data->company_id > 0 && $data->requester_id > 0 ) {
 			$args = array(
 				"posts_per_page" => $data->stories,
 				"order_by" => "date",
@@ -1375,10 +1425,11 @@ class BROTHER {
 	*	This function is used to retrieve user posts from the specified Company_Group.
 	*/
 	function get_user_stories( $data ) {
-		$user_id = !empty( $data->user_id ) ? $data->user_id : get_current_user_id();
+		$user_id = isset( $data->user_id ) && !empty( $data->user_id ) ? intval( $data->user_id ) : get_current_user_id();
+		$data->company_id = isset( $data->company_id ) && !empty( $data->company_id ) ? intval( $data->company_id ) : 0;
 		$stories_container = array();
 
-		if ( !empty( $data->company_id ) ) {
+		if ( $data->company_id > 0 && $user_id > 0 ) {
 			$company_id = $data->company_id;
 
 			$args = array(
@@ -1426,14 +1477,12 @@ class BROTHER {
 	*	This function is used to return the full information about the specified by the $post_id Post.
 	*/
 	function get_user_story( $data ) {
-		$post_id = !empty( $data->post_id ) ? $data->post_id : NULL;
-		$company_id = !empty( $data->company_id ) ? $data->company_id : NULL;
+		$post_id = !empty( $data->post_id ) ? intval( $data->post_id ) : NULL;
+		$company_id = !empty( $data->company_id ) ? intval( $data->company_id ) : NULL;
 
 		$story_container = array();
 
-		if ( empty( $post_id ) || empty( $company_id ) ) {
-			$story_container = "ERROR: Post ID or Company ID is empty.";
-		} else {
+		if ( $post_id > 0 && $company_id > 0 ) {
 			$post_ = get_post( $post_id );
 			$story_container[ "ID" ] = $post_id;
 			$story_container[ "title" ] = $post_->post_title;
@@ -1456,6 +1505,8 @@ class BROTHER {
 			$story_container[ "meta" ][ "is_requester_employee" ] = $this->is_employee( $company_id, $user_id );
 			$story_container[ "meta" ][ "comments_allowed" ] = get_user_meta( $company_id, "company_publications_communication_permissions", true );
 			$story_container = (object)$story_container;
+		} else {
+			$story_container = "ERROR: Post ID or Company ID is empty.";
 		}
 
 		return $story_container;
@@ -1467,7 +1518,7 @@ class BROTHER {
 	*	Function purpose: This function is used to count the stories of the specified User by $user_id.
 	*/
 	function count_user_stories( $user_id = "" ) {
-		return count_user_posts( empty( $user_id ) ? get_current_user_id() : $user_id );
+		return count_user_posts( empty( $user_id ) ? get_current_user_id() : intval( $user_id ) );
 	}
 
 	/*
@@ -1476,19 +1527,23 @@ class BROTHER {
 	*	Function purpose: This function is used to collect full information about the likes for the specified by $story_id Company Post.
 	*/
 	function get_story_likes( $story_id ) {
-		global $wpdb;
+		$story_id = intval( $story_id );
 
-		$user_likes_table = $wpdb->prefix ."user_likes";
+		if ( $story_id > 0 ) {
+			global $wpdb;
 
-		$sql_ = "
-		SELECT id, story_id, user_id, action_date
-		FROM $user_likes_table
-		WHERE story_id = $story_id
-		";
+			$user_likes_table = $wpdb->prefix ."user_likes";
 
-		$results_ = $wpdb->get_results( $sql_, OBJECT );
+			$sql_ = "
+			SELECT id, story_id, user_id, action_date
+			FROM $user_likes_table
+			WHERE story_id = $story_id
+			";
 
-		return $results_;
+			$results_ = $wpdb->get_results( $sql_, OBJECT );
+
+			return $results_;
+		} else { return array(); }
 	}
 
 	/*
@@ -1500,8 +1555,9 @@ class BROTHER {
 	*	The function returns an OBJECT with action: LIKE || UNLIKE && likes_count: CURRENT_POST_LIKES
 	*/
 	function like_unlike_story( $data ) {
-		if ( !empty( $data->story_id ) ) {
+		if ( !empty( $data->story_id ) && intval( $data->story_id ) > 0 ) {
 			if ( empty( $data->user_id ) ) { $data->user_id = get_current_user_id(); }
+			else { $data->user_id = intval( $data->user_id ); }
 
 			if ( $this->is_employee( get_post_meta( $data->story_id, "related_company_id", true ), $data->user_id ) ) {
 				global $wpdb;
@@ -1543,36 +1599,41 @@ class BROTHER {
 	*/
 	function get_story_comments( $data ) {
 		if ( !isset( $data->user_id ) || empty( $data->user_id ) ) { $data->user_id = ""; }
+		else { $data->user_id = intval( $data->user_id ); }
 
-		$args = array(
-			"count" => false,
-			"orberby" => "comment_date",
-			"order" => "DESC",
-			"post_id" => $data->story_id,
-			"user_id" => $data->user_id
-		);
-		$comments_ = get_comments( $args );
+		$data->story_id = isset( $data->story_id ) && !empty( $data->story_id ) ? intval( $data->story_id ) : "";
 
-		if ( is_array( $comments_ ) ) {
-			$comments_container = array();
-			foreach ( $comments_ as $comment_ ) {
-				$comment_container = array();
-				$comment_container[ "id" ] = $comment_->comment_ID;
-				$comment_container[ "content" ] = $comment_->comment_content;
-				$comment_container[ "data" ] = $comment_->comment_date;
-				$comment_container[ "user" ][ "id" ] = $comment_->user_id;
-				$comment_container[ "user" ][ "avatar" ] = $this->get_user_avatar_url( $comment_->user_id );
-				$comment_container[ "user" ][ "banner" ] = $this->get_user_banner_url( $comment_->user_id );
-				$comment_container[ "user" ][ "first_name" ] = get_user_meta( $comment_->user_id, "first_name", true );
-				$comment_container[ "user" ][ "last_name" ] = get_user_meta( $comment_->user_id, "last_name", true );
-				$comment_container[ "user" ][ "user_shortname" ] = get_user_meta( $comment_->user_id, "user_shortname", true );
-				$comment_container[ "user" ][ "url" ] = get_author_posts_url( $comment_->user_id );
-				$comment_container[ "user" ][ "is_author" ] = get_current_user_id() == $comment_->user_id && $this->is_employee( get_post_meta( $data->story_id, "related_company_id", true ), get_current_user_id() ) ? true : false;
-				array_push( $comments_container, (object)$comment_container );
-			}
+		if ( $data->user_id > 0 && $data->story_id > 0 ) {
+			$args = array(
+				"count" => false,
+				"orberby" => "comment_date",
+				"order" => "DESC",
+				"post_id" => $data->story_id,
+				"user_id" => $data->user_id
+			);
+			$comments_ = get_comments( $args );
 
-			return $comments_container;
-		} else { return ""; }
+			if ( is_array( $comments_ ) ) {
+				$comments_container = array();
+				foreach ( $comments_ as $comment_ ) {
+					$comment_container = array();
+					$comment_container[ "id" ] = $comment_->comment_ID;
+					$comment_container[ "content" ] = $comment_->comment_content;
+					$comment_container[ "data" ] = $comment_->comment_date;
+					$comment_container[ "user" ][ "id" ] = $comment_->user_id;
+					$comment_container[ "user" ][ "avatar" ] = $this->get_user_avatar_url( $comment_->user_id );
+					$comment_container[ "user" ][ "banner" ] = $this->get_user_banner_url( $comment_->user_id );
+					$comment_container[ "user" ][ "first_name" ] = get_user_meta( $comment_->user_id, "first_name", true );
+					$comment_container[ "user" ][ "last_name" ] = get_user_meta( $comment_->user_id, "last_name", true );
+					$comment_container[ "user" ][ "user_shortname" ] = get_user_meta( $comment_->user_id, "user_shortname", true );
+					$comment_container[ "user" ][ "url" ] = get_author_posts_url( $comment_->user_id );
+					$comment_container[ "user" ][ "is_author" ] = get_current_user_id() == $comment_->user_id && $this->is_employee( get_post_meta( $data->story_id, "related_company_id", true ), get_current_user_id() ) ? true : false;
+					array_push( $comments_container, (object)$comment_container );
+				}
+
+				return $comments_container;
+			} else { return ""; }
+		}
 	}
 
 	/*
@@ -1582,11 +1643,16 @@ class BROTHER {
 	*/
 	function has_liked( $user_id = "", $story_id ) {
 		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
+		else { $user_id = intval( $user_id ); }
 
-		global $wpdb;
-		$user_likes_table = $wpdb->prefix ."user_likes";
-		$sql_ = "SELECT * FROM $user_likes_table WHERE story_id=$story_id AND user_id=$user_id";
-		return !empty( $wpdb->get_results( $sql_, OBJECT ) ) ? true : false;
+		$story_id = intval( $story_id );
+
+		if ( $user_id > 0 && $story_id > 0 ) {
+			global $wpdb;
+			$user_likes_table = $wpdb->prefix ."user_likes";
+			$sql_ = "SELECT * FROM $user_likes_table WHERE story_id=$story_id AND user_id=$user_id";
+			return !empty( $wpdb->get_results( $sql_, OBJECT ) ) ? true : false;
+		}
 	}
 
 	/*
@@ -1595,39 +1661,42 @@ class BROTHER {
 	*	Function purpose: This function is used to publish $comment_content for the specified $story_id.
 	*/
 	function publish_story_comment( $data ) {
-		if ( !empty( $data->story_id ) ) {
-			if ( !empty( $data->comment_content ) ) {
+		if ( !empty( $data->story_id ) && intval( $data->story_id ) > 0 ) {
+			if ( !empty( sanitize_text_field( $data->comment_content ) ) ) {
 				if ( empty( $data->user_id ) ) { $data->user_id =  get_current_user_id(); }
+				else { $data->user_id = intval( $data->user_id ); }
 
-				$update_result = 0;
-				$comment_id = "";
+				if ( $data->user_id > 0 ) {
+					$update_result = 0;
+					$comment_id = "";
 
-				if ( !empty( $data->comment_id ) ) {
-					$update_result = wp_update_comment( array(
-						"comment_ID" => $data->comment_id,
-						"comment_content" => $data->comment_content
-					) );
-				}
-				else {
-					$commentdata = array(
-						"comment_post_ID" => $data->story_id,
-						"comment_content" => $data->comment_content,
-						"user_id" => $data->user_id
-					);
-					$comment_id = wp_new_comment( $commentdata );
-				}
-
-				if ( is_numeric( $comment_id ) || $update_result == 1 ) {
-					$author_id = get_post_field( "post_author", $data->story_id );
-
-					if ( $update_result == 0 ) {
-						$notification_id = $this->generate_notification( 324, $author_id, $data->user_id );
-						$this->generate_notification_meta( $notification_id, "commented_story_id", $data->story_id );
-						$this->generate_notification_meta( $notification_id, "comment_id", !empty( $comment_id ) ? $comment_id : $data->comment_id );
+					if ( !empty( $data->comment_id ) ) {
+						$update_result = wp_update_comment( array(
+							"comment_ID" => $data->comment_id,
+							"comment_content" => $data->comment_content
+						) );
+					}
+					else {
+						$commentdata = array(
+							"comment_post_ID" => $data->story_id,
+							"comment_content" => $data->comment_content,
+							"user_id" => $data->user_id
+						);
+						$comment_id = wp_new_comment( $commentdata );
 					}
 
-					return !empty( $comment_id ) ? $comment_id : $update_result;
-				} else { return ""; }
+					if ( is_numeric( $comment_id ) || $update_result == 1 ) {
+						$author_id = get_post_field( "post_author", $data->story_id );
+
+						if ( $update_result == 0 ) {
+							$notification_id = $this->generate_notification( 324, $author_id, $data->user_id );
+							$this->generate_notification_meta( $notification_id, "commented_story_id", $data->story_id );
+							$this->generate_notification_meta( $notification_id, "comment_id", !empty( $comment_id ) ? $comment_id : $data->comment_id );
+						}
+
+						return !empty( $comment_id ) ? $comment_id : $update_result;
+					} else { return ""; }
+				}
 			} else { return "ERROR: Story Content is not set."; }
 		} else { return "ERROR: Story ID is not set."; }
 	}
@@ -1637,7 +1706,7 @@ class BROTHER {
 	*	Function arguments: $comment_id [ INT ] (required)
 	*	Function purpose: This function removes the specified by $comment_id, story comment.
 	*/
-	function delete_story_comment( $comment_id ) { return array( "result" => wp_delete_comment( $comment_id, true ), "comment_id" => $comment_id );	}
+	function delete_story_comment( $comment_id ) { return array( "result" => wp_delete_comment( intval( $comment_id ), true ), "comment_id" => $comment_id );	}
 
 	/*
 	*	Function name: get_available_media_space
@@ -1646,14 +1715,17 @@ class BROTHER {
 	*/
 	function get_available_media_space( $user_id = "" ) {
 		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
+		else { $user_id = intval( $user_id ); }
 
-		$media_space = get_user_meta( $user_id, "media_space", true );
-		if ( empty( $media_space ) || !isset( $media_space ) ) {
-			add_user_meta( $user_id, "media_space", "1000000000", false ); // Set 1GB free disk space
-			$media_space = 1000000000;
-		}
+		if ( $user_id > 0 ) {
+			$media_space = get_user_meta( $user_id, "media_space", true );
+			if ( empty( $media_space ) || !isset( $media_space ) ) {
+				add_user_meta( $user_id, "media_space", "1000000000", false ); // Set 1GB free disk space
+				$media_space = 1000000000;
+			}
 
-		return $media_space;
+			return $media_space;
+		} else { return false; }
 	}
 
 	/*
@@ -1682,60 +1754,63 @@ class BROTHER {
 	function get_user_media( $data ) {
 		$user_id = $data->user_id;
 		$is_ajax = $data->is_ajax;
-		$offset = !empty( $data->offset ) && isset( $data->offset ) ? $data->offset : 0;
+		$offset = !empty( $data->offset ) && isset( $data->offset ) ? intval( $data->offset ) : 0;
 
 		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
+		else { $user_id = intval( $user_id ); }
 
-		$args = array(
-			"posts_per_page" => 20,
-			"offset" => $offset,
-			"post_type" => "attachment",
-			"orderby" => "ID",
-			"order" => "DESC",
-			"meta_key" => "owner_id",
-			"meta_value" => $user_id
-		);
-		$medias_ = get_posts( $args );
+		if ( $user_id > 0 && ( $is_ajax == true || $is_ajax == false ) ) {
+			$args = array(
+				"posts_per_page" => 20,
+				"offset" => $offset,
+				"post_type" => "attachment",
+				"orderby" => "ID",
+				"order" => "DESC",
+				"meta_key" => "owner_id",
+				"meta_value" => $user_id
+			);
+			$medias_ = get_posts( $args );
 
-		if ( $is_ajax ) { $medias_holder = array(); }
+			if ( $is_ajax ) { $medias_holder = array(); }
 
-		if ( count( $medias_ ) > 0 ) {
-			foreach ( $medias_ as $media_ ) {
-				$background_url =
-					explode( "/", $media_->post_mime_type )[1] == "zip" ? get_template_directory_uri() ."/assets/images/zip-icon.png" :
-						( explode( "/", $media_->post_mime_type )[0] == "image" || explode( "/", $media_->post_mime_type )[0] == "video" ? wp_get_attachment_url( $media_->ID ) : get_template_directory_uri() ."/assets/images/file-icon.png" );
+			if ( count( $medias_ ) > 0 ) {
+				foreach ( $medias_ as $media_ ) {
+					$background_url =
+						explode( "/", $media_->post_mime_type )[1] == "zip" ? get_template_directory_uri() ."/assets/images/zip-icon.png" :
+							( explode( "/", $media_->post_mime_type )[0] == "image" || explode( "/", $media_->post_mime_type )[0] == "video" ? wp_get_attachment_url( $media_->ID ) : get_template_directory_uri() ."/assets/images/file-icon.png" );
 
-				if ( !$is_ajax ) {
-					if ( explode( "/", $media_->post_mime_type )[0] == "image" ) {
-				?>
-					<div id='media-<?php echo $media_->ID; ?>' class='media-container animated bounceIn' style='background-image: url(<?php echo $background_url; ?>);' media-type='<?php echo $media_->post_mime_type; ?>'>
-						<button id='marker'></button>
-					</div>
-				<?php
-					} elseif ( explode( "/", $media_->post_mime_type )[0] == "video" ) {
+					if ( !$is_ajax ) {
+						if ( explode( "/", $media_->post_mime_type )[0] == "image" ) {
 					?>
-					<div id='media-<?php echo $media_->ID; ?>' class='media-container animated bounceIn' media-type='<?php echo $media_->post_mime_type; ?>'>
-						<button id='marker'></button>
-						<video autoplay="true" muted="true" loop="true">
-							<source src="<?php echo $background_url; ?>" type="<?php echo $media_->post_mime_type; ?>">
-						</video>
-						<div class="overlay"></div>
-					</div>
+						<div id='media-<?php echo $media_->ID; ?>' class='media-container animated bounceIn' style='background-image: url(<?php echo $background_url; ?>);' media-type='<?php echo $media_->post_mime_type; ?>'>
+							<button id='marker'></button>
+						</div>
 					<?php
+						} elseif ( explode( "/", $media_->post_mime_type )[0] == "video" ) {
+						?>
+						<div id='media-<?php echo $media_->ID; ?>' class='media-container animated bounceIn' media-type='<?php echo $media_->post_mime_type; ?>'>
+							<button id='marker'></button>
+							<video autoplay="true" muted="true" loop="true">
+								<source src="<?php echo $background_url; ?>" type="<?php echo $media_->post_mime_type; ?>">
+							</video>
+							<div class="overlay"></div>
+						</div>
+						<?php
+						}
+					} elseif ( $is_ajax ) {
+						$media_holder = array();
+						$media_holder[ "ID" ] = $media_->ID;
+						$media_holder[ "URL" ] = $background_url;
+						$media_holder[ "TYPE" ] = $media_->post_mime_type;
+						array_push( $medias_holder, (object)$media_holder );
 					}
-				} elseif ( $is_ajax ) {
-					$media_holder = array();
-					$media_holder[ "ID" ] = $media_->ID;
-					$media_holder[ "URL" ] = $background_url;
-					$media_holder[ "TYPE" ] = $media_->post_mime_type;
-					array_push( $medias_holder, (object)$media_holder );
 				}
-			}
 
-			if ( $is_ajax ) { return json_encode( $medias_holder ); }
-		} else {
-			if ( !$is_ajax ) { echo "<h1 class='no-information-message'>You don't have any media.</h1>"; }
-		 	else { return json_encode( "You don't have any media." ); }
+				if ( $is_ajax ) { return json_encode( $medias_holder ); }
+			} else {
+				if ( !$is_ajax ) { echo "<h1 class='no-information-message'>You don't have any media.</h1>"; }
+			 	else { return json_encode( "You don't have any media." ); }
+			}
 		}
 	}
 
@@ -1745,11 +1820,11 @@ class BROTHER {
 	*	Function purpose: This function is used to delete MEDIA_FILE from the HUB DB & HDD.
 	*/
 	function delete_user_media( $data ) {
-		$user_id = !empty( $data->user_id ) ? $data->user_id : get_current_user_id();
-		$attachment_id = $data->attachment_id;
+		$user_id = !empty( $data->user_id ) ? intval( $data->user_id ) : get_current_user_id();
+		$attachment_id = intval( $data->attachment_id );
 		$result = false;
 
-		if ( !empty( $attachment_id ) && isset( $attachment_id ) ) {
+		if ( $user_id > 0 && $attachment_id > 0 ) {
 			$file_size = filesize( $this->get_attachment_path( $attachment_id ) );
 			$current_available_space = $this->get_available_media_space( $user_id );
 			$updated_available_space = $current_available_space + $file_size;
@@ -1769,19 +1844,21 @@ class BROTHER {
 	*	This function checks and clears the path IF NEEDED.
 	*/
 	function get_attachment_path( $attachment_id ) {
-		$path_ = get_attached_file( $attachment_id );
+		if ( intval( $attachment_id ) > 0 ) {
+			$path_ = get_attached_file( $attachment_id );
 
-		if ( strpos( $path_, "http" ) || strpos( $path_, "https" ) ) {
-			$extract_url = explode( "/", explode( "://", $path_ )[1] );
+			if ( strpos( $path_, "http" ) || strpos( $path_, "https" ) ) {
+				$extract_url = explode( "/", explode( "://", $path_ )[1] );
 
-			$year_path = $extract_url[ 3 ];
-			$month_path = $extract_url[ 4 ];
-			$file_name = $extract_url[ 5 ];
+				$year_path = $extract_url[ 3 ];
+				$month_path = $extract_url[ 4 ];
+				$file_name = $extract_url[ 5 ];
 
-			$path_ = get_home_path() ."wp-content/uploads/". $year_path ."/". $month_path ."/". $file_name;
-		}
+				$path_ = get_home_path() ."wp-content/uploads/". $year_path ."/". $month_path ."/". $file_name;
+			}
 
-		return $path_;
+			return $path_;
+		} else { return false; }
 	}
 
 	/*
@@ -1791,7 +1868,7 @@ class BROTHER {
 	*	This function is used to return the URL to the Attachment pointed by the $attachment_id parameter.
 	*/
 	function get_attachment_url( $attachment_id ) {
-		return wp_get_attachment_url( $attachment_id );
+		return intval( $attachment_id ) > 0 ? wp_get_attachment_url( $attachment_id ) : false;
 	}
 
 	/*
@@ -1940,11 +2017,11 @@ class BROTHER {
 	*	Function purpose: This function is used to generate Company Invite Request (CIR) to the specified by $user_id user from the HUB.
 	*/
 	function send_invite_request( $data ) {
-		$user_id = $data->user_id;
-		$company_id = !empty( $data->company_id ) ? $data->company_id : get_current_user_id();
+		$user_id = intval( $data->user_id );
+		$company_id = !empty( $data->company_id ) ? intval( $data->company_id ) : get_current_user_id();
 		$result = "";
 
-		if ( !empty( $user_id ) && isset( $user_id ) ) {
+		if ( $user_id > 0 && $company_id > 0 ) {
 			global $wpdb;
 			$table_ = $wpdb->prefix ."user_requests";
 
@@ -1990,14 +2067,14 @@ class BROTHER {
 	*	Function purpose: This function is used to send a JOIN request to the chosed by the user company.
 	*/
 	function send_join_request( $data ) {
-		$company_id = $data->company_id;
-		$user_id = !empty( $data->user_id ) ? $data->user_id : get_current_user_id();
+		$company_id = intval( $data->company_id );
+		$user_id = !empty( $data->user_id ) ? intval( $data->user_id ) : get_current_user_id();
 		$user_cv_link = !empty( $data->user_cv_link ) ? $data->user_cv_link : "";
 		$user_portfolio_link = !empty( $data->user_portfolio_link ) ? $data->user_portfolio_link : "";
 
 		$result = "";
 
-		if ( !empty( $company_id ) ) {
+		if ( $user_id > 0 && $company_id > 0 ) {
 			if ( empty( $user_cv_link ) ) { $result = "You CV is required to apply!"; }
 			else {
 				if ( !filter_var( $user_cv_link, FILTER_VALIDATE_URL ) ) { $result = "The link to your CV is not valid!"; }
@@ -2060,7 +2137,7 @@ class BROTHER {
 	function update_join_request( $data ) {
 		$result = false;
 
-		if ( !empty( $data->request_id ) && isset( $data->request_id ) && !empty( $data->response ) && isset( $data->response ) ) {
+		if ( !empty( $data->request_id ) && isset( $data->request_id ) && intval( $data->request_id ) > 0 && !empty( $data->response ) && isset( $data->response ) ) {
 			global $wpdb;
 			$table_ = $wpdb->prefix ."user_requests";
 			$wpdb->update(
@@ -2081,6 +2158,18 @@ class BROTHER {
 					$this->generate_notification( 231, $result_->requester_id, $result_->company_id );
 				}
 			} else {
+				global $wpdb;
+
+				$table_ = $wpdb->prefix ."user_requests";
+
+				$wpdb->delete(
+					$table_,
+					array(
+						"requester_id" => $result_->requester_id,
+						"company_id" => $result_->company_id
+					)
+				);
+
 				if ( $data->request_type == "join" ) { $this->generate_notification( 226, $result_->requester_id, $result_->company_id ); }
 				else { $this->generate_notification( 232, $result_->requester_id, $result_->company_id ); }
 			}
@@ -2095,56 +2184,58 @@ class BROTHER {
 	*	Function purpose: This function is used to get all requests send to the specified company.
 	*/
 	function get_requests( $data ) {
-		$company_id = !empty( $data->company_id ) ? $data->company_id : get_current_user_id();
+		$company_id = !empty( $data->company_id ) ? intval( $data->company_id ) : get_current_user_id();
 		$requests_holder = array();
 		$listed_users = array();
 
-		global $wpdb;
-		$table_ = $wpdb->prefix ."user_requests";
+		if ( $company_id > 0 ) {
+			global $wpdb;
+			$table_ = $wpdb->prefix ."user_requests";
 
-		$sql_ = "SELECT DISTINCT * FROM $table_ WHERE company_id='$company_id' ORDER BY request_date DESC";
-		$results_ = $wpdb->get_results( $sql_, OBJECT );
+			$sql_ = "SELECT DISTINCT * FROM $table_ WHERE company_id='$company_id' ORDER BY request_date DESC";
+			$results_ = $wpdb->get_results( $sql_, OBJECT );
 
-		foreach ( $results_ as $request_ ) {
-			if ( !in_array( $request_->requester_id, $listed_users ) ) {
-				$user_first_name = get_user_meta( $request_->requester_id, "first_name", true );
-				$user_last_name = get_user_meta( $request_->requester_id, "last_name", true );
-				$user_short_name = get_user_meta( $request_->requester_id, "user_shortname", true );
+			foreach ( $results_ as $request_ ) {
+				if ( !in_array( $request_->requester_id, $listed_users ) ) {
+					$user_first_name = get_user_meta( $request_->requester_id, "first_name", true );
+					$user_last_name = get_user_meta( $request_->requester_id, "last_name", true );
+					$user_short_name = get_user_meta( $request_->requester_id, "user_shortname", true );
 
-				if ( !isset( $data->is_ajax ) || !$data->is_ajax ) {
-					?>
+					if ( !isset( $data->is_ajax ) || !$data->is_ajax ) {
+						?>
 
-					<a href="<?php echo get_permalink( 85 ); ?>?request_id=<?php echo $request_->id; ?>" class="request-anchor">
-						<div id="request-<?php echo $request_->id; ?>" class="list-item">
-							<div class="avatar" style="background-image: url(<?php echo $this->get_user_avatar_url( $request_->requester_id ); ?>);'"></div>
-							<h1 class="names"><?php echo !empty( $user_short_name ) ? $user_short_name : $user_first_name ." ". $user_last_name; ?></h1>
-							<div class="list-item-meta">
-								<?php if ( !empty( $request_->request_response ) ) { ?> <p class="meta icon <?php echo $request_->request_response == "accept" ? "green" : "red"; ?>"><i class="fa <?php echo $request_->request_response == "accept" ? "fa-check" : "fa-close" ?>"></i></p> <?php } ?>
-								<?php if ( !empty( $request_->requester_cv ) ) { ?> <p class="meta icon blue">CV</p> <?php } ?>
-								<?php if ( !empty( $request_->requester_portfolio ) ) { ?> <p class="meta icon green">PF</p> <?php } ?>
-								<p class="meta"><?php echo date( "d-m-Y", strtotime( $request_->request_date ) ); ?></p>
+						<a href="<?php echo get_permalink( 85 ); ?>?request_id=<?php echo $request_->id; ?>" class="request-anchor">
+							<div id="request-<?php echo $request_->id; ?>" class="list-item">
+								<div class="avatar" style="background-image: url(<?php echo $this->get_user_avatar_url( $request_->requester_id ); ?>);'"></div>
+								<h1 class="names"><?php echo !empty( $user_short_name ) ? $user_short_name : $user_first_name ." ". $user_last_name; ?></h1>
+								<div class="list-item-meta">
+									<?php if ( !empty( $request_->request_response ) ) { ?> <p class="meta icon <?php echo $request_->request_response == "accept" ? "green" : "red"; ?>"><i class="fa <?php echo $request_->request_response == "accept" ? "fa-check" : "fa-close" ?>"></i></p> <?php } ?>
+									<?php if ( !empty( $request_->requester_cv ) ) { ?> <p class="meta icon blue">CV</p> <?php } ?>
+									<?php if ( !empty( $request_->requester_portfolio ) ) { ?> <p class="meta icon green">PF</p> <?php } ?>
+									<p class="meta"><?php echo date( "d-m-Y", strtotime( $request_->request_date ) ); ?></p>
+								</div>
 							</div>
-						</div>
-					</a>
+						</a>
 
-					<?php
-				} elseif ( $data->is_ajax ) {
-					$request_holder = array();
-					$request_holder[ "ID" ] = $request_->id;
-					$request_holder[ "REQUESTER_ID" ] = $request_->requester_id;
-					$request_holder[ "REQUESTER_CV" ] = $request_->requester_cv;
-					$request_holder[ "REQUESTER_PORTFOLIO" ] = $request_->requester_portfolio;
-					$request_holder[ "REQUEST_DATE" ] = $request_->request_date;
-					$request_holder[ "REQUEST_RESPONSE" ] = $request_->request_response;
-					$request_holder[ "COMPANY_ID" ] = $request_->company_id;
-					array_push( $requests_holder, (object)$request_holder );
+						<?php
+					} elseif ( $data->is_ajax ) {
+						$request_holder = array();
+						$request_holder[ "ID" ] = $request_->id;
+						$request_holder[ "REQUESTER_ID" ] = $request_->requester_id;
+						$request_holder[ "REQUESTER_CV" ] = $request_->requester_cv;
+						$request_holder[ "REQUESTER_PORTFOLIO" ] = $request_->requester_portfolio;
+						$request_holder[ "REQUEST_DATE" ] = $request_->request_date;
+						$request_holder[ "REQUEST_RESPONSE" ] = $request_->request_response;
+						$request_holder[ "COMPANY_ID" ] = $request_->company_id;
+						array_push( $requests_holder, (object)$request_holder );
+					}
+
+					array_push( $listed_users, $request_->requester_id );
 				}
-
-				array_push( $listed_users, $request_->requester_id );
 			}
-		}
 
-		if ( isset( $data->is_ajax ) && $data->is_ajax ) { return json_encode( $requests_holder ); }
+			if ( isset( $data->is_ajax ) && $data->is_ajax ) { return json_encode( $requests_holder ); }
+		}
 	}
 
 	/*
@@ -2153,16 +2244,18 @@ class BROTHER {
 	*	Function purpose: This function is used to return Object with the information about the specified request by the $request_id variable.
 	*/
 	function get_request( $request_id ) {
-		$result_ = false;
-		if ( !empty( $request_id ) && isset( $request_id ) ) {
-			global $wpdb;
-			$table_ = $wpdb->prefix ."user_requests";
+		if ( intval( $request_id ) > 0 ) {
+			$result_ = false;
+			if ( !empty( $request_id ) && isset( $request_id ) ) {
+				global $wpdb;
+				$table_ = $wpdb->prefix ."user_requests";
 
-			$sql_ = "SELECT * FROM $table_ WHERE id='$request_id'";
-			$result_ = $wpdb->get_results( $sql_, OBJECT );
-			if ( !empty( $result_[0] ) ) { $result_ = $result_[0]; }
+				$sql_ = "SELECT * FROM $table_ WHERE id='$request_id'";
+				$result_ = $wpdb->get_results( $sql_, OBJECT );
+				if ( !empty( $result_[0] ) ) { $result_ = $result_[0]; }
+			}
+			return $result_;
 		}
-		return $result_;
 	}
 
 	/*
@@ -2171,28 +2264,42 @@ class BROTHER {
 	*	Function purpose: This function is used to remove an employee from a company.
 	*/
 	function leave_company( $data ) {
-		$user_id = !empty( $data->user_id ) ? $data->user_id : get_current_user_id();
+		$user_id = !empty( $data->user_id ) ? intval( $data->user_id ) : get_current_user_id();
 		$user_password = $data->password;
-		$company_id = $data->company_id;
+		$company_id = intval( $data->company_id );
 
-		$result = "";
+		if ( $user_id > 0 && $company_id > 0 ) {
+			$result = "";
 
-		if ( empty( $company_id ) || !isset( $company_id ) ) { $result = "ERROR: Company ID is unknown."; }
-		if ( empty( $user_password ) || !isset( $user_password ) ) { $result = "Enter your password!"; }
-		else {
-			$user_ = get_user_by( "ID", $user_id );
-			if ( $user_ && wp_check_password( $user_password, $user_->data->user_pass, $user_id ) ) {
-				$leave_company = $this->hire_or_fire_relation( (object)array( "user_id" => $user_id, "company_id" => $company_id ) );
-				if ( $leave_company == "fired" ) {
-					$notification_id = $this->generate_notification( 233, $company_id, $user_id );
-					$result = "left";
+			if ( empty( $company_id ) || !isset( $company_id ) ) { $result = "ERROR: Company ID is unknown."; }
+			if ( empty( $user_password ) || !isset( $user_password ) ) { $result = "Enter your password!"; }
+			else {
+				$user_ = get_user_by( "ID", $user_id );
+				if ( $user_ && wp_check_password( $user_password, $user_->data->user_pass, $user_id ) ) {
+					$leave_company = $this->hire_or_fire_relation( (object)array( "user_id" => $user_id, "company_id" => $company_id ) );
+					if ( $leave_company == "fired" ) {
+						global $wpdb;
+
+						$table_ = $wpdb->prefix ."user_requests";
+
+						$wpdb->delete(
+							$table_,
+							array(
+								"requester_id" => $user_id,
+								"company_id" => $company_id
+							)
+						);
+
+						$notification_id = $this->generate_notification( 233, $company_id, $user_id );
+						$result = "left";
+					}
+				} else {
+					$result = "Your password is wrong!";
 				}
-			} else {
-				$result = "Your password is wrong!";
 			}
-		}
 
-		return $result;
+			return $result;
+		}
 	}
 
 	/*
@@ -2200,7 +2307,7 @@ class BROTHER {
 	*	Function arguments: $post_id [ INT ] (required)
 	*	Function purpose: This function is used to retrieve the banner URL of the specified Post by the $post_id variable.
 	*/
-	function get_post_banner_url( $post_id ) { return wp_get_attachment_image_src( get_post_thumbnail_id( $post_id ), "full" )[0]; }
+	function get_post_banner_url( $post_id ) { return intval( $post_id ) > 0 ? wp_get_attachment_image_src( get_post_thumbnail_id( $post_id ), "full" )[0] : ""; }
 
 	/*
 	*	Function name: set_story_view
@@ -2209,10 +2316,11 @@ class BROTHER {
 	*/
 	function set_story_view( $data ) {
 		if ( !isset( $data->user_id ) && empty( $data->user_id ) ) { $data->user_id = get_current_user_id(); }
+		else { $data->user_id = intval( $data->user_id ); }
 
 		$response = "";
 
-		if ( isset( $data->story_id ) && !empty( $data->story_id ) ) {
+		if ( intval( $data->story_id ) > 0 && $data->user_id > 0 ) {
 			global $wpdb;
 			$table_ = $wpdb->prefix ."story_views";
 
@@ -2251,122 +2359,27 @@ class BROTHER {
 	*/
 	function get_user_board( $data ) {
 		if ( !isset( $data->user_id ) || empty( $data->user_id ) ) { $data->user_id = get_current_user_id(); }
+		else { $data->user_id = intval( $data->user_id ); }
+
 		if ( !isset( $data->offset ) || empty( $data->offset ) ) { $data->offset = 0; }
+		else { $data->offset = intval( $data->offset ); }
 
-		if ( isset( $data->user_compositions ) && $data->user_compositions == true ) {
-			$args = array(
-				"posts_per_page" => 5,
-				"offset" => $data->offset,
-				"order_by" => "date",
-				"order" => "DESC",
-				"post_type" => "post",
-				"author" => $data->user_id,
-				"post_status" => "publish"
-			);
-			$compositions_ = get_posts( $args );
-
-			if ( isset( $data->is_ajax ) && $data->is_ajax == true ) { $stories_container = array(); }
-
-			foreach ( $compositions_ as $post_ ) {
-				$company_id = get_post_meta( $post_->ID, "related_company_id", true );
-
-				if ( $this->is_company_public( $company_id ) ) {
-					$post_banner = $this->get_post_banner_url( $post_->ID );
-					$post_excerpt = wp_trim_words( $post_->post_content, 50, "..." );
-					$post_likes = count( $this->get_story_likes( $post_->ID ) );
-					$post_url = get_permalink( $post_->ID );
-					$company_avatar = $this->get_user_avatar_url( $company_id );
-					$company_url = get_author_posts_url( $company_id );
-
-					if ( isset( $data->is_ajax ) && $data->is_ajax == true ) {
-						$story_container = array();
-						$story_container[ "ID" ] = $post_->ID;
-						$story_container[ "title" ] = $post_->post_title;
-						$story_container[ "content" ] = $post_->post_content;
-						$story_container[ "excerpt" ] = $post_excerpt;
-						$story_container[ "banner" ] = $post_banner;
-						$story_container[ "url" ] = $post_url;
-						$story_container[ "author" ][ "ID" ] = $post_->post_author;
-						$story_container[ "author" ][ "avatar_url" ] = $this->get_user_avatar_url( $post_->post_author );
-						$story_container[ "author" ][ "banner_url" ] = $this->get_user_banner_url( $post_->post_author );
-						$story_container[ "author" ][ "author_url" ] = get_author_posts_url( $post_->post_author );
-						$story_container[ "author" ][ "first_name" ] = get_user_meta( $post_->post_author, "first_name", true );
-						$story_container[ "author" ][ "last_name" ] = get_user_meta( $post_->post_author, "last_name", true );
-						$story_container[ "author" ][ "short_name" ] = get_user_meta( $post_->post_author, "user_shortname", true );
-						$story_container[ "company" ][ "ID" ] = $company_id;
-						$story_container[ "company" ][ "avatar_url" ] = $company_avatar;
-						$story_container[ "company" ][ "banner_url" ] = $this->get_user_banner_url( $company_id );
-						$story_container[ "company" ][ "company_url" ] = $company_url;
-						$story_container[ "company" ][ "first_name" ] = get_user_meta( $company_id, "first_name", true );
-						$story_container[ "company" ][ "last_name" ] = get_user_meta( $company_id, "last_name", true );
-						$story_container[ "company" ][ "short_name" ] = get_user_meta( $company_id, "user_shortname", true );
-						$story_container[ "meta" ][ "likes" ] = $post_likes;
-						array_push( $stories_container, (object)$story_container );
-					} else {
-						?>
-
-						<a href="<?php echo $post_url; ?>" class="post-anchor">
-							<div id="story-<?php echo $post_->ID; ?>" class="story-container animated fadeInUp">
-								<div class="story-banner" style="background-image: url(<?php echo $post_banner; ?>);"></div>
-								<h1 class="story-title"><?php echo $post_->post_title; ?></h1>
-								<div class="story-content"><?php echo $post_excerpt; ?></div>
-								<div class="story-meta">
-									<span class="meta story-likes fa fa-heart"><i class="numbers"><?php echo $post_likes; ?></i></span>
-									<span class="meta" title="Company"><i class="icon fa fa-at"></i><div class="avatar" style="background-image: url(<?php echo $company_avatar; ?>);"></div></span>
-								</div>
-							</div>
-						</a>
-
-						<?php
-					}
-				}
-			}
-		} else {
-			global $wpdb;
-
-			$user_likes_table = $wpdb->prefix ."user_likes";
-			$story_views_table = $wpdb->prefix ."story_views";
-
-			$post_ids = array();
-			$data->offset = $data->offset / 2;
-
-			$sql_ = "
-			SELECT story_id FROM $user_likes_table
-			WHERE user_id = $data->user_id
-			ORDER BY story_id DESC
-			LIMIT 5
-			OFFSET ". $data->offset;
-			$results_ = $wpdb->get_results( $sql_, OBJECT );
-
-			if ( count( $results_ ) > 0 ) {
-				foreach ( $results_ as $post_data ) { array_push( $post_ids, $post_data->story_id ); }
-				$sql_extension = "story_id NOT IN ( ". implode( ",", $post_ids ) ." )";
-			} else {
-				$sql_extension = "story_id NOT IN ( SELECT story_id FROM $user_likes_table WHERE user_id = $data->user_id )";
-			}
-
-			$sql_ ="
-			SELECT story_id FROM $story_views_table
-			WHERE user_id = $data->user_id AND $sql_extension
-			ORDER BY story_id DESC
-			LIMIT 5
-			OFFSET ". $data->offset;
-			$results_ = $wpdb->get_results( $sql_, OBJECT );
-
-			if ( count( $results_ ) ) { foreach ( $results_ as $post_data ) { array_push( $post_ids, $post_data->story_id ); } }
-
-			if ( isset( $data->is_ajax ) && $data->is_ajax == true ) { $stories_container = array(); }
-
-			if ( !empty( $post_ids ) ) {
+		if ( $data->user_id > 0 ) {
+			if ( isset( $data->user_compositions ) && $data->user_compositions == true ) {
 				$args = array(
-					"posts_per_page" => -1,
-					"post__in" => $post_ids,
+					"posts_per_page" => 5,
+					"offset" => $data->offset,
+					"order_by" => "date",
+					"order" => "DESC",
 					"post_type" => "post",
+					"author" => $data->user_id,
 					"post_status" => "publish"
 				);
-				$posts_ = get_posts( $args );
+				$compositions_ = get_posts( $args );
 
-				foreach ( $posts_ as $post_ ) {
+				if ( isset( $data->is_ajax ) && $data->is_ajax == true ) { $stories_container = array(); }
+
+				foreach ( $compositions_ as $post_ ) {
 					$company_id = get_post_meta( $post_->ID, "related_company_id", true );
 
 					if ( $this->is_company_public( $company_id ) ) {
@@ -2376,7 +2389,6 @@ class BROTHER {
 						$post_url = get_permalink( $post_->ID );
 						$company_avatar = $this->get_user_avatar_url( $company_id );
 						$company_url = get_author_posts_url( $company_id );
-						$author_avatar = $this->get_user_avatar_url( $post_->post_author );
 
 						if ( isset( $data->is_ajax ) && $data->is_ajax == true ) {
 							$story_container = array();
@@ -2387,7 +2399,7 @@ class BROTHER {
 							$story_container[ "banner" ] = $post_banner;
 							$story_container[ "url" ] = $post_url;
 							$story_container[ "author" ][ "ID" ] = $post_->post_author;
-							$story_container[ "author" ][ "avatar_url" ] = $author_avatar;
+							$story_container[ "author" ][ "avatar_url" ] = $this->get_user_avatar_url( $post_->post_author );
 							$story_container[ "author" ][ "banner_url" ] = $this->get_user_banner_url( $post_->post_author );
 							$story_container[ "author" ][ "author_url" ] = get_author_posts_url( $post_->post_author );
 							$story_container[ "author" ][ "first_name" ] = get_user_meta( $post_->post_author, "first_name", true );
@@ -2405,14 +2417,13 @@ class BROTHER {
 						} else {
 							?>
 
-							<a href="<?php echo $post_url ?>" class="post-anchor">
+							<a href="<?php echo $post_url; ?>" class="post-anchor">
 								<div id="story-<?php echo $post_->ID; ?>" class="story-container animated fadeInUp">
 									<div class="story-banner" style="background-image: url(<?php echo $post_banner; ?>);"></div>
 									<h1 class="story-title"><?php echo $post_->post_title; ?></h1>
 									<div class="story-content"><?php echo $post_excerpt; ?></div>
 									<div class="story-meta">
 										<span class="meta story-likes fa fa-heart"><i class="numbers"><?php echo $post_likes; ?></i></span>
-										<span class="meta" title="Author"><i class="icon fa fa-pencil"></i><div class="avatar" style="background-image: url(<?php echo $author_avatar ?>);"></div></span>
 										<span class="meta" title="Company"><i class="icon fa fa-at"></i><div class="avatar" style="background-image: url(<?php echo $company_avatar; ?>);"></div></span>
 									</div>
 								</div>
@@ -2422,10 +2433,112 @@ class BROTHER {
 						}
 					}
 				}
-			}
-		}
+			} else {
+				global $wpdb;
 
-		if ( isset( $data->is_ajax ) && $data->is_ajax == true ) { return $stories_container; }
+				$user_likes_table = $wpdb->prefix ."user_likes";
+				$story_views_table = $wpdb->prefix ."story_views";
+
+				$post_ids = array();
+				$data->offset = $data->offset / 2;
+
+				$sql_ = "
+				SELECT story_id FROM $user_likes_table
+				WHERE user_id = $data->user_id
+				ORDER BY story_id DESC
+				LIMIT 5
+				OFFSET ". $data->offset;
+				$results_ = $wpdb->get_results( $sql_, OBJECT );
+
+				if ( count( $results_ ) > 0 ) {
+					foreach ( $results_ as $post_data ) { array_push( $post_ids, $post_data->story_id ); }
+					$sql_extension = "story_id NOT IN ( ". implode( ",", $post_ids ) ." )";
+				} else {
+					$sql_extension = "story_id NOT IN ( SELECT story_id FROM $user_likes_table WHERE user_id = $data->user_id )";
+				}
+
+				$sql_ ="
+				SELECT story_id FROM $story_views_table
+				WHERE user_id = $data->user_id AND $sql_extension
+				ORDER BY story_id DESC
+				LIMIT 5
+				OFFSET ". $data->offset;
+				$results_ = $wpdb->get_results( $sql_, OBJECT );
+
+				if ( count( $results_ ) ) { foreach ( $results_ as $post_data ) { array_push( $post_ids, $post_data->story_id ); } }
+
+				if ( isset( $data->is_ajax ) && $data->is_ajax == true ) { $stories_container = array(); }
+
+				if ( !empty( $post_ids ) ) {
+					$args = array(
+						"posts_per_page" => -1,
+						"post__in" => $post_ids,
+						"post_type" => "post",
+						"post_status" => "publish"
+					);
+					$posts_ = get_posts( $args );
+
+					foreach ( $posts_ as $post_ ) {
+						$company_id = get_post_meta( $post_->ID, "related_company_id", true );
+
+						if ( $this->is_company_public( $company_id ) ) {
+							$post_banner = $this->get_post_banner_url( $post_->ID );
+							$post_excerpt = wp_trim_words( $post_->post_content, 50, "..." );
+							$post_likes = count( $this->get_story_likes( $post_->ID ) );
+							$post_url = get_permalink( $post_->ID );
+							$company_avatar = $this->get_user_avatar_url( $company_id );
+							$company_url = get_author_posts_url( $company_id );
+							$author_avatar = $this->get_user_avatar_url( $post_->post_author );
+
+							if ( isset( $data->is_ajax ) && $data->is_ajax == true ) {
+								$story_container = array();
+								$story_container[ "ID" ] = $post_->ID;
+								$story_container[ "title" ] = $post_->post_title;
+								$story_container[ "content" ] = $post_->post_content;
+								$story_container[ "excerpt" ] = $post_excerpt;
+								$story_container[ "banner" ] = $post_banner;
+								$story_container[ "url" ] = $post_url;
+								$story_container[ "author" ][ "ID" ] = $post_->post_author;
+								$story_container[ "author" ][ "avatar_url" ] = $author_avatar;
+								$story_container[ "author" ][ "banner_url" ] = $this->get_user_banner_url( $post_->post_author );
+								$story_container[ "author" ][ "author_url" ] = get_author_posts_url( $post_->post_author );
+								$story_container[ "author" ][ "first_name" ] = get_user_meta( $post_->post_author, "first_name", true );
+								$story_container[ "author" ][ "last_name" ] = get_user_meta( $post_->post_author, "last_name", true );
+								$story_container[ "author" ][ "short_name" ] = get_user_meta( $post_->post_author, "user_shortname", true );
+								$story_container[ "company" ][ "ID" ] = $company_id;
+								$story_container[ "company" ][ "avatar_url" ] = $company_avatar;
+								$story_container[ "company" ][ "banner_url" ] = $this->get_user_banner_url( $company_id );
+								$story_container[ "company" ][ "company_url" ] = $company_url;
+								$story_container[ "company" ][ "first_name" ] = get_user_meta( $company_id, "first_name", true );
+								$story_container[ "company" ][ "last_name" ] = get_user_meta( $company_id, "last_name", true );
+								$story_container[ "company" ][ "short_name" ] = get_user_meta( $company_id, "user_shortname", true );
+								$story_container[ "meta" ][ "likes" ] = $post_likes;
+								array_push( $stories_container, (object)$story_container );
+							} else {
+								?>
+
+								<a href="<?php echo $post_url ?>" class="post-anchor">
+									<div id="story-<?php echo $post_->ID; ?>" class="story-container animated fadeInUp">
+										<div class="story-banner" style="background-image: url(<?php echo $post_banner; ?>);"></div>
+										<h1 class="story-title"><?php echo $post_->post_title; ?></h1>
+										<div class="story-content"><?php echo $post_excerpt; ?></div>
+										<div class="story-meta">
+											<span class="meta story-likes fa fa-heart"><i class="numbers"><?php echo $post_likes; ?></i></span>
+											<span class="meta" title="Author"><i class="icon fa fa-pencil"></i><div class="avatar" style="background-image: url(<?php echo $author_avatar ?>);"></div></span>
+											<span class="meta" title="Company"><i class="icon fa fa-at"></i><div class="avatar" style="background-image: url(<?php echo $company_avatar; ?>);"></div></span>
+										</div>
+									</div>
+								</a>
+
+								<?php
+							}
+						}
+					}
+				}
+			}
+
+			if ( isset( $data->is_ajax ) && $data->is_ajax == true ) { return $stories_container; }
+		}
 	}
 
 	/*
@@ -2460,34 +2573,45 @@ class BROTHER {
 		$notification_color_code = sanitize_text_field( $notification_color_code );
 		$notification_parser = sanitize_text_field( $notification_parser );
 
-		$args = array(
-			"posts_per_page" => 1,
-			"post_type" => "notifications",
-			"name" => $notification_slug
-		);
-
-		$page_ = get_posts( $args );
-
-		if ( isset( $page_ ) && !empty( $page_ ) ) { return $page_[ 0 ]; }
-		else {
-			$postarr = array(
-				"ID" => 0,
-				"post_title" => $notification_title,
-				"post_name" => $notification_slug,
+		if (
+			!empty( $notification_title ) &&
+			!empty( $notification_slug ) &&
+			!empty( $notification_name ) &&
+			!empty( $notification_url ) &&
+			!empty( $notification_text ) &&
+			!empty( $notification_icon_code ) &&
+			!empty( $notification_color_code ) &&
+			!empty( $notification_parser )
+		) {
+			$args = array(
+				"posts_per_page" => 1,
 				"post_type" => "notifications",
-				"post_status" => "publish",
-				"meta_input" => array(
-					"notification_name" => $notification_name,
-					"notification_url" => $notification_url,
-					"notification_text" => $notification_text,
-					"notification_icon_code" => $notification_icon_code,
-					"notification_icon_background_code" => $notification_color_code,
-					"notification_converter" => $notification_parser
-				)
+				"name" => $notification_slug
 			);
-			$new_page = wp_insert_post( $postarr );
 
-			return $new_page;
+			$page_ = get_posts( $args );
+
+			if ( isset( $page_ ) && !empty( $page_ ) ) { return $page_[ 0 ]; }
+			else {
+				$postarr = array(
+					"ID" => 0,
+					"post_title" => $notification_title,
+					"post_name" => $notification_slug,
+					"post_type" => "notifications",
+					"post_status" => "publish",
+					"meta_input" => array(
+						"notification_name" => $notification_name,
+						"notification_url" => $notification_url,
+						"notification_text" => $notification_text,
+						"notification_icon_code" => $notification_icon_code,
+						"notification_icon_background_code" => $notification_color_code,
+						"notification_converter" => $notification_parser
+					)
+				);
+				$new_page = wp_insert_post( $postarr );
+
+				return $new_page;
+			}
 		}
 	}
 
@@ -2499,16 +2623,18 @@ class BROTHER {
 	function get_notification_template( $notification_slug ) {
 		$notification_slug = sanitize_text_field( $notification_slug );
 
-		$args = array(
-			"posts_per_page" => 1,
-			"post_type" => "notifications",
-			"name" => $notification_slug
-		);
+		if ( !empty( $notification_slug ) ) {
+			$args = array(
+				"posts_per_page" => 1,
+				"post_type" => "notifications",
+				"name" => $notification_slug
+			);
 
-		$page_ = get_posts( $args );
+			$page_ = get_posts( $args );
 
-		if ( isset( $page_ ) && !empty( $page_ ) ) { return $page_[ 0 ]; }
-		else { return false; }
+			if ( isset( $page_ ) && !empty( $page_ ) ) { return $page_[ 0 ]; }
+			else { return false; }
+		}
 	}
 
 	/*
@@ -2520,7 +2646,7 @@ class BROTHER {
 		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
 		else { $user_id = intval( $user_id ); }
 
-		if ( is_int( $user_id ) ) {
+		if ( $user_id > 0 ) {
 			$today_date_int = strtotime( date( "d-M-Y" ) );
 
 			$hubber_premium_start_int = get_user_meta( $user_id, "premium_start", true );
@@ -2540,7 +2666,7 @@ class BROTHER {
 	*/
 	function get_post_meta_data( $post_id ) {
 		$post_id = isset( $post_id ) && !empty( $post_id ) ? intval( $post_id ) : false;
-		return is_int( $post_id ) && $post_id != 0 ? get_post_meta( $post_id ) : false;
+		return $post_id > 0 ? get_post_meta( $post_id ) : false;
 	}
 
 	/*
@@ -2552,7 +2678,7 @@ class BROTHER {
 		$user_id = isset( $args_->user_id ) && !empty( $args_->user_id ) ? intval( $args_->user_id ) : get_current_user_id();
 		$payment_id = isset( $args_->payment_id ) && !empty( $args_->payment_id ) ? $args_->payment_id : false;
 
-		if ( $payment_id !== false ) {
+		if ( $user_id > 0 && $payment_id !== false ) {
 			$phubber_page = get_page_by_path( "phubber" );
 
 			$environment = get_field( "paypal_environment", $phubber_page->ID );
@@ -2589,7 +2715,7 @@ class BROTHER {
 		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
 		else { $user_id = intval( $user_id ); }
 
-		if ( is_int( $user_id ) && $user_id != 0 ) {
+		if ( $user_id > 0 ) {
 			require_once get_template_directory() ."/badges/phubber.php";
 		}
 	}

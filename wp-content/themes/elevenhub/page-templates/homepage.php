@@ -21,8 +21,8 @@ get_header();
 			By explanation the <span class="quote">hub is the central part of a wheel that connects...</span>
 			And exactly like it's explanation 11hub is connecting your employees!
 			<div class="separator"></div>
-			It works just like a social media, but that which makes us different from the rest is the <strong>productivity</strong>.
-			We are connecting your company members and keeping their productivity to up <strong>99%</strong>!
+			It works just like a social media, but that which makes it different from the rest is the <strong>productivity</strong>.
+			We are connecting your company members and keeping their productivity up to <strong>99%</strong>!
 		</div>
 	</div>
 	<div class="right-side">

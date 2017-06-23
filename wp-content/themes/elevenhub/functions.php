@@ -179,59 +179,60 @@ add_action('after_setup_theme', 'remove_admin_bar');
 add_action( 'wp_ajax_nopriv_register_user', 'register_user' );
 add_action( 'wp_ajax_register_user', 'register_user' );
 function register_user() {
-	$first_name = $_POST[ "first_name" ];
-	$last_name = $_POST[ "last_name" ];
-	$email = $_POST[ "email" ];
-	$password = $_POST[ "password" ];
+	$first_name = isset( $_POST[ "first_name" ] ) && !empty( $_POST[ "first_name" ] ) ? sanitize_text_field( $_POST[ "first_name" ] ) : "";
+	$last_name = isset( $_POST[ "last_name" ] ) && !empty( $_POST[ "last_name" ] ) ? sanitize_text_field( $_POST[ "last_name" ] ) : "";
+	$email = isset( $_POST[ "email" ] ) && !empty( $_POST[ "email" ] ) ? trim( strtolower( $_POST[ "email" ] ) ) : "";
+	$password = isset( $_POST[ "password" ] ) && !empty( $_POST[ "password" ] ) ? $_POST[ "password" ] : "";
 
-	$wp_username = strtolower( $first_name ."_". $last_name );
+	if ( !empty( $first_name ) && !empty( $last_name ) && is_email( $email ) && !empty( $password ) ) {
+		$wp_username = strtolower( $first_name ."_". $last_name );
 
-	if ( empty( $email ) || !is_email( $email ) ) { echo "Choose your email!"; die(); }
-	if ( empty( $password ) ) { echo "Choose your password!"; die(); }
-	if ( !is_alphabetical( array( $first_name, $last_name ) ) ) { echo "Enter your real names!"; die(); }
+		if ( empty( $email ) || !is_email( $email ) ) { echo "Choose your email!"; die(); }
+		if ( empty( $password ) ) { echo "Choose your password!"; die(); }
+		if ( !is_alphabetical( array( $first_name, $last_name ) ) ) { echo "Enter your real names!"; die(); }
 
-	$wp_registration_result = wp_create_user( $wp_username, $password, $email );
+		$wp_registration_result = wp_create_user( $wp_username, $password, $email );
 
-	if ( is_wp_error( $wp_registration_result ) || !is_alphabetical( array( $first_name, $last_name ) ) ) {
-		if ( !empty( $wp_registration_result->errors[ "existing_user_login" ] ) && !email_exists( $email ) ) {
-			while ( !empty( $wp_registration_result->errors[ "existing_user_login" ] ) ) { $wp_registration_result = wp_create_user( $wp_username . mt_rand( 100000, 999999 ), $password, $email ); }
-	 	} else {
-			echo $response = ( email_exists( $email ) ? "This email is already in use!" : ( !is_alphabetical( array( $first_name, $last_name ) ) ? "Use only alphabetical characters in your name!" : ( empty( $password ) ? "Choose your password!" : "Something wrong happens here!" ) ) );
-			die();
+		if ( is_wp_error( $wp_registration_result ) || !is_alphabetical( array( $first_name, $last_name ) ) ) {
+			if ( !empty( $wp_registration_result->errors[ "existing_user_login" ] ) && !email_exists( $email ) ) {
+				while ( !empty( $wp_registration_result->errors[ "existing_user_login" ] ) ) { $wp_registration_result = wp_create_user( $wp_username . mt_rand( 100000, 999999 ), $password, $email ); }
+		 	} else {
+				echo $response = ( email_exists( $email ) ? "This email is already in use!" : ( !is_alphabetical( array( $first_name, $last_name ) ) ? "Use only alphabetical characters in your name!" : ( empty( $password ) ? "Choose your password!" : "Something wrong happens here!" ) ) );
+				die( "" );
+			}
 		}
-	}
 
-	// Update the new user
-	$args = array(
-		"ID" => $wp_registration_result,
-		"first_name" => $first_name,
-		"last_name" => $last_name,
-		"role" => "subscriber"
-	);
-	$wp_update_result = wp_update_user( $args );
+		// Update the new user
+		$args = array(
+			"ID" => $wp_registration_result,
+			"first_name" => $first_name,
+			"last_name" => $last_name,
+			"role" => "subscriber"
+		);
+		$wp_update_result = wp_update_user( $args );
 
-	$user_id = $wp_registration_result;
+		$user_id = $wp_registration_result;
 
-	// Add needed user meta
-	add_user_meta( $user_id, "account_tutorial", "0", false );
+		// Add needed user meta
+		add_user_meta( $user_id, "account_tutorial", "0", false );
 
-	// Get registration controller settings
-	$registration_controller = get_page_by_path( "registration-controller" );
-	$free_premium = get_field( "free_premium", $registration_controller->ID );
+		// Get registration controller settings
+		$registration_controller = get_page_by_path( "registration-controller" );
+		$free_premium = get_field( "free_premium", $registration_controller->ID );
 
-	if ( !empty( $free_premium ) && $free_premium == "yes" ) {
-		$today_date_int = strtotime( date( "Y-m-d" ) );
-		update_user_meta( $user_id, "premium_start", $today_date_int );
-		update_user_meta( $user_id, "premium_end", strtotime( "+7 day", $today_date_int ) );
-	}
+		if ( !empty( $free_premium ) && $free_premium == "yes" ) {
+			$today_date_int = strtotime( date( "Y-m-d" ) );
+			update_user_meta( $user_id, "premium_start", $today_date_int );
+			update_user_meta( $user_id, "premium_end", strtotime( "+7 day", $today_date_int ) );
+		}
 
-	// Prepare Hello mail
-	$subject = "Welcome to 11hub!";
-	$content = "Welcome onboard!<br/><br/>We hope to see you <a href='". get_site_url() ."' target='_blank' style='color: #3498db; text-decoration: underline;'>hubbing soon</a>!<br/><br/>Cheers!";
-	wp_mail( $email, $subject, $content, array( "From: Gero Nikolov <vtm.sunrise@gmail.com>", "Content-type: text/html" ) );
+		// Prepare Hello mail
+		$subject = "Welcome to 11hub!";
+		$content = "Welcome onboard!<br/><br/>We hope to see you <a href='". get_site_url() ."' target='_blank' style='color: #3498db; text-decoration: underline;'>hubbing soon</a>!<br/><br/>Cheers!";
+		wp_mail( $email, $subject, $content, array( "From: Gero Nikolov <vtm.sunrise@gmail.com>", "Content-type: text/html" ) );
+	} else { echo "There is a problem with your information."; }
 
-
-	die();
+	die( "" );
 }
 
 
@@ -285,19 +286,22 @@ function add_profile_association() {
 add_action( 'wp_ajax_nopriv_reset_user_password', 'reset_user_password' );
 add_action( 'wp_ajax_reset_user_password', 'reset_user_password' );
 function reset_user_password() {
-	$email = $_POST[ "email" ];
-	$user_id = email_exists( $email );
+	$email = isset( $_POST[ "email" ] ) && !empty( $_POST[ "email" ] ) ? $_POST[ "email" ] : "";
 
-	if ( $user_id !== false ) {
-		$new_password = mt_rand( 100000, 999999 );
-		wp_set_password( $new_password, $user_id );
+	if ( is_email( $email ) ) {
+		$user_id = email_exists( $email );
 
-		// Prepare new password email
-		$subject = "Your password in 11hub was changed!";
-		$content = "Hello there!<br/><br/>Your password was changed via request for forgotten password.<br/><br/>Your new password is: $new_password<br/>(You can reset this password later)<br/><br/><a href='". get_site_url() ."' target='_blank' style='color: #3498db; text-decoration: underline;'>Go hubbing!</a>";
-		wp_mail( $email, $subject, $content, array( "From: Gero Nikolov <vtm.sunrise@gmail.com>", "Content-type: text/html" ) );
+		if ( $user_id !== false ) {
+			$new_password = mt_rand( 100000, 999999 );
+			wp_set_password( $new_password, $user_id );
 
-		echo "READY";
+			// Prepare new password email
+			$subject = "Your password in 11hub was changed!";
+			$content = "Hello there!<br/><br/>Your password was changed via request for forgotten password.<br/><br/>Your new password is: $new_password<br/>(You can reset this password later)<br/><br/><a href='". get_site_url() ."' target='_blank' style='color: #3498db; text-decoration: underline;'>Go hubbing!</a>";
+			wp_mail( $email, $subject, $content, array( "From: Gero Nikolov <vtm.sunrise@gmail.com>", "Content-type: text/html" ) );
+
+			echo "READY";
+		} else { echo "There aren't users with that email."; }
 	} else { echo "There aren't users with that email."; }
 
 	die();
