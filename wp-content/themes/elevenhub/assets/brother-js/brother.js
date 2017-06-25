@@ -1017,7 +1017,7 @@ var UserStory = function( userID = "" ) {
 									company_id: companyID
 								}
 							}, function( response ) {
-								response = JSON.parse( response );								
+								response = JSON.parse( response );
 
 								jQuery( "#story-composer" ).attr( "post-id", response.ID );
 								jQuery( "#story-composer #story-featured-image" ).attr( "attachment-id", response.banner.ID ).attr( "style", "background-image: url("+ response.banner.url +")" );
@@ -1092,9 +1092,7 @@ var UserStory = function( userID = "" ) {
 				bannerID = jQuery( "#story-featured-image" ).attr( "attachment-id" );
 				bannerID = bannerID !== undefined ? bannerID.split( "-" )[1] : false;
 				content = tinyMCE.activeEditor.getContent();
-				postID = jQuery( "#story-composer" ).attr( "post-id" );
-
-				console.log( content );
+				postID = jQuery( "#story-composer" ).attr( "post-id" );				
 
 				if ( title != "" && title !== undefined ) {
 					generateAJAX({

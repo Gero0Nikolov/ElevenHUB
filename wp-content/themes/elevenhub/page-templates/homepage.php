@@ -18,10 +18,10 @@ get_header();
 	<div class="left-side">
 		<h1 class="section-header">What is the <span class="dark-highlithed">hub</span>?</h1>
 		<div class="section-content">
-			By explanation the <span class="quote">hub is the central part of a wheel that connects...</span>
+			By definition the <span class="quote">hub is the central part of a wheel that connects...</span>
 			And exactly like it's explanation 11hub is connecting your employees!
 			<div class="separator"></div>
-			It works just like a social media, but that which makes it different from the rest is the <strong>productivity</strong>.
+			It works just like a social media, but what makes it different from the rest is the <strong>productivity</strong>.
 			We are connecting your company members and keeping their productivity up to <strong>99%</strong>!
 		</div>
 	</div>

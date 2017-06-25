@@ -49,7 +49,7 @@ $brother_->set_story_view( (object)array( "story_id" => $post_id ) );
 			<h1 class="author-names"><?php echo empty( $author_short_name ) ? $author_first_name ." ". $author_last_name : $author_short_name; ?></h1>
 		</a>
 		<div class="author-meta">
-			<p class="meta"><span class="fa fa-at icon belize-hole"></span><a href="<?php echo $company_url; ?>" class="company-anchor"><?php echo empty( $company_short_name ) ? $company_first_name ." ". $company_last_name : $company_short_name; ?><span class="company-avatar" style="background-image: url(<?php echo $company_avatar; ?>);"></span></a></p>
+			<p class="meta"><span class="fa fa-at icon belize-hole"></span><a href="<?php echo $company_url; ?>" class="company-anchor"><?php echo empty( $company_short_name ) ? $company_first_name ." ". $company_last_name : $company_short_name; ?></a></p>
 			<p class="meta"><span class="fa fa-archive icon wisteria"></span><?php echo $author_stories ." ". ( $author_stories == 1 ? "story" : "stories" ); ?></p>
 		</div>
 	</div>
@@ -68,27 +68,29 @@ $brother_->set_story_view( (object)array( "story_id" => $post_id ) );
 		<div id="comments-container" class="post-comments">
 			<div id="comments" class="comments-list">
 				<?php
-				foreach ( $post_comments as $comment_ ) {
-				?>
+				if ( !empty( $post_comments ) ) {
+					foreach ( $post_comments as $comment_ ) {
+					?>
 
-				<div id="comment-<?php echo $comment_->id; ?>" class="comment">
-					<div class="user-container">
-						<a href="<?php echo $comment_->user[ "url" ]; ?>" class="user-anchor">
-							<div class="avatar" style="background-image: url(<?php echo $comment_->user[ "avatar" ] ?>);"></div>
-						</a>
+					<div id="comment-<?php echo $comment_->id; ?>" class="comment">
+						<div class="user-container">
+							<a href="<?php echo $comment_->user[ "url" ]; ?>" class="user-anchor">
+								<div class="avatar" style="background-image: url(<?php echo $comment_->user[ "avatar" ] ?>);"></div>
+							</a>
+						</div>
+						<div class="comment-content">
+							<?php echo $comment_->content; ?>
+						</div>
+						<?php if ( $comment_->user[ "is_author" ] == true && $brother_->is_employee( $company_id, $author_id ) ) { ?>
+						<div class="comment-meta">
+							<button id="edit-<?php echo $comment_->id; ?>" class="edit-controller fa fa-pencil"></button>
+							<button id="delete-<?php echo $comment_->id; ?>" class="delete-controller fa fa-trash-o"></button>
+						</div>
+						<?php } ?>
 					</div>
-					<div class="comment-content">
-						<?php echo $comment_->content; ?>
-					</div>
-					<?php if ( $comment_->user[ "is_author" ] == true && $brother_->is_employee( $company_id, $author_id ) ) { ?>
-					<div class="comment-meta">
-						<button id="edit-<?php echo $comment_->id; ?>" class="edit-controller fa fa-pencil"></button>
-						<button id="delete-<?php echo $comment_->id; ?>" class="delete-controller fa fa-trash-o"></button>
-					</div>
-					<?php } ?>
-				</div>
 
-				<?php
+					<?php
+					}
 				}
 				?>
 			</div>

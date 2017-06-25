@@ -1603,7 +1603,7 @@ class BROTHER {
 
 		$data->story_id = isset( $data->story_id ) && !empty( $data->story_id ) ? intval( $data->story_id ) : "";
 
-		if ( $data->user_id > 0 && $data->story_id > 0 ) {
+		if ( $data->story_id > 0 ) {
 			$args = array(
 				"count" => false,
 				"orberby" => "comment_date",
@@ -2452,20 +2452,20 @@ class BROTHER {
 
 				if ( count( $results_ ) > 0 ) {
 					foreach ( $results_ as $post_data ) { array_push( $post_ids, $post_data->story_id ); }
-					$sql_extension = "story_id NOT IN ( ". implode( ",", $post_ids ) ." )";
+					//$sql_extension = "story_id NOT IN ( ". implode( ",", $post_ids ) ." )";
 				} else {
-					$sql_extension = "story_id NOT IN ( SELECT story_id FROM $user_likes_table WHERE user_id = $data->user_id )";
+					//$sql_extension = "story_id NOT IN ( SELECT story_id FROM $user_likes_table WHERE user_id = $data->user_id )";
 				}
 
-				$sql_ ="
-				SELECT story_id FROM $story_views_table
-				WHERE user_id = $data->user_id AND $sql_extension
-				ORDER BY story_id DESC
-				LIMIT 5
-				OFFSET ". $data->offset;
-				$results_ = $wpdb->get_results( $sql_, OBJECT );
-
-				if ( count( $results_ ) ) { foreach ( $results_ as $post_data ) { array_push( $post_ids, $post_data->story_id ); } }
+				// $sql_ ="
+				// SELECT story_id FROM $story_views_table
+				// WHERE user_id = $data->user_id AND $sql_extension
+				// ORDER BY story_id DESC
+				// LIMIT 5
+				// OFFSET ". $data->offset;
+				// $results_ = $wpdb->get_results( $sql_, OBJECT );
+				//
+				// if ( count( $results_ ) ) { foreach ( $results_ as $post_data ) { array_push( $post_ids, $post_data->story_id ); } }
 
 				if ( isset( $data->is_ajax ) && $data->is_ajax == true ) { $stories_container = array(); }
 

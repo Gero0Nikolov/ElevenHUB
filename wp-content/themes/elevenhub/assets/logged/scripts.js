@@ -971,7 +971,10 @@ function openStoryReader( storyID, slideToComments = false ) {
 
 			// Pull comments
 			storyController = new UserStory();
-			storyController.getComments( storyID, "", function( response ) { if ( Array.isArray( response ) ) { parseComments( response ); } } );
+			storyController.getComments( storyID, "", function( response ) {
+				if ( Array.isArray( response ) ) { parseComments( response ); }
+				else { jQuery( "#story-reader-popup #story-reader-inline #comments-container #comments #loader" ).remove(); }
+			} );
 
 			// Slide to comments - If needed
 			if ( slideToComments == true ) {

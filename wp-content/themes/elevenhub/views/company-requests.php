@@ -27,6 +27,7 @@ if ( !isset( $company_id ) || empty( $company_id ) ) { $company_id = $user_id; }
 			$requester_first_name = get_user_meta( $request_->requester_id, "first_name", true );
 			$requester_last_name = get_user_meta( $request_->requester_id, "last_name", true );
 			$requester_avatar = $brother_->get_user_avatar_url( $request_->requester_id );
+			$requester_bio = get_user_meta( $request_->requester_id, "user_biography", true );		
 			?>
 
 			<div id="request-information">
@@ -36,10 +37,12 @@ if ( !isset( $company_id ) || empty( $company_id ) ) { $company_id = $user_id; }
 							<div class="avatar" style="background-image: url(<?php echo $requester_avatar; ?>);"></div>
 							<div class="names"><?php echo $requester_first_name ." ". $requester_last_name; ?></div>
 						</a>
+						<?php if ( !empty( $requester_bio ) ) { ?>
 						<div class="bio">
 							<h1>About:</h1>
-							<div class="text"><?php echo get_user_meta( $request_->requester_id, "user_biography", true ); ?></div>
+							<div class="text"><?php echo $requester_bio; ?></div>
 						</div>
+						<?php } ?>
 					</div>
 					<div class="requester-links">
 						<?php if ( !empty( $request_->requester_cv ) ) { ?> <a href="<?php echo $request_->requester_cv; ?>" id="cv-link" class="blue-bold-button display-block mb-1em text-align-center" target="_blank">View CV</a> <?php } ?>
