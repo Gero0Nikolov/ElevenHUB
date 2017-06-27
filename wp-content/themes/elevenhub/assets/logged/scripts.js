@@ -461,7 +461,7 @@ function buildUserRelation( container ) {
 			actionResult = response.action_result;
 			followersText = response.followers.length == 1 ? response.followers.length + " follower" : response.followers.length + " followers" ;
 
-			if ( jQuery( "#profile-board .user-board #followers" ).length ) { jQuery( "#profile-board .user-board #followers" ).html( followersText ); }
+			if ( jQuery( "#profile-board .user-board #followers" ).length ) { jQuery( "#profile-board .user-board #followers" ).html( "<i class='fa fa-globe icon belize-hole'></i> "+ followersText ); }
 			if ( jQuery( "#company-container #company-information .overlay #company-meta" ).length ) { jQuery( "#company-container #company-information .overlay #company-meta #company-followers-controller" ).html( followersText ); }
 		} else { actionResult = response };
 

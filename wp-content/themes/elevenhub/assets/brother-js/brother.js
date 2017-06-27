@@ -1092,7 +1092,7 @@ var UserStory = function( userID = "" ) {
 				bannerID = jQuery( "#story-featured-image" ).attr( "attachment-id" );
 				bannerID = bannerID !== undefined ? bannerID.split( "-" )[1] : false;
 				content = tinyMCE.activeEditor.getContent();
-				postID = jQuery( "#story-composer" ).attr( "post-id" );				
+				postID = jQuery( "#story-composer" ).attr( "post-id" );
 
 				if ( title != "" && title !== undefined ) {
 					generateAJAX({

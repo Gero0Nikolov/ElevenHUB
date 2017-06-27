@@ -58,10 +58,10 @@ $brother_->set_story_view( (object)array( "story_id" => $post_id ) );
 		<h1 class="story-title"><?php echo $post_->post_title; ?></h1>
 		<div class="post-content"><?php echo $brother_->convert_iframe_videos( $post_->post_content, false ); ?></div>
 		<div class="post-meta">
-			<button id="like-controller" class="fa <?php echo !$brother_->has_liked( "", $post_id ) ? "fa-heart-o" : "fa-heart" ; echo !$brother_->is_employee( $company_id, $author_id ) ? " inactive" : "" ; ?> control" story-id="<?php echo $post_id; ?>"><i class="numbers"><?php echo $post_likes; ?></i></button>
+			<button id="like-controller" class="fa <?php echo !$brother_->has_liked( "", $post_id ) ? "fa-heart-o" : "fa-heart" ; echo !$brother_->is_employee( $company_id, $user_id ) ? " inactive" : "" ; ?> control" story-id="<?php echo $post_id; ?>"><i class="numbers"><?php echo $post_likes; ?></i></button>
 			<?php
 			if ( $company_comments == "allow" ) { ?>
-				<button id="comment-controller" class="fa fa-comment <?php echo !$brother_->is_employee( $company_id, $author_id ) ? " inactive" : "" ; ?> control" story-id="<?php echo $post_id; ?>"><i class="numbers"><?php echo $post_comments_count; ?></i></button>
+				<button id="comment-controller" class="fa fa-comment <?php echo !$brother_->is_employee( $company_id, $user_id ) ? " inactive" : "" ; ?> control" story-id="<?php echo $post_id; ?>"><i class="numbers"><?php echo $post_comments_count; ?></i></button>
 			<?php } ?>
 		</div>
 		<?php if ( $company_comments == "allow" ) { ?>

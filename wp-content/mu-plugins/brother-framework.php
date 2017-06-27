@@ -68,7 +68,7 @@ class BROTHER {
 		$company_id = intval( $_POST[ "company_id" ] );
 		$total = count( $_FILES[ "upload" ] );
 
-		if ( is_int( $company_id ) ) {
+		if ( $company_id > 0 ) {
 			if (
 				( isset( $company_id ) && !empty( $company_id ) ) &&
 				( isset( $_FILES[ "upload" ] ) && !empty( $_FILES[ "upload" ] ) && $total > 0 )
