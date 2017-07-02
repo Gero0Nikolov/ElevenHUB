@@ -1150,31 +1150,37 @@ function pullUserStoriesBoard( storiesContainer, args ) {
 	storiesController.getUserStoriesBoard( args.userID, args.offset, args.compositions, function( response ){
 		jQuery( storiesContainer +" #loader" ).remove();
 
-		stories_ = response;
-		for ( story_key in stories_ ) {
-			story_ = stories_[ story_key ];
+		if ( response.length > 0 ) {
+			stories_ = response;
+			for ( story_key in stories_ ) {
+				story_ = stories_[ story_key ];
 
-			view_ = "\
-			<a href='"+ story_.url +"' class='post-anchor'>\
-				<div id='story-"+ story_.ID +"' class='story-container animated fadeInUp'>\
-					<div class='story-banner' style='background-image: url("+ story_.banner +");'></div>\
-					<h1 class='story-title'>"+ story_.title +"</h1>\
-					<div class='story-content'>"+ story_.excerpt +"</div>\
-					<div class='story-meta'>\
-						<span class='meta story-likes fa fa-heart'><i class='numbers'>"+ story_.meta.likes +"</i></span>\
-						<span class='meta' title='Author'><i class='icon fa fa-pencil'></i><div class='avatar' style='background-image: url("+ story_.author.avatar_url +");'></div></span>\
-						<span class='meta' title='Company'><i class='icon fa fa-at'></i><div class='avatar' style='background-image: url("+ story_.company.avatar_url +");'></div></span>\
+				view_ = "\
+				<a href='"+ story_.url +"' class='post-anchor'>\
+					<div id='story-"+ story_.ID +"' class='story-container animated fadeInUp'>\
+						<div class='story-banner' style='background-image: url("+ story_.banner +");'></div>\
+						<h1 class='story-title'>"+ story_.title +"</h1>\
+						<div class='story-content'>"+ story_.excerpt +"</div>\
+						<div class='story-meta'>\
+							<span class='meta story-likes fa fa-heart'><i class='numbers'>"+ story_.meta.likes +"</i></span>\
+							<span class='meta' title='Author'><i class='icon fa fa-pencil'></i><div class='avatar' style='background-image: url("+ story_.author.avatar_url +");'></div></span>\
+							<span class='meta' title='Company'><i class='icon fa fa-at'></i><div class='avatar' style='background-image: url("+ story_.company.avatar_url +");'></div></span>\
+						</div>\
 					</div>\
-				</div>\
-			</a>\
-			";
+				</a>\
+				";
 
-			jQuery( storiesContainer ).append( view_ );
+				jQuery( storiesContainer ).append( view_ );
+			}
+
+			storiesOffset += 10;
+			if ( stories_.length > 0 ) { lockStoriesLoad = false; }
+			if ( firstLoad == false ) { firstLoad = true; }
+		} else {
+			if ( jQuery( storiesContainer ).children().length == 0 ) {
+				jQuery( storiesContainer ).append( "<h1 class='no-information-message'>No stories yet...</h1>" );
+			}
 		}
-
-		storiesOffset += 10;
-		if ( stories_.length > 0 ) { lockStoriesLoad = false; }
-		if ( firstLoad == false ) { firstLoad = true; }
 	} );
 }
 

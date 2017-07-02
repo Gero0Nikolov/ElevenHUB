@@ -2535,7 +2535,7 @@ class BROTHER {
 						}
 					}
 				}
-			}
+			}					
 
 			if ( isset( $data->is_ajax ) && $data->is_ajax == true ) { return $stories_container; }
 		}

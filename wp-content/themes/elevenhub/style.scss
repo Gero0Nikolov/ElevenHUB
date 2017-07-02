@@ -1414,17 +1414,28 @@ a.skeleton-bold-button {
     background: #eee;
     background-size: cover;
     background-position: center;
+	position: relative;
+	overflow: hidden;
+
+	video {
+		position: absolute;
+		width: 100%;
+		height: auto;
+		top: 0;
+		left: 0;
+	}
 
     .banner-text {
     	font-family: OswaldRegular;
     	font-size: 4rem;
     	font-weight: normal;
+		position: relative;
 
     	letter-spacing: 1px;
     	text-align: center;
 
     	margin: 0;
-    	padding: 4em 0.5em;
+    	padding: 3em 0.5em;
 
     	color: #fff;
     	background: rgba(0, 0, 0, 0.5);
@@ -1467,6 +1478,7 @@ a.skeleton-bold-button {
 }
 
 .mt-2em { margin-top: 2em !important; }
+.mt-3em { margin-top: 3em !important; }
 .mt-5em { margin-top: 5em !important; }
 .mt-8em { margin-top: 8em !important; }
 
@@ -1710,6 +1722,24 @@ a.skeleton-bold-button {
 	}
 }
 
+.error-404 {
+	.page-sign {
+		font-size: 10em !important;
+		margin: 0.25em 0 0;
+		line-height: 100%;
+	}
+
+	.page-title,
+	.page-sign {
+		text-align: center;
+		font-family: OswaldRegular;
+		font-size: 4rem;
+		font-weight: normal;
+		color: $alizarin;
+		letter-spacing: 1px;
+	}
+}
+
 /* MOBILE */
 .mobile {
 	.main-navigation { padding: 1em !important; }
@@ -1719,8 +1749,11 @@ a.skeleton-bold-button {
 		margin: 2em 0;
 
 		.big-banner {
+			margin: 3em 0 0;
+
 			.banner-text {
 				padding: 1em 0.25em;
+				font-size: 3rem !important;
 			}
 		}
 

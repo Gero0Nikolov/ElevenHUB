@@ -10,11 +10,16 @@
 get_header();
 ?>
 
-<div id="homepage-banner" class="big-banner" style="background-image: url('<?php echo get_template_directory_uri(); ?>/assets/images/banner.jpg');">
+<div id="homepage-banner" class="big-banner" <?php if ( wp_is_mobile() ) { ?>style="background-image: url('<?php echo get_template_directory_uri(); ?>/assets/images/banner.jpg');"<?php } ?>>
+	<?php if ( !wp_is_mobile() ) { ?>
+	<video id="video-background" preload="none" autoplay="autoplay" loop="loop" muted="muted">
+		<source src="<?php echo get_template_directory_uri(); ?>/assets/images/hub-video.mp4" type="video/mp4">
+	</video>
+	<?php } ?>
 	<h1 class="banner-text">The <span class="red-highlithed">hub</span> where your company stays connected!</h1>
 </div>
 
-<div class="flex-container mt-5em">
+<div class="flex-container mt-3em">
 	<div class="left-side">
 		<h1 class="section-header">What is the <span class="dark-highlithed">hub</span>?</h1>
 		<div class="section-content">
@@ -31,7 +36,7 @@ get_header();
 	</div>
 </div>
 
-<div class="flex-container mt-5em">
+<div class="flex-container mt-3em">
 	<div class="left-side">
 		<div class="full-size-banner" style="background-image: url('<?php echo get_template_directory_uri(); ?>/assets/images/banner_2.jpg');">
 		</div>
@@ -47,7 +52,7 @@ get_header();
 	</div>
 </div>
 
-<div class="flex-container mt-5em">
+<div class="flex-container mt-3em">
 	<div class="left-side">
 		<h1 class="section-header">How it <span class="dark-highlithed">works</span>?</h1>
 		<div class="section-content">
