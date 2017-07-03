@@ -179,8 +179,8 @@ add_action('after_setup_theme', 'remove_admin_bar');
 add_action( 'wp_ajax_nopriv_register_user', 'register_user' );
 add_action( 'wp_ajax_register_user', 'register_user' );
 function register_user() {
-	$first_name = isset( $_POST[ "first_name" ] ) && !empty( $_POST[ "first_name" ] ) ? sanitize_text_field( $_POST[ "first_name" ] ) : "";
-	$last_name = isset( $_POST[ "last_name" ] ) && !empty( $_POST[ "last_name" ] ) ? sanitize_text_field( $_POST[ "last_name" ] ) : "";
+	$first_name = isset( $_POST[ "first_name" ] ) && !empty( $_POST[ "first_name" ] ) ? ucfirst( anitize_text_field( $_POST[ "first_name" ] ) ) : "";
+	$last_name = isset( $_POST[ "last_name" ] ) && !empty( $_POST[ "last_name" ] ) ? ucfirst( sanitize_text_field( $_POST[ "last_name" ] ) ) : "";
 	$email = isset( $_POST[ "email" ] ) && !empty( $_POST[ "email" ] ) ? trim( strtolower( $_POST[ "email" ] ) ) : "";
 	$password = isset( $_POST[ "password" ] ) && !empty( $_POST[ "password" ] ) ? $_POST[ "password" ] : "";
 
@@ -189,7 +189,7 @@ function register_user() {
 
 		if ( empty( $email ) || !is_email( $email ) ) { echo "Choose your email!"; die(); }
 		if ( empty( $password ) ) { echo "Choose your password!"; die(); }
-		if ( !is_alphabetical( array( $first_name, $last_name ) ) ) { echo "Enter your real names!"; die(); }
+		if ( !is_alphabetical( array( $first_name, $last_name ) ) ) { echo "Enter your real names!"; die(); }		
 
 		$wp_registration_result = wp_create_user( $wp_username, $password, $email );
 
