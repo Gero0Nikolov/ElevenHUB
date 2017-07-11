@@ -15,7 +15,7 @@ if ( $automatic_registrations == "true" ) {
 	$first_name = isset( $_GET[ "fname" ] ) && !empty( $_GET[ "fname" ] ) ? sanitize_text_field( urldecode( $_GET[ "fname" ] ) ) : "";
 	$last_name = isset( $_GET[ "lname" ] ) && !empty( $_GET[ "lname" ] ) ? sanitize_text_field( urldecode( $_GET[ "lname" ] ) ) : "";
 
-	if ( !empty( $email ) && is_email( $email ) && !empty( $first_name ) && !empty( $last_name ) && is_alphabetical( array( $first_name, $last_name ) ) ) {
+	if ( !empty( $email ) && is_email( $email ) && !email_exists( $email ) && !empty( $first_name ) && !empty( $last_name ) && is_alphabetical( array( $first_name, $last_name ) ) ) {
 		$wp_username = strtolower( $first_name ."_". $last_name );
 		$password = substr( md5( microtime() ), rand( 0, 26 ), 5 );
 

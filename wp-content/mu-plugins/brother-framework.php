@@ -187,7 +187,19 @@ class BROTHER {
 	*	Function purpose: This function returns the URL to the avatar picture of the specified user
 	*/
 	function get_user_avatar_url( $user_id = "" ) {
-		return !empty( $user_id ) && intval( $user_id ) > 0 ? get_user_meta( $user_id, "user_avatar_url", true ) : get_user_meta( get_current_user_id(), "user_avatar_url", true );
+		$user_id = !empty( $user_id ) ? intval( $user_id ) : get_current_user_id();
+
+		if ( $user_id > 0 ) {
+			$user_avatar_url = get_user_meta( $user_id, "user_avatar_url", true );
+			$user_avatar_url = str_replace( "http:", "https:", $user_avatar_url );
+
+			if ( empty( $user_avatar_url ) ) {
+				$user_first_name = str_split( get_user_meta( $user_id, "first_name", true ) );
+				$user_avatar_url = get_template_directory_uri() ."/assets/images/alphabet/". strtoupper( $user_first_name[ 0 ] ) .".png";
+			}
+		}
+
+		return  $user_avatar_url;
 	}
 
 	/*
@@ -202,9 +214,17 @@ class BROTHER {
 		if ( $user_id > 0 ) {
 			$user_avatar = (object) array(
 				"avatar_id" => get_user_meta( $user_id, "user_avatar_id", true ),
-				"avatar_url" => get_user_meta( $user_id, "user_avatar_url", true ),
+				"avatar_url" => "",
 				"avatar_path" => get_user_meta( $user_id, "user_avatar_path", true )
 			);
+
+			$user_avatar->avatar_url = get_user_meta( $user_id, "user_avatar_url", true );
+			$user_avatar->avatar_url = str_replace( "http:", "https:", $user_avatar->avatar_url );
+
+			if ( empty( $user_avatar[ "avatar_url" ] ) ) {
+				$user_first_name = str_split( get_user_meta( $user_id, "first_name", true ) );
+				$user_avatar[ "avatar_url" ] = get_template_directory_uri() ."/assets/images/alphabet/". strtoupper( $user_first_name[ 0 ] ) .".png";
+			}
 		} else { $user_avatar = false; }
 
 		return $user_avatar;
@@ -216,7 +236,14 @@ class BROTHER {
 	*	Function purpose: This function returns the URL to the banner picture of the specified user
 	*/
 	function get_user_banner_url( $user_id = "" ) {
-		return !empty( $user_id ) && intval( $user_id ) > 0 ? get_user_meta( $user_id, "user_banner_url", true ) : get_user_meta( get_current_user_id(), "user_banner_url", true );
+		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
+		else { $user_id = intval( $user_id ); }
+
+		if ( $user_id > 0 ) {
+			$banner_url = get_user_meta( $user_id, "user_banner_url", true );
+			$banner_url = str_replace( "http:", "https:", $banner_url );
+			return $banner_url;
+		} else { return ""; }
 	}
 
 	/*
@@ -231,9 +258,12 @@ class BROTHER {
 		if ( $user_id > 0 ) {
 			$user_banner = (object) array(
 				"banner_id" => get_user_meta( $user_id, "user_banner_id", true ),
-				"banner_url" => get_user_meta( $user_id, "user_banner_url", true ),
+				"banner_url" => "",
 				"banner_path" => get_user_meta( $user_id, "user_banner_path", true )
 			);
+
+			$user_banner->banner_url = get_user_meta( $user_id, "user_banner_url", true );
+			$user_banner->banner_url = str_replace( "http:", "https:", $user_banner->banner_url );
 		} else { $user_banner = false; }
 
 		return $user_banner;
@@ -477,9 +507,10 @@ class BROTHER {
 			foreach ( $follows as $follow ) {
 				$follow_holder = array();
 				$follow_holder[ "row_id" ] = $follow->id;
-				$follow_holder[ "user_follow_body" ][ "user_id" ] = $follow->user_follow_id;
+				$follow_holder[ "user_follow_body" ][ "user_id" ] = $follow->user_followed_id;
 				$follow_holder[ "user_follow_body" ][ "user_url" ] = get_author_posts_url( $follow->user_followed_id );
 				$follow_holder[ "user_follow_body" ][ "user_avatar_url" ] = $this->get_user_avatar_url( $follow->user_followed_id );
+				$follow_holder[ "user_follow_body" ][ "user_banner_url" ] = $this->get_user_banner_url( $follow->user_followed_id );
 				$follow_holder[ "user_follow_body" ][ "user_first_name" ] = get_user_meta( $follow->user_followed_id, "first_name", true );
 				$follow_holder[ "user_follow_body" ][ "user_last_name" ] = get_user_meta( $follow->user_followed_id, "last_name", true );
 				$follow_holder[ "user_follow_body" ][ "user_shortname" ] = get_user_meta( $follow->user_followed_id, "user_shortname", true );
@@ -514,6 +545,7 @@ class BROTHER {
 				$employee_holder[ "user_employee_body" ][ "user_id" ] = $employee->user_followed_id;
 				$employee_holder[ "user_employee_body" ][ "user_url"] = get_author_posts_url( $employee->user_followed_id );
 				$employee_holder[ "user_employee_body" ][ "user_avatar_url" ] = $this->get_user_avatar_url( $employee->user_followed_id );
+				$employee_holder[ "user_employee_body" ][ "user_banner_url" ] = $this->get_user_banner_url( $employee->user_followed_id );
 				$employee_holder[ "user_employee_body" ][ "user_first_name" ] = get_user_meta( $employee->user_followed_id, "first_name", true );
 				$employee_holder[ "user_employee_body" ][ "user_last_name" ] = get_user_meta( $employee->user_followed_id, "last_name", true );
 				$employee_holder[ "user_employee_body" ][ "user_shortname" ] = get_user_meta( $employee->user_followed_id, "user_shortname", true );
@@ -545,9 +577,11 @@ class BROTHER {
 			foreach ( $employers as $employer ) {
 				$employer_container = new stdClass;
 				$employer_container->row_id = $employer->id;
+				$employer_container->employer = new stdClass;
 				$employer_container->employer->user_id = $employer->user_employer_id;
 				$employer_container->employer->user_url = get_author_posts_url( $employer->user_employer_id );
 				$employer_container->employer->avatar_url = $this->get_user_avatar_url( $employer->user_employer_id );
+				$employer_container->employer->banner_url = $this->get_user_banner_url( $employer->user_employer_id );
 				$employer_container->employer->first_name = get_user_meta( $employer->user_employer_id, "first_name", true );
 				$employer_container->employer->last_name = get_user_meta( $employer->user_employer_id, "last_name", true );
 				$employer_container->employer->short_name = get_user_meta( $employer->user_employer_id, "user_shortname", true );
@@ -706,6 +740,21 @@ class BROTHER {
 	*/
 	function is_company_public( $user_id ) {
 		return intval( $user_id ) > 0 && get_user_meta( $user_id, "company_type", true ) == "public" ? true : false;
+	}
+
+	/*
+	*	Function name: is_company
+	*	Function arguments: $user_id [ INT ]
+	*	Function purpose: This function is used to check if a USER is a company typed by $user_id.
+	*/
+	function is_company( $user_id = "" ) {
+		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
+		else { $user_id = intval( $user_id ); }
+
+		if ( $user_id > 0 ) {
+			$association_type = get_user_meta( $user_id, "account_association", true );
+			return $association_type == "company" ? true : false;
+		} else { return false; }
 	}
 
 	/*
@@ -2195,43 +2244,47 @@ class BROTHER {
 			$sql_ = "SELECT DISTINCT * FROM $table_ WHERE company_id='$company_id' ORDER BY request_date DESC";
 			$results_ = $wpdb->get_results( $sql_, OBJECT );
 
-			foreach ( $results_ as $request_ ) {
-				if ( !in_array( $request_->requester_id, $listed_users ) ) {
-					$user_first_name = get_user_meta( $request_->requester_id, "first_name", true );
-					$user_last_name = get_user_meta( $request_->requester_id, "last_name", true );
-					$user_short_name = get_user_meta( $request_->requester_id, "user_shortname", true );
+			if ( !empty( $results_ ) ) {
+				foreach ( $results_ as $request_ ) {
+					if ( !in_array( $request_->requester_id, $listed_users ) ) {
+						$user_first_name = get_user_meta( $request_->requester_id, "first_name", true );
+						$user_last_name = get_user_meta( $request_->requester_id, "last_name", true );
+						$user_short_name = get_user_meta( $request_->requester_id, "user_shortname", true );
 
-					if ( !isset( $data->is_ajax ) || !$data->is_ajax ) {
-						?>
+						if ( !isset( $data->is_ajax ) || !$data->is_ajax ) {
+							?>
 
-						<a href="<?php echo get_permalink( 85 ); ?>?request_id=<?php echo $request_->id; ?>" class="request-anchor">
-							<div id="request-<?php echo $request_->id; ?>" class="list-item">
-								<div class="avatar" style="background-image: url(<?php echo $this->get_user_avatar_url( $request_->requester_id ); ?>);'"></div>
-								<h1 class="names"><?php echo !empty( $user_short_name ) ? $user_short_name : $user_first_name ." ". $user_last_name; ?></h1>
-								<div class="list-item-meta">
-									<?php if ( !empty( $request_->request_response ) ) { ?> <p class="meta icon <?php echo $request_->request_response == "accept" ? "green" : "red"; ?>"><i class="fa <?php echo $request_->request_response == "accept" ? "fa-check" : "fa-close" ?>"></i></p> <?php } ?>
-									<?php if ( !empty( $request_->requester_cv ) ) { ?> <p class="meta icon blue">CV</p> <?php } ?>
-									<?php if ( !empty( $request_->requester_portfolio ) ) { ?> <p class="meta icon green">PF</p> <?php } ?>
-									<p class="meta"><?php echo date( "d-m-Y", strtotime( $request_->request_date ) ); ?></p>
+							<a href="<?php echo get_permalink( 85 ); ?>?request_id=<?php echo $request_->id; ?>" class="request-anchor">
+								<div id="request-<?php echo $request_->id; ?>" class="list-item">
+									<div class="avatar" style="background-image: url(<?php echo $this->get_user_avatar_url( $request_->requester_id ); ?>);'"></div>
+									<h1 class="names"><?php echo !empty( $user_short_name ) ? $user_short_name : $user_first_name ." ". $user_last_name; ?></h1>
+									<div class="list-item-meta">
+										<?php if ( !empty( $request_->request_response ) ) { ?> <p class="meta icon <?php echo $request_->request_response == "accept" ? "green" : "red"; ?>"><i class="fa <?php echo $request_->request_response == "accept" ? "fa-check" : "fa-close" ?>"></i></p> <?php } ?>
+										<?php if ( !empty( $request_->requester_cv ) ) { ?> <p class="meta icon blue">CV</p> <?php } ?>
+										<?php if ( !empty( $request_->requester_portfolio ) ) { ?> <p class="meta icon green">PF</p> <?php } ?>
+										<p class="meta"><?php echo date( "d-m-Y", strtotime( $request_->request_date ) ); ?></p>
+									</div>
 								</div>
-							</div>
-						</a>
+							</a>
 
-						<?php
-					} elseif ( $data->is_ajax ) {
-						$request_holder = array();
-						$request_holder[ "ID" ] = $request_->id;
-						$request_holder[ "REQUESTER_ID" ] = $request_->requester_id;
-						$request_holder[ "REQUESTER_CV" ] = $request_->requester_cv;
-						$request_holder[ "REQUESTER_PORTFOLIO" ] = $request_->requester_portfolio;
-						$request_holder[ "REQUEST_DATE" ] = $request_->request_date;
-						$request_holder[ "REQUEST_RESPONSE" ] = $request_->request_response;
-						$request_holder[ "COMPANY_ID" ] = $request_->company_id;
-						array_push( $requests_holder, (object)$request_holder );
+							<?php
+						} elseif ( $data->is_ajax ) {
+							$request_holder = array();
+							$request_holder[ "ID" ] = $request_->id;
+							$request_holder[ "REQUESTER_ID" ] = $request_->requester_id;
+							$request_holder[ "REQUESTER_CV" ] = $request_->requester_cv;
+							$request_holder[ "REQUESTER_PORTFOLIO" ] = $request_->requester_portfolio;
+							$request_holder[ "REQUEST_DATE" ] = $request_->request_date;
+							$request_holder[ "REQUEST_RESPONSE" ] = $request_->request_response;
+							$request_holder[ "COMPANY_ID" ] = $request_->company_id;
+							array_push( $requests_holder, (object)$request_holder );
+						}
+
+						array_push( $listed_users, $request_->requester_id );
 					}
-
-					array_push( $listed_users, $request_->requester_id );
 				}
+			} else {
+				if ( !isset( $data->is_ajax ) && !$data->is_ajax ) { ?> <h1 class="no-information-message">No requests / invitations yet...</h1> <?php }
 			}
 
 			if ( isset( $data->is_ajax ) && $data->is_ajax ) { return json_encode( $requests_holder ); }
@@ -2413,6 +2466,7 @@ class BROTHER {
 							$story_container[ "company" ][ "last_name" ] = get_user_meta( $company_id, "last_name", true );
 							$story_container[ "company" ][ "short_name" ] = get_user_meta( $company_id, "user_shortname", true );
 							$story_container[ "meta" ][ "likes" ] = $post_likes;
+							$story_container[ "meta" ][ "is_liked" ] = $this->has_liked( get_current_user_id(), $post_->ID );
 							array_push( $stories_container, (object)$story_container );
 						} else {
 							?>
@@ -2423,7 +2477,7 @@ class BROTHER {
 									<h1 class="story-title"><?php echo $post_->post_title; ?></h1>
 									<div class="story-content"><?php echo $post_excerpt; ?></div>
 									<div class="story-meta">
-										<span class="meta story-likes fa fa-heart"><i class="numbers"><?php echo $post_likes; ?></i></span>
+										<span class="meta story-likes fa <?php echo $this->has_liked( get_current_user_id(), $post_->ID ) ? "fa-heart" : "fa-heart-o"; ?>"><i class="numbers"><?php echo $post_likes; ?></i></span>
 										<span class="meta" title="Company"><i class="icon fa fa-at"></i><div class="avatar" style="background-image: url(<?php echo $company_avatar; ?>);"></div></span>
 									</div>
 								</div>
@@ -2452,20 +2506,20 @@ class BROTHER {
 
 				if ( count( $results_ ) > 0 ) {
 					foreach ( $results_ as $post_data ) { array_push( $post_ids, $post_data->story_id ); }
-					//$sql_extension = "story_id NOT IN ( ". implode( ",", $post_ids ) ." )";
+					$sql_extension = "story_id NOT IN ( ". implode( ",", $post_ids ) ." )";
 				} else {
-					//$sql_extension = "story_id NOT IN ( SELECT story_id FROM $user_likes_table WHERE user_id = $data->user_id )";
+					$sql_extension = "story_id NOT IN ( SELECT story_id FROM $user_likes_table WHERE user_id = $data->user_id )";
 				}
 
-				// $sql_ ="
-				// SELECT story_id FROM $story_views_table
-				// WHERE user_id = $data->user_id AND $sql_extension
-				// ORDER BY story_id DESC
-				// LIMIT 5
-				// OFFSET ". $data->offset;
-				// $results_ = $wpdb->get_results( $sql_, OBJECT );
-				//
-				// if ( count( $results_ ) ) { foreach ( $results_ as $post_data ) { array_push( $post_ids, $post_data->story_id ); } }
+				$sql_ ="
+				SELECT story_id FROM $story_views_table
+				WHERE user_id = $data->user_id AND $sql_extension
+				ORDER BY story_id DESC
+				LIMIT 5
+				OFFSET ". $data->offset;
+				$results_ = $wpdb->get_results( $sql_, OBJECT );
+
+				if ( count( $results_ ) ) { foreach ( $results_ as $post_data ) { array_push( $post_ids, $post_data->story_id ); } }
 
 				if ( isset( $data->is_ajax ) && $data->is_ajax == true ) { $stories_container = array(); }
 
@@ -2513,6 +2567,7 @@ class BROTHER {
 								$story_container[ "company" ][ "last_name" ] = get_user_meta( $company_id, "last_name", true );
 								$story_container[ "company" ][ "short_name" ] = get_user_meta( $company_id, "user_shortname", true );
 								$story_container[ "meta" ][ "likes" ] = $post_likes;
+								$story_container[ "meta" ][ "is_liked" ] = $this->has_liked( get_current_user_id(), $post_->ID );
 								array_push( $stories_container, (object)$story_container );
 							} else {
 								?>
@@ -2523,7 +2578,7 @@ class BROTHER {
 										<h1 class="story-title"><?php echo $post_->post_title; ?></h1>
 										<div class="story-content"><?php echo $post_excerpt; ?></div>
 										<div class="story-meta">
-											<span class="meta story-likes fa fa-heart"><i class="numbers"><?php echo $post_likes; ?></i></span>
+											<span class="meta story-likes fa <?php echo $this->has_liked( get_current_user_id(), $post_->ID ) ? "fa-heart" : "fa-heart-o"; ?>"><i class="numbers"><?php echo $post_likes; ?></i></span>
 											<span class="meta" title="Author"><i class="icon fa fa-pencil"></i><div class="avatar" style="background-image: url(<?php echo $author_avatar ?>);"></div></span>
 											<span class="meta" title="Company"><i class="icon fa fa-at"></i><div class="avatar" style="background-image: url(<?php echo $company_avatar; ?>);"></div></span>
 										</div>
@@ -2535,7 +2590,7 @@ class BROTHER {
 						}
 					}
 				}
-			}					
+			}
 
 			if ( isset( $data->is_ajax ) && $data->is_ajax == true ) { return $stories_container; }
 		}

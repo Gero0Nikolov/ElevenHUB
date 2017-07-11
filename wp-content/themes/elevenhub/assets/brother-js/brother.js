@@ -126,10 +126,10 @@ var UserMedia = function( userID = "" ) {
 							view_ = "";
 							switch ( attachmentTYPE.split( "/" )[0] ) {
 								case "image":
-									view_ = "<img src='"+ response +"' id='"+ attachmentID +"' class='picture-preview animated flipInX'/>";
+									view_ = "<img src='"+ response +"' id='"+ attachmentID +"' class='picture-preview animated fadeIn'/>";
 									break;
 								case "video":
-									view_ = "<video id='"+ attachmentID +"' class='video-preview animated flipInX' controls loop autoplay><source src='"+ response +"' type='"+ attachmentTYPE +"'></video>";
+									view_ = "<video id='"+ attachmentID +"' class='video-preview animated fadeIn' controls loop autoplay><source src='"+ response +"' type='"+ attachmentTYPE +"'></video>";
 									break;
 
 								default:
@@ -501,7 +501,9 @@ var UserNotifications = function( userID = "" ) {
 	*	Function purpose: This function returns and JSON object of the all last 100 notifications ordered by Notifications_ID
 	*/
 	this.getUserNotifications = function( userID = "", onSuccess ) {
-		generateAJAX( { functionName : "get_user_notifications", arguments : userID }, function( response ) { onSuccess( JSON.parse( JSON.parse( response ) ) ); } );
+		generateAJAX( { functionName : "get_user_notifications", arguments : userID }, function( response ) {
+			console.log( response );
+			onSuccess( JSON.parse( JSON.parse( response ) ) ); } );
 	}
 
 	/*

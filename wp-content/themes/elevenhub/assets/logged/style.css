@@ -4,6 +4,27 @@ body {
   margin: 0 !important;
   padding: 0 !important; }
 
+blockquote {
+  display: block;
+  padding: 0 1em;
+  margin: 2em auto;
+  border-left: none;
+  font-size: 2rem;
+  text-align: center;
+  position: relative; }
+  blockquote:before {
+    content: "\275d";
+    display: inline-block;
+    position: absolute;
+    left: 0;
+    color: #999; }
+  blockquote:after {
+    content: "\275e";
+    display: inline-block;
+    position: absolute;
+    right: 0;
+    color: #999; }
+
 /** EDITABLE CONTAINERS **/
 [contenteditable=true]:empty:before {
   content: attr(placeholder);
@@ -35,7 +56,7 @@ body {
   vertical-align: middle; }
   .header-avatar-holder .avatar {
     display: inline-block;
-    background-color: #eee;
+    background-color: #fff;
     background-size: cover;
     background-position: center;
     border-radius: 100%;
@@ -306,6 +327,7 @@ body {
   .profile-board .stories-board {
     display: inline-block;
     width: 70%;
+    min-height: 350px;
     padding-left: 1em;
     border-left: 1px dashed #ddd; }
     .profile-board .stories-board .post-anchor {
@@ -346,6 +368,14 @@ body {
         text-align: justify;
         word-wrap: break-word;
         word-break: break-word; }
+        .profile-board .stories-board .story-container .story-content a {
+          display: inline-block;
+          font-size: 1.5rem;
+          font-weight: normal;
+          color: #3498db;
+          text-decoration: none; }
+          .profile-board .stories-board .story-container .story-content a:hover, .profile-board .stories-board .story-container .story-content a:focus, .profile-board .stories-board .story-container .story-content a:active {
+            color: #2980b9; }
       .profile-board .stories-board .story-container .story-meta {
         display: -webkit-flex;
         display: -webkit-box;
@@ -439,7 +469,7 @@ body {
       height: 4em;
       border-radius: 100%;
       box-shadow: 0 0 0 5px #fff;
-      background-color: #ddd;
+      background-color: #fff;
       background-size: cover;
       background-position: center;
       position: relative;
@@ -738,7 +768,7 @@ body {
       width: 128px;
       height: 128px;
       border-radius: 100%;
-      background-color: #eee;
+      background-color: #fff;
       background-size: cover;
       background-position: center;
       margin: 2em auto; }
@@ -941,7 +971,7 @@ body {
           width: 48px;
           height: 48px;
           border-radius: 100%;
-          background-color: #eee;
+          background-color: #fff;
           background-size: cover;
           background-position: center;
           vertical-align: middle;
@@ -1173,7 +1203,7 @@ body {
         display: inline-block;
         width: 38px;
         height: 38px;
-        background-color: #eee;
+        background-color: #fff;
         background-size: cover;
         background-position: center;
         border-radius: 100%;
@@ -1427,6 +1457,14 @@ body {
       font-size: 1.25rem; }
     #story-composer .story-content .user-preview:hover {
       color: #2980b9; }
+    #story-composer .story-content a {
+      display: inline-block;
+      font-size: 1.5rem;
+      font-weight: normal;
+      color: #3498db;
+      text-decoration: none; }
+      #story-composer .story-content a:hover, #story-composer .story-content a:focus, #story-composer .story-content a:active {
+        color: #2980b9; }
   #story-composer #story-floating-controls {
     display: block;
     margin: 1em auto;
@@ -1703,6 +1741,14 @@ body {
           margin: 0 0 1em; }
         .reader-popup .reader-inline-popup .story-container .story .story-content .content-video {
           width: 100%; }
+        .reader-popup .reader-inline-popup .story-container .story .story-content a {
+          display: inline-block;
+          font-size: 1.5rem;
+          font-weight: normal;
+          color: #3498db;
+          text-decoration: none; }
+          .reader-popup .reader-inline-popup .story-container .story .story-content a:hover, .reader-popup .reader-inline-popup .story-container .story .story-content a:focus, .reader-popup .reader-inline-popup .story-container .story .story-content a:active {
+            color: #2980b9; }
     .reader-popup .reader-inline-popup .story-meta {
       padding: 0 1em;
       border-top: 1px dashed #ddd;
@@ -1766,7 +1812,7 @@ body {
               font-size: 3rem;
               background-size: cover;
               background-position: center;
-              background-color: #ccc;
+              background-color: #fff;
               box-shadow: 0 0 0 1px #ddd;
               border-radius: 100%;
               margin-right: 0.15em; }
@@ -1973,6 +2019,19 @@ body {
 #hubbers-list {
   margin-top: 1em;
   text-align: center; }
+  #companies-list .list-title,
+  #hubbers-list .list-title {
+    display: block;
+    font-family: OpenSansBold;
+    font-size: 2rem;
+    font-weight: normal;
+    color: #333;
+    letter-spacing: 2px;
+    margin: 1.5em 0 1em;
+    text-transform: uppercase; }
+    #companies-list .list-title:first-of-type,
+    #hubbers-list .list-title:first-of-type {
+      margin: 1em 0 1em; }
   #companies-list .company-anchor,
   #companies-list .user-anchor,
   #hubbers-list .company-anchor,
@@ -2033,7 +2092,7 @@ body {
         height: 1.75em;
         background-size: cover;
         background-position: center;
-        background-color: #eee;
+        background-color: #fff;
         border-radius: 100%;
         vertical-align: middle;
         margin: 0 auto 0.25em; }
@@ -2055,6 +2114,40 @@ body {
         margin: 0 auto;
         text-align: center;
         letter-spacing: 1px; }
+      #companies-list .company-anchor .list-item .badges,
+      #companies-list .user-anchor .list-item .badges,
+      #hubbers-list .company-anchor .list-item .badges,
+      #hubbers-list .user-anchor .list-item .badges {
+        display: block;
+        position: relative;
+        transform: translateY(1em); }
+        #companies-list .company-anchor .list-item .badges .icon,
+        #companies-list .user-anchor .list-item .badges .icon,
+        #hubbers-list .company-anchor .list-item .badges .icon,
+        #hubbers-list .user-anchor .list-item .badges .icon {
+          display: inline-flex;
+          font-size: 1rem;
+          color: #fff;
+          width: 24px;
+          height: 24px;
+          text-align: center;
+          padding: 0.25em;
+          vertical-align: middle;
+          margin: 0.15em;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          border-radius: 3px; }
+          #companies-list .company-anchor .list-item .badges .icon.employer,
+          #companies-list .user-anchor .list-item .badges .icon.employer,
+          #hubbers-list .company-anchor .list-item .badges .icon.employer,
+          #hubbers-list .user-anchor .list-item .badges .icon.employer {
+            background-color: #f1c40f; }
+          #companies-list .company-anchor .list-item .badges .icon.following,
+          #companies-list .user-anchor .list-item .badges .icon.following,
+          #hubbers-list .company-anchor .list-item .badges .icon.following,
+          #hubbers-list .user-anchor .list-item .badges .icon.following {
+            background-color: #f39c12; }
     #companies-list .company-anchor .list-item:hover .overlay,
     #companies-list .company-anchor .list-item:active .overlay,
     #companies-list .user-anchor .list-item:hover .overlay,
@@ -2087,7 +2180,7 @@ body {
         box-shadow: 0 0 0 1px #ddd;
         background-size: cover;
         background-position: center;
-        background-color: #eee;
+        background-color: #fff;
         vertical-align: middle; }
       #requests-list .request-anchor .list-item .names {
         display: inline-block;
@@ -2142,7 +2235,7 @@ body {
       height: 2em;
       background-size: cover;
       background-position: center;
-      background-color: #eee;
+      background-color: #fff;
       border-radius: 100%;
       vertical-align: middle;
       box-shadow: 0 0 0 1px #ddd; }
@@ -2581,6 +2674,14 @@ body {
     text-align: justify;
     word-wrap: break-word;
     word-break: break-word; }
+    .public-stories-container .story-container .story-content a {
+      display: inline-block;
+      font-size: 1.5rem;
+      font-weight: normal;
+      color: #3498db;
+      text-decoration: none; }
+      .public-stories-container .story-container .story-content a:hover, .public-stories-container .story-container .story-content a:focus, .public-stories-container .story-container .story-content a:active {
+        color: #2980b9; }
   .public-stories-container .story-container .story-meta {
     display: -webkit-flex;
     display: -webkit-box;
@@ -2696,6 +2797,9 @@ body {
 .mobile .popup-container .inline-media {
   width: 1.35em !important;
   height: 1.35em !important; }
+.mobile #companies-list .list-title,
+.mobile #hubbers-list .list-title {
+  font-size: 1.85rem; }
 .mobile #companies-list .user-anchor,
 .mobile #companies-list .company-anchor,
 .mobile #hubbers-list .user-anchor,
