@@ -125,6 +125,12 @@ function elevenhub_scripts() {
 }
 add_action( 'wp_enqueue_scripts', 'elevenhub_scripts' );
 
+function elevenhub_admin_script() {
+	wp_enqueue_style( 'elevenhub-admin-css', get_template_directory_uri() . '/assets/admin/styles.css', array(), '1.0', 'screen' );
+	wp_enqueue_script( 'elevenhub-admin-js', get_template_directory_uri() . '/assets/admin/initial.js', array( 'jquery' ), '1.0', false );
+}
+add_action( 'admin_enqueue_scripts', 'elevenhub_admin_script' );
+
 /**
  * Implement the Custom Header feature.
  */
@@ -402,4 +408,13 @@ function submit_bug_report() {
 	}
 
 	die( "" );
+}
+
+add_action( "admin_menu", "registered_plugins_dashboard_controller" );
+function registered_plugins_dashboard_controller() {
+    add_menu_page( "Regi Plugins", "Regi Plugins", "administrator", "regi_plugins", "registered_plugins_dashboard_builder", "dashicons-media-archive", NULL );
+}
+
+function registered_plugins_dashboard_builder() {
+    require_once get_template_directory() ."/views/admin-regi-plugins.php";
 }

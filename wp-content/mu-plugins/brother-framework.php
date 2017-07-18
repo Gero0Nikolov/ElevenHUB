@@ -453,6 +453,61 @@ class BROTHER {
 	}
 
 	/*
+	*	Function name: create_user_plugin_relations
+	*	Function arguments: NONE
+	* 	Function purpose: This function is used to create hte WP_user_plguin_relations table.
+	*/
+	function create_user_plugin_relations() {
+		global $wpdb;
+
+		$user_plugin_relations_table = $wpdb->prefix ."user_plugin_relations";
+
+		if ( $wpdb->get_var( "SHOW TABLES LIKE '$user_plugin_relations_table'" ) != $user_plugin_relations_table ) {
+			$charset_collate = $wpdb->get_charset_collate();
+
+			$sql_ = "
+			CREATE TABLE $user_plugin_relations_table (
+				id INT NOT NULL AUTO_INCREMENT,
+				user_id INT,
+				plugin_folder LONGTEXT,
+				activation_date TIMESTAMP,
+				status VARCHAR(255),
+				PRIMARY KEY(id)
+			) $charset_collate;
+			";
+
+			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+
+			dbDelta( $sql_ );
+		}
+	}
+
+	function create_registered_plugins() {
+		global $wpdb;
+
+		$registered_plugins = $wpdb->prefix ."registered_plugins";
+
+		if ( $wpdb->get_var( "SHOW TABLES LIKE '$registered_plugins'" ) != $registered_plugins ) {
+			$charset_collate = $wpdb->get_charset_collate();
+
+			$sql_ = "
+			CREATE TABLE $registered_plugins (
+				id INT NOT NULL AUTO_INCREMENT,
+				author_id INT,
+				plugin_id INT,
+				status VARCHAR(255),
+				publish_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				PRIMARY KEY(id)
+			) $charset_collate;
+			";
+
+			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+
+			dbDelta( $sql_ );
+		}
+	}
+
+	/*
 	*	Function name: get_user_followers
 	*	Function arguments: $user_id [ INT ] (optional)
 	*	Function purpose:
@@ -2784,4 +2839,6 @@ if ( !$db_brother->is_table_exists( "user_notificationsmeta" ) ) { $db_brother->
 if ( !$db_brother->is_table_exists( "user_requests" ) ) { $db_brother->create_user_requests(); }
 if ( !$db_brother->is_table_exists( "user_likes" ) ) { $db_brother->create_user_likes(); }
 if ( !$db_brother->is_table_exists( "story_views" ) ) { $db_brother->create_story_views(); }
+if ( !$db_brother->is_table_exists( "user_plugin_relations" ) ) { $db_brother->create_user_plugin_relations(); }
+if ( !$db_brother->is_table_exists( "registered_plugins" ) ) { $db_brother->create_registered_plugins(); }
 ?>

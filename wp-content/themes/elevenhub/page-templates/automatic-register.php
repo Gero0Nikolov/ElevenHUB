@@ -56,6 +56,13 @@ if ( $automatic_registrations == "true" ) {
 		$content = "Welcome onboard!<br/><br/>We hope to see you <a href='". get_site_url() ."' target='_blank' style='color: #3498db; text-decoration: underline;'>hubbing soon</a>!<br/><br/>Cheers!<br/><br/>Your login details are:<br/>Email: $email<br/>Password: $password<br/>";
 		wp_mail( $email, $subject, $content, array( "From: Gero Nikolov <vtm.sunrise@gmail.com>", "Content-type: text/html" ) );
 
+		// Autologin user
+		$creds = array();
+		$creds[ "user_login" ] = $email;
+		$creds[ "user_password" ] = $password;
+		$creds[ "remember" ] = false;
+		wp_signon( $creds, false );
+
 		wp_redirect( get_site_url() );
 	} else { wp_redirect( get_site_url() ); }
 }
