@@ -21,7 +21,7 @@ $user_association = get_user_meta( $user_id, "account_association", true );
 		$follows_ = $brother_->get_user_follows();
 		if ( count( $follows_ ) > 0 ) {
 		?>
-		<h1 class="list-title">Followed hubbers</h1>
+		<h1 class="list-title">Following</h1>
 		<div id="follows">
 			<?php
 			foreach ( $follows_ as $followed_user ) {
@@ -79,7 +79,7 @@ $user_association = get_user_meta( $user_id, "account_association", true );
 		}
 	}
 	?>
-	<h1 class="list-title">All hubbers</h1>
+	<h1 class="list-title">All</h1>
 	<div id="hubbers">
 		<?php $brother_->get_hubbers( (object)array( "number" => -1 ) ); ?>
 	</div>

@@ -1266,7 +1266,7 @@ a.skeleton-bold-button {
     box-shadow: none !important;
     text-shadow: none;
     font-weight: normal;
-    color: $belize_hole;
+    color: $belize_hole !important;
     border: 1px solid $belize_hole !important;
     border-radius: 100px;
     outline: 0;
@@ -1740,6 +1740,243 @@ a.skeleton-bold-button {
 	}
 }
 
+/** RESOLUTION FIXES **/
+@media screen
+  and (min-device-width: 1400px)
+  and (max-device-width: 1980px)
+  and (-webkit-min-device-pixel-ratio: 1) {
+  	#homepage-banner .banner-text {
+		font-size: 5rem;
+  		padding: 4em 0.5em;
+	}
+
+	.public-story #banner-container { height: 45em; }
+}
+
+@media screen
+  and (min-device-width: 1400px)
+  and (max-device-width: 1980px)
+  and (-webkit-min-device-pixel-ratio: 2)
+  and (min-resolution: 192dpi) {
+}
+
+.home .flex-container:nth-of-type(even) .left-side { width: 40%; }
+.home .flex-container:nth-of-type(even) .right-side { width: 60%; }
+
+.home .flex-container:nth-of-type(odd) .left-side { width: 60%; }
+.home .flex-container:nth-of-type(odd) .right-side { width: 40%; }
+
+#login-form input:focus { border-color: $peter_river !important; }
+
+.page-template-page-join {
+	background: $alizarin;
+
+	#alert-box {
+        position: absolute;
+	    background: #fff;
+	    border: 1px solid #ddd;
+	    width: 350px;
+	    text-align: center;
+	    padding: 1em;
+	    border-radius: 5px;
+	    font-family: OpenSansRegular;
+	    font-weight: normal;
+	    font-size: 1.25rem;
+	    letter-spacing: 1px;
+		top: calc(50% - 150px / 2);
+		left: calc(50% - 350px / 2);
+
+		label {
+			display: block;
+			margin: 1em 1em 0.25em;
+
+			font-family: OpenSansRegular;
+			font-size: 1rem;
+			font-weight: normal;
+
+			letter-spacing: 1px;
+			color: #333;
+		}
+
+		input {
+			display: block;
+
+			margin: 0 1em;
+			padding: 0.25em;
+
+			width: 92%;
+			border: 1px solid #ddd;
+			border-radius: 5px;
+
+			font-family: OpenSansRegular;
+			font-size: 1rem;
+			font-weight: normal;
+
+			color: #333;
+			outline: 0;
+			letter-spacing: 1px;
+
+			box-shadow: none;
+			text-shadow: none;
+		}
+
+		#submit-button {
+			display: block;
+			width: 80%;
+			margin: 1em auto;
+		}
+
+	    #close-popup-button {
+	    	display: block;
+	    	width: 80%;
+		    font-family: OpenSansBold;
+		    font-size: 0.8rem;
+		    text-transform: uppercase;
+		    padding: 1em 2.5em;
+	        margin: 1em auto 0;
+		    letter-spacing: 1px;
+		    background: $alizarin;
+		    box-shadow: none !important;
+		    text-shadow: none;
+		    font-weight: normal;
+		    color: #fff;
+		    border: 0px solid transparent;
+		    border-radius: 100px;
+		    outline: 0;
+
+		    webkit-transition: all 0.25s ease-in-out;
+			-moz-transition: all 0.25s ease-in-out;
+			-o-transition: all 0.25s ease-in-out;
+			transition: all 0.25s ease-in-out;
+	    }
+	    #close-popup-button:hover { background: $pomegranate; }
+	}
+
+	.site-content {
+		margin: 1.5em 0;
+
+		#login-form-holder {
+			display: block;
+			margin: 0 auto;
+			position: relative;
+			width: 600px;
+			max-width: 100%;
+			padding: 0 1em;
+
+			.logo-container {
+				display: block;
+			    margin: 0em auto;
+			    width: 6em;
+			    border: 1px solid rgba(255, 255, 255, 0.2);
+			}
+
+			.page-title {
+				display: block;
+				font-family: OpenSansRegular;
+				font-size: 3rem;
+				font-weight: normal;
+				color: #fff;
+				text-align: center;
+				letter-spacing: 1px;
+				margin: 0.5em;
+				line-height: 100%;
+			}
+
+			.page-quote {
+				display: block;
+				font-family: OpenSansRegular;
+				font-size: 2rem;
+				font-weight: normal;
+				color: #fff;
+				letter-spacing: 1px;
+				margin: 0;
+				line-height: 100%;
+				text-align: center;
+			}
+
+			#register {
+				display: block;
+				width: 100%;
+				margin: 1em 0 0;
+				text-align: center;
+
+				input {
+					border: none;
+					border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+					border-radius: 0;
+					color: #fff;
+					font-family: OpenSansRegular;
+					font-size: 1.25rem;
+					font-weight: normal;
+					letter-spacing: 1px;
+					line-height: 100%;
+					padding: 0.5em 0em;
+					display: block;
+					width: 100%;
+					background: none;
+					text-shadow: none;
+					outline: 0;
+					box-shadow: none;
+					text-align: left;
+
+					&:focus { border-color: rgba(255, 255, 255, 0.8); }
+
+					&:nth-of-type(1) { margin-right: 2.5%; }
+					&:nth-of-type(2) { margin-left: 2.5%; }
+
+					&:nth-of-type(1),
+					&:nth-of-type(2) {
+						display: inline-block;
+						width: 47%;
+						vertical-align: top;
+					}
+
+					&::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+					    color: #fff;
+					}
+					&:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+					   color: #fff;
+					   opacity:  1;
+					}
+					&:-moz-placeholder { /* Mozilla Firefox 19+ */
+					   color: #fff;
+					   opacity:  1;
+					}
+					&::-ms-input-placeholder { /* Internet Explorer 10-11 */
+					   color: #fff;
+					}
+					&:-ms-input-placeholder { /* Microsoft Edge */
+					   color: #fff;
+					}
+				}
+
+				#login-captcha {
+					text-align: center;
+				    display: inline-block;
+				    margin: 2em auto 1em;
+				}
+
+				.form-button { width: 50% !important; }
+
+				.simple-link {
+					display: inline-block;
+					font-family: OpenSansRegular;
+					font-size: 1rem;
+					font-weight: normal;
+					color: #fff;
+					letter-spacing: 1px;
+					line-height: 125%;
+					text-decoration: none;
+
+					&:hover,
+					&:focus,
+					&:active { text-decoration: underline; }
+				}
+			}
+		}
+	}
+}
+
 /* MOBILE */
 .mobile {
 	.main-navigation { padding: 1em !important; }
@@ -1918,11 +2155,21 @@ a.skeleton-bold-button {
 	    margin: 0 auto;
 		border-radius: 5px;
 	    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.25);
+		overflow-x: hidden;
+		overflow-y: auto;
 
 	    webkit-transition: all 0.25s ease-in-out;
 	    -moz-transition: all 0.25s ease-in-out;
 	    -o-transition: all 0.25s ease-in-out;
 	    transition: all 0.25s ease-in-out;
+
+		.g-recaptcha {
+			display: block;
+			width: 101%;
+			position: relative;
+			overflow: hidden;
+			margin: 1em 0 1em -0.5%;
+		}
 
 		.wide-fat {
 			display: block;

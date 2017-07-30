@@ -33,10 +33,12 @@ if ( wp_is_mobile() ) { $mobile_class = "mobile"; }
 <script>
 	var ajax_url = '<?php echo admin_url('admin-ajax.php'); ?>';
 </script>
+<script src='https://www.google.com/recaptcha/api.js'></script>
 </head>
 
 <body <?php body_class( $mobile_class ); ?>>
 <div id="page" class="site">
+	<?php if ( !is_page_template( "page-templates/page-join.php" ) ) { ?>
 	<nav id="site-navigation" class="main-navigation" role="navigation">
 		<?php if ( !is_page_template( "page-templates/employee-company.php" ) ) { ?>
 		<div class="left-aligned">
@@ -58,5 +60,6 @@ if ( wp_is_mobile() ) { $mobile_class = "mobile"; }
 		</div>
 		<?php } ?>
 	</nav><!-- #site-navigation -->
+	<?php } ?>
 
 	<div id="content" class="site-content">

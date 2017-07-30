@@ -1,11 +1,14 @@
 <?php
 /*
-*	Plugin name: Hello Hubby for 11hub
+*	Plugin name: Hello Hubby
 *	Description: This plugin is designed specificly for the HUB Core. It will say Hello Hubby to you!
 *	Version: 1.0
 *	Author: GeroNikolov
 *	Author URI: https://geronikolov.com
 *	License: PS (CS)
+*	Visibility: Personal
+*	UserID: 1
+*	Call hooks: OPVe, OPVc
 */
 
 class HELLO_HUBBY {

@@ -13,8 +13,16 @@ $brother_ = new BROTHER;
 	<?php
 	$employers_ = $brother_->get_user_employers();
 	$follows_ = $brother_->get_user_follows();
+	$followed_companies = array();
 
-	if ( !empty( $employers_ ) || !empty( $follows_ ) ) {
+	foreach ( $follows_ as $followed_user ) {
+		$followed_user->user_follow_body = (object)$followd_user->user_follow_body;
+		if ( $brother_->is_company( $followed_user->user_follow_body->user_id ) ) {
+			array_push( $followed_companies, $followed_user );
+		}
+	}
+
+	if ( !empty( $employers_ ) || !empty( $followed_companies ) ) {
 	?>
 	<div id="employers">
 		<h1 class="list-title">My companies</h1>
@@ -46,8 +54,7 @@ $brother_ = new BROTHER;
 			}
 		}
 
-		foreach ( $follows_ as $followed_user ) {
-			$followed_user->user_follow_body = (object)$followed_user->user_follow_body;
+		foreach ( $followed_companies as $followed_user ) {
 			if ( $brother_->is_company( $followed_user->user_follow_body->user_id ) && !in_array( $followed_user->user_follow_body->user_id, $followed_employers ) ) {
 				?>
 

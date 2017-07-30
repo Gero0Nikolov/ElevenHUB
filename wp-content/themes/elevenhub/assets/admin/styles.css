@@ -1,3 +1,51 @@
-
+.plugin-container {
+  display: inline-block;
+  padding: 1em 1em;
+  width: 46.45%; }
+  .plugin-container .header-section {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between; }
+    .plugin-container .header-section .left-section,
+    .plugin-container .header-section .right-section {
+      display: inline-block;
+      vertical-align: top; }
+    .plugin-container .header-section .left-section {
+      width: 40%;
+      background-size: cover;
+      background-position: center;
+      background-color: #f6f6f6;
+      padding: 2em 0; }
+    .plugin-container .header-section .right-section {
+      width: 60%;
+      padding-left: 1em; }
+    .plugin-container .header-section .plugin-icon {
+      position: relative;
+      top: initial;
+      left: initial;
+      display: block;
+      margin: 0 auto;
+      width: 3em;
+      height: 3em;
+      font-size: 3rem;
+      border-radius: 100%;
+      background-size: cover;
+      background-position: center;
+      background-color: #eee;
+      border: 1px solid #ddd; }
+    .plugin-container .header-section .plugin-name {
+      font-size: 1.5rem;
+      letter-spacing: 1px; }
+    .plugin-container .header-section .plugin-description {
+      font-size: 1rem;
+      line-height: 150%;
+      letter-spacing: 1px;
+      text-align: left;
+      margin: 0.5em 0; }
+    .plugin-container .header-section .plugin-controls {
+      display: block;
+      margin: 1em 0; }
 
 /*# sourceMappingURL=styles.css.map */

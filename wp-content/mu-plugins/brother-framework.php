@@ -493,8 +493,8 @@ class BROTHER {
 			$sql_ = "
 			CREATE TABLE $registered_plugins (
 				id INT NOT NULL AUTO_INCREMENT,
-				author_id INT,
-				plugin_id INT,
+				author_id LONGTEXT,
+				plugin_id LONGTEXT,
 				status VARCHAR(255),
 				publish_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 				PRIMARY KEY(id)

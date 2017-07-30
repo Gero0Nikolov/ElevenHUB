@@ -1069,7 +1069,7 @@ a.skeleton-bold-button {
   box-shadow: none !important;
   text-shadow: none;
   font-weight: normal;
-  color: #2980b9;
+  color: #2980b9 !important;
   border: 1px solid #2980b9 !important;
   border-radius: 100px;
   outline: 0;
@@ -1493,6 +1493,197 @@ a.skeleton-bold-button {
   color: #e74c3c;
   letter-spacing: 1px; }
 
+/** RESOLUTION FIXES **/
+@media screen and (min-device-width: 1400px) and (max-device-width: 1980px) and (-webkit-min-device-pixel-ratio: 1) {
+  #homepage-banner .banner-text {
+    font-size: 5rem;
+    padding: 4em 0.5em; }
+
+  .public-story #banner-container {
+    height: 45em; } }
+.home .flex-container:nth-of-type(even) .left-side {
+  width: 40%; }
+
+.home .flex-container:nth-of-type(even) .right-side {
+  width: 60%; }
+
+.home .flex-container:nth-of-type(odd) .left-side {
+  width: 60%; }
+
+.home .flex-container:nth-of-type(odd) .right-side {
+  width: 40%; }
+
+#login-form input:focus {
+  border-color: #3498db !important; }
+
+.page-template-page-join {
+  background: #e74c3c; }
+  .page-template-page-join #alert-box {
+    position: absolute;
+    background: #fff;
+    border: 1px solid #ddd;
+    width: 350px;
+    text-align: center;
+    padding: 1em;
+    border-radius: 5px;
+    font-family: OpenSansRegular;
+    font-weight: normal;
+    font-size: 1.25rem;
+    letter-spacing: 1px;
+    top: calc(50% - 150px / 2);
+    left: calc(50% - 350px / 2); }
+    .page-template-page-join #alert-box label {
+      display: block;
+      margin: 1em 1em 0.25em;
+      font-family: OpenSansRegular;
+      font-size: 1rem;
+      font-weight: normal;
+      letter-spacing: 1px;
+      color: #333; }
+    .page-template-page-join #alert-box input {
+      display: block;
+      margin: 0 1em;
+      padding: 0.25em;
+      width: 92%;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-family: OpenSansRegular;
+      font-size: 1rem;
+      font-weight: normal;
+      color: #333;
+      outline: 0;
+      letter-spacing: 1px;
+      box-shadow: none;
+      text-shadow: none; }
+    .page-template-page-join #alert-box #submit-button {
+      display: block;
+      width: 80%;
+      margin: 1em auto; }
+    .page-template-page-join #alert-box #close-popup-button {
+      display: block;
+      width: 80%;
+      font-family: OpenSansBold;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      padding: 1em 2.5em;
+      margin: 1em auto 0;
+      letter-spacing: 1px;
+      background: #e74c3c;
+      box-shadow: none !important;
+      text-shadow: none;
+      font-weight: normal;
+      color: #fff;
+      border: 0px solid transparent;
+      border-radius: 100px;
+      outline: 0;
+      webkit-transition: all 0.25s ease-in-out;
+      -moz-transition: all 0.25s ease-in-out;
+      -o-transition: all 0.25s ease-in-out;
+      transition: all 0.25s ease-in-out; }
+    .page-template-page-join #alert-box #close-popup-button:hover {
+      background: #c0392b; }
+  .page-template-page-join .site-content {
+    margin: 1.5em 0; }
+    .page-template-page-join .site-content #login-form-holder {
+      display: block;
+      margin: 0 auto;
+      position: relative;
+      width: 600px;
+      max-width: 100%;
+      padding: 0 1em; }
+      .page-template-page-join .site-content #login-form-holder .logo-container {
+        display: block;
+        margin: 0em auto;
+        width: 6em;
+        border: 1px solid rgba(255, 255, 255, 0.2); }
+      .page-template-page-join .site-content #login-form-holder .page-title {
+        display: block;
+        font-family: OpenSansRegular;
+        font-size: 3rem;
+        font-weight: normal;
+        color: #fff;
+        text-align: center;
+        letter-spacing: 1px;
+        margin: 0.5em;
+        line-height: 100%; }
+      .page-template-page-join .site-content #login-form-holder .page-quote {
+        display: block;
+        font-family: OpenSansRegular;
+        font-size: 2rem;
+        font-weight: normal;
+        color: #fff;
+        letter-spacing: 1px;
+        margin: 0;
+        line-height: 100%;
+        text-align: center; }
+      .page-template-page-join .site-content #login-form-holder #register {
+        display: block;
+        width: 100%;
+        margin: 1em 0 0;
+        text-align: center; }
+        .page-template-page-join .site-content #login-form-holder #register input {
+          border: none;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: 0;
+          color: #fff;
+          font-family: OpenSansRegular;
+          font-size: 1.25rem;
+          font-weight: normal;
+          letter-spacing: 1px;
+          line-height: 100%;
+          padding: 0.5em 0em;
+          display: block;
+          width: 100%;
+          background: none;
+          text-shadow: none;
+          outline: 0;
+          box-shadow: none;
+          text-align: left; }
+          .page-template-page-join .site-content #login-form-holder #register input:focus {
+            border-color: rgba(255, 255, 255, 0.8); }
+          .page-template-page-join .site-content #login-form-holder #register input:nth-of-type(1) {
+            margin-right: 2.5%; }
+          .page-template-page-join .site-content #login-form-holder #register input:nth-of-type(2) {
+            margin-left: 2.5%; }
+          .page-template-page-join .site-content #login-form-holder #register input:nth-of-type(1), .page-template-page-join .site-content #login-form-holder #register input:nth-of-type(2) {
+            display: inline-block;
+            width: 47%;
+            vertical-align: top; }
+          .page-template-page-join .site-content #login-form-holder #register input::-webkit-input-placeholder {
+            /* WebKit, Blink, Edge */
+            color: #fff; }
+          .page-template-page-join .site-content #login-form-holder #register input:-moz-placeholder {
+            /* Mozilla Firefox 4 to 18 */
+            color: #fff;
+            opacity: 1; }
+          .page-template-page-join .site-content #login-form-holder #register input:-moz-placeholder {
+            /* Mozilla Firefox 19+ */
+            color: #fff;
+            opacity: 1; }
+          .page-template-page-join .site-content #login-form-holder #register input::-ms-input-placeholder {
+            /* Internet Explorer 10-11 */
+            color: #fff; }
+          .page-template-page-join .site-content #login-form-holder #register input:-ms-input-placeholder {
+            /* Microsoft Edge */
+            color: #fff; }
+        .page-template-page-join .site-content #login-form-holder #register #login-captcha {
+          text-align: center;
+          display: inline-block;
+          margin: 2em auto 1em; }
+        .page-template-page-join .site-content #login-form-holder #register .form-button {
+          width: 50% !important; }
+        .page-template-page-join .site-content #login-form-holder #register .simple-link {
+          display: inline-block;
+          font-family: OpenSansRegular;
+          font-size: 1rem;
+          font-weight: normal;
+          color: #fff;
+          letter-spacing: 1px;
+          line-height: 125%;
+          text-decoration: none; }
+          .page-template-page-join .site-content #login-form-holder #register .simple-link:hover, .page-template-page-join .site-content #login-form-holder #register .simple-link:focus, .page-template-page-join .site-content #login-form-holder #register .simple-link:active {
+            text-decoration: underline; }
+
 /* MOBILE */
 .mobile .main-navigation {
   padding: 1em !important; }
@@ -1632,10 +1823,18 @@ a.skeleton-bold-button {
     margin: 0 auto;
     border-radius: 5px;
     box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.25);
+    overflow-x: hidden;
+    overflow-y: auto;
     webkit-transition: all 0.25s ease-in-out;
     -moz-transition: all 0.25s ease-in-out;
     -o-transition: all 0.25s ease-in-out;
     transition: all 0.25s ease-in-out; }
+    .popup-holder .popup-inner .g-recaptcha {
+      display: block;
+      width: 101%;
+      position: relative;
+      overflow: hidden;
+      margin: 1em 0 1em -0.5%; }
     .popup-holder .popup-inner .wide-fat {
       display: block;
       width: 100%;

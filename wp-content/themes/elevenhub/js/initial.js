@@ -11,6 +11,8 @@ jQuery( document ).ready(function(){
 			buildLoginForm();
 		} );
 	} );
+
+	if ( jQuery( "#login-form-controller" ).length > 0 && window.location.href.indexOf( "#login" ) > -1 ) { buildLoginForm(); }
 });
 
 function buildLoginForm() {
@@ -32,6 +34,7 @@ function buildLoginForm() {
 				<input type='text' placeholder='Last name' id='last-name' class='small-fat' onkeydown='keyPressedForms(event, 1);'>\
 				<input type='email' placeholder='Email' id='email-registration' class='wide-fat' onkeydown='keyPressedForms(event, 1);'>\
 				<input type='password' placeholder='Password' id='password-registration' class='wide-fat' onkeydown='keyPressedForms(event, 1);'>\
+				<div id='login-captcha' class='g-recaptcha' data-sitekey='6LcbrioUAAAAAEgA9LAbeaK_TQHOKVWhd8QZeXrI'></div>\
 				<button id='register-controller' class='green-bold-button form-button' onclick='registerUser();' onkeydown='keyPressedForms(event, 1);'>Register</button>\
 			</div>\
 		</div>\
@@ -40,6 +43,15 @@ function buildLoginForm() {
 
 	buildElement( build_ );
 
+	// Render the reCaptcha
+	grecaptcha.render(
+		"login-captcha",
+		{
+			"sitekey" : "6LcbrioUAAAAAEgA9LAbeaK_TQHOKVWhd8QZeXrI",
+			"theme" : "light"
+		}
+	);
+
 	jQuery( "#login-form-holder" ).on("click", function( e ){ if( e.target == this ){ destroyLoginForm(); } });
 }
 function destroyLoginForm() {
@@ -47,7 +59,6 @@ function destroyLoginForm() {
 	jQuery( "#login-form-holder" ).removeClass( "fadeIn" ).addClass( "fadeOut" );
 	setTimeout(function(){ jQuery( "#login-form-holder" ).remove(); }, 750);
 }
-
 
 function buildElement( markup ) { jQuery( "body" ).append( markup ); }
 
@@ -99,6 +110,7 @@ function registerUser() {
 	last_name = jQuery( "#last-name" ).val().trim();
 	email = jQuery( "#email-registration" ).val().trim();
 	password = jQuery( "#password-registration" ).val().trim();
+	captcha = grecaptcha.getResponse();
 
 	jQuery.ajax({
 		url : ajax_url,
@@ -108,14 +120,24 @@ function registerUser() {
 			first_name : first_name,
 			last_name : last_name,
 			email : email,
-			password : password
+			password : password,
+			captcha : captcha
 		},
 		success : function( response ) {
 			//Remove loading sign
 			jQuery( "#login-form-holder #register #loader" ).remove();
 
+			buttonEvent = "removeAlertBox();";
+			buttonText = "Close";
+
+			if ( jQuery( "body" ).hasClass( "page-template-page-join" ) ) {
+				buttonEvent = response == "" ? "window.location=\""+ window.location.origin +"/#login\"" : "removeAlertBox();";
+				buttonText = response == "" ? "Login" : "Close";
+
+			}
+
 			response = response == "" ? "Welcome to the <span style='color: #e74c3c;'>hub</span>!<br/>You can now login :-)" : response;
-			alert_box = "<div id='alert-box' class='animated bounceInDown'>"+ response +"<button id='close-popup-button' onclick='removeAlertBox();'>Close</button></div>";
+			alert_box = "<div id='alert-box' class='animated bounceInDown'>"+ response +"<button id='close-popup-button' onclick='"+ buttonEvent +"'>"+ buttonText +"</button></div>";
 			jQuery( "#login-form-holder" ).append( alert_box );
 		}
 	});

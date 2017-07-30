@@ -185,58 +185,78 @@ add_action('after_setup_theme', 'remove_admin_bar');
 add_action( 'wp_ajax_nopriv_register_user', 'register_user' );
 add_action( 'wp_ajax_register_user', 'register_user' );
 function register_user() {
-	$first_name = isset( $_POST[ "first_name" ] ) && !empty( $_POST[ "first_name" ] ) ? ucfirst( anitize_text_field( $_POST[ "first_name" ] ) ) : "";
+	$first_name = isset( $_POST[ "first_name" ] ) && !empty( $_POST[ "first_name" ] ) ? ucfirst( sanitize_text_field( $_POST[ "first_name" ] ) ) : "";
 	$last_name = isset( $_POST[ "last_name" ] ) && !empty( $_POST[ "last_name" ] ) ? ucfirst( sanitize_text_field( $_POST[ "last_name" ] ) ) : "";
 	$email = isset( $_POST[ "email" ] ) && !empty( $_POST[ "email" ] ) ? trim( strtolower( $_POST[ "email" ] ) ) : "";
 	$password = isset( $_POST[ "password" ] ) && !empty( $_POST[ "password" ] ) ? $_POST[ "password" ] : "";
+	$captcha = isset( $_POST[ "captcha" ] ) && !empty( $_POST[ "captcha" ] ) ? $_POST[ "captcha" ] : "";
 
-	if ( !empty( $first_name ) && !empty( $last_name ) && is_email( $email ) && !empty( $password ) ) {
-		$wp_username = strtolower( $first_name ."_". $last_name );
+	// Check the Captcha before start
+	$curl = curl_init();
+	curl_setopt_array($curl, array(
+	    CURLOPT_RETURNTRANSFER => 1,
+	    CURLOPT_URL => 'https://www.google.com/recaptcha/api/siteverify',
+	    CURLOPT_USERAGENT => 'ElevenHUB',
+	    CURLOPT_POST => 1,
+	    CURLOPT_POSTFIELDS => array(
+	        "secret" => "6LcbrioUAAAAAHHe1f5rDElLdaLVkBK6lkpf415v",
+	        "response" => $captcha
+	    )
+	));
+	$resp = curl_exec( $curl );
+	curl_close( $curl );
 
-		if ( empty( $email ) || !is_email( $email ) ) { echo "Choose your email!"; die(); }
-		if ( empty( $password ) ) { echo "Choose your password!"; die(); }
-		if ( !is_alphabetical( array( $first_name, $last_name ) ) ) { echo "Enter your real names!"; die(); }
+	$resp = json_decode( $resp );
 
-		$wp_registration_result = wp_create_user( $wp_username, $password, $email );
+	if ( $resp->success == true ) {
+		if ( !empty( $first_name ) && !empty( $last_name ) && is_email( $email ) && !empty( $password ) ) {
+			$wp_username = strtolower( $first_name ."_". $last_name );
 
-		if ( is_wp_error( $wp_registration_result ) || !is_alphabetical( array( $first_name, $last_name ) ) ) {
-			if ( !empty( $wp_registration_result->errors[ "existing_user_login" ] ) && !email_exists( $email ) ) {
-				while ( !empty( $wp_registration_result->errors[ "existing_user_login" ] ) ) { $wp_registration_result = wp_create_user( $wp_username . mt_rand( 100000, 999999 ), $password, $email ); }
-		 	} else {
-				echo $response = ( email_exists( $email ) ? "This email is already in use!" : ( !is_alphabetical( array( $first_name, $last_name ) ) ? "Use only alphabetical characters in your name!" : ( empty( $password ) ? "Choose your password!" : "Something wrong happens here!" ) ) );
-				die( "" );
+			if ( empty( $email ) || !is_email( $email ) ) { echo "Choose your email!"; die(); }
+			if ( empty( $password ) ) { echo "Choose your password!"; die(); }
+			if ( !is_alphabetical( array( $first_name, $last_name ) ) ) { echo "Enter your real names!"; die(); }
+
+			$wp_registration_result = wp_create_user( $wp_username, $password, $email );
+
+			if ( is_wp_error( $wp_registration_result ) || !is_alphabetical( array( $first_name, $last_name ) ) ) {
+				if ( !empty( $wp_registration_result->errors[ "existing_user_login" ] ) && !email_exists( $email ) ) {
+					while ( !empty( $wp_registration_result->errors[ "existing_user_login" ] ) ) { $wp_registration_result = wp_create_user( $wp_username . mt_rand( 100000, 999999 ), $password, $email ); }
+			 	} else {
+					echo $response = ( email_exists( $email ) ? "This email is already in use!" : ( !is_alphabetical( array( $first_name, $last_name ) ) ? "Use only alphabetical characters in your name!" : ( empty( $password ) ? "Choose your password!" : "Something wrong happens here!" ) ) );
+					die( "" );
+				}
 			}
-		}
 
-		// Update the new user
-		$args = array(
-			"ID" => $wp_registration_result,
-			"first_name" => $first_name,
-			"last_name" => $last_name,
-			"role" => "subscriber"
-		);
-		$wp_update_result = wp_update_user( $args );
+			// Update the new user
+			$args = array(
+				"ID" => $wp_registration_result,
+				"first_name" => $first_name,
+				"last_name" => $last_name,
+				"role" => "subscriber"
+			);
+			$wp_update_result = wp_update_user( $args );
 
-		$user_id = $wp_registration_result;
+			$user_id = $wp_registration_result;
 
-		// Add needed user meta
-		add_user_meta( $user_id, "account_tutorial", "0", false );
+			// Add needed user meta
+			add_user_meta( $user_id, "account_tutorial", "0", false );
 
-		// Get registration controller settings
-		$registration_controller = get_page_by_path( "registration-controller" );
-		$free_premium = get_field( "free_premium", $registration_controller->ID );
+			// Get registration controller settings
+			$registration_controller = get_page_by_path( "registration-controller" );
+			$free_premium = get_field( "free_premium", $registration_controller->ID );
 
-		if ( !empty( $free_premium ) && $free_premium == "yes" ) {
-			$today_date_int = strtotime( date( "Y-m-d" ) );
-			update_user_meta( $user_id, "premium_start", $today_date_int );
-			update_user_meta( $user_id, "premium_end", strtotime( "+7 day", $today_date_int ) );
-		}
+			if ( !empty( $free_premium ) && $free_premium == "yes" ) {
+				$today_date_int = strtotime( date( "Y-m-d" ) );
+				update_user_meta( $user_id, "premium_start", $today_date_int );
+				update_user_meta( $user_id, "premium_end", strtotime( "+7 day", $today_date_int ) );
+			}
 
-		// Prepare Hello mail
-		$subject = "Welcome to 11hub!";
-		$content = "Welcome onboard!<br/><br/>We hope to see you <a href='". get_site_url() ."' target='_blank' style='color: #3498db; text-decoration: underline;'>hubbing soon</a>!<br/><br/>Cheers!";
-		wp_mail( $email, $subject, $content, array( "From: Gero Nikolov <vtm.sunrise@gmail.com>", "Content-type: text/html" ) );
-	} else { echo "There is a problem with your information."; }
+			// Prepare Hello mail
+			$subject = "Welcome to 11hub!";
+			$content = "Welcome onboard!<br/><br/>We hope to see you <a href='". get_site_url() ."' target='_blank' style='color: #3498db; text-decoration: underline;'>hubbing soon</a>!<br/><br/>Cheers!";
+			wp_mail( $email, $subject, $content, array( "From: Gero Nikolov <vtm.sunrise@gmail.com>", "Content-type: text/html" ) );
+		} else { echo "There is a problem with your information."; }
+	} else { echo "Are you a human?"; }
 
 	die( "" );
 }
@@ -410,11 +430,140 @@ function submit_bug_report() {
 	die( "" );
 }
 
+// User Plugins Admin page
 add_action( "admin_menu", "registered_plugins_dashboard_controller" );
 function registered_plugins_dashboard_controller() {
-    add_menu_page( "Regi Plugins", "Regi Plugins", "administrator", "regi_plugins", "registered_plugins_dashboard_builder", "dashicons-media-archive", NULL );
+    add_menu_page( "Registered Plugins", "Reg. Plugins", "administrator", "registered_plugins", "registered_plugins_dashboard_builder", "dashicons-media-archive", NULL );
 }
 
 function registered_plugins_dashboard_builder() {
     require_once get_template_directory() ."/views/admin-regi-plugins.php";
+}
+
+add_action( 'wp_ajax_nopriv_control_user_plugin', 'controll_user_plugin' );
+add_action( 'wp_ajax_controll_user_plugin', 'controll_user_plugin' );
+function controll_user_plugin() {
+	$status = isset( $_POST[ "status" ] ) && !empty( $_POST[ "status" ] ) ? sanitize_text_field( $_POST[ "status" ] ) : "";
+	$plugin_id = isset( $_POST[ "plugin_id" ] ) && !empty( $_POST[ "plugin_id" ] ) ? sanitize_text_field( $_POST[ "plugin_id" ] ) : "";
+	$author_id = isset( $_POST[ "author_id" ] ) && !empty( $_POST[ "author_id" ] ) ? sanitize_text_field( $_POST[ "author_id" ] ) : "";
+
+	$result = false;
+
+	if ( !empty( $plugin_id ) && !empty( $status ) && !empty( $author_id ) ) {
+		global $wpdb;
+		$table_ = $wpdb->prefix ."registered_plugins";
+
+		switch ( $status ) {
+			case "activate" :
+				$sql_ = "SELECT * FROM $table_ WHERE plugin_id='$plugin_id' AND author_id='$author_id'";
+				$results_ = $wpdb->get_results( $sql_, OBJECT );
+
+				if ( !empty( $results_ ) && count( $results_ ) > 0 ) {
+					$wpdb->update(
+						$table_,
+						array( "status" => "active" ),
+						array(
+							"plugin_id" => $plugin_id,
+							"author_id" => $author_id
+						)
+					);
+				} else {
+					$wpdb->insert(
+						$table_,
+						array(
+							"author_id" => $author_id,
+							"plugin_id" => $plugin_id,
+							"status" => "active"
+						)
+					);
+				}
+
+				$result = "activated";
+				break;
+			case "deactivate" :
+				$sql_ = "SELECT * FROM $table_ WHERE plugin_id='$plugin_id' AND author_id='$author_id'";
+				$results_ = $wpdb->get_results( $sql_, OBJECT );
+
+				if ( !empty( $results_ ) && count( $results_ ) > 0 ) {
+					$wpdb->update(
+						$table_,
+						array( "status" => "deactivated" ),
+						array(
+							"plugin_id" => $plugin_id,
+							"author_id" => $author_id
+						)
+					);
+				} else {
+					$wpdb->insert(
+						$table_,
+						array(
+							"author_id" => $author_id,
+							"plugin_id" => $plugin_id,
+							"status" => "deactivated"
+						)
+					);
+				}
+
+				$result = "deactivated";
+				break;
+			case "decline" :
+				$sql_ = "SELECT * FROM $table_ WHERE plugin_id='$plugin_id' AND author_id='$author_id'";
+				$results_ = $wpdb->get_results( $sql_, OBJECT );
+
+				if ( !empty( $results_ ) && count( $results_ ) > 0 ) {
+					$wpdb->update(
+						$table_,
+						array( "status" => "declined" ),
+						array(
+							"plugin_id" => $plugin_id,
+							"author_id" => $author_id
+						)
+					);
+				} else {
+					$wpdb->insert(
+						$table_,
+						array(
+							"author_id" => $author_id,
+							"plugin_id" => $plugin_id,
+							"status" => "declined"
+						)
+					);
+				}
+
+				$result = "declined";
+				break;
+			case "approve" :
+				$sql_ = "SELECT * FROM $table_ WHERE plugin_id='$plugin_id' AND author_id='$author_id'";
+				$results_ = $wpdb->get_results( $sql_, OBJECT );
+
+				if ( !empty( $results_ ) && count( $results_ ) > 0 ) {
+					$wpdb->update(
+						$table_,
+						array( "status" => "approved" ),
+						array(
+							"plugin_id" => $plugin_id,
+							"author_id" => $author_id
+						)
+					);
+				} else {
+					$wpdb->insert(
+						$table_,
+						array(
+							"author_id" => $author_id,
+							"plugin_id" => $plugin_id,
+							"status" => "approved"
+						)
+					);
+				}
+
+				$result = "approved";
+				break;
+
+			default :
+		}
+	}
+
+	echo json_encode( $result );
+
+	die( "" );
 }
