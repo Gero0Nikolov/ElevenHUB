@@ -1630,6 +1630,7 @@ a.skeleton-bold-button {
 				line-height: 125%;
 				color: #fff;
 				margin: 0;
+				text-align: center;
 			}
 		}
 	}
@@ -1704,6 +1705,8 @@ a.skeleton-bold-button {
 		    text-align: center;
 		  	position: relative;
 
+			a { font-size: 2.25rem; }
+
 			&:before {
 			  content: "\275d";
 			  display: inline-block;
@@ -1765,8 +1768,6 @@ a.skeleton-bold-button {
 
 .home .flex-container:nth-of-type(odd) .left-side { width: 60%; }
 .home .flex-container:nth-of-type(odd) .right-side { width: 40%; }
-
-#login-form input:focus { border-color: $peter_river !important; }
 
 .page-template-page-join {
 	background: $alizarin;
@@ -2040,6 +2041,9 @@ a.skeleton-bold-button {
 		.site-content { padding: 0 1em !important; }
 }
 
+.mobile.page-template-page-join #register input:nth-of-type(1),
+.mobile.page-template-page-join #register input:nth-of-type(2) { width: 46.8% !important; }
+
 /* POPUP */
 .popup-holder {
 	display:-webkit-flex;
@@ -2174,7 +2178,7 @@ a.skeleton-bold-button {
 		.wide-fat {
 			display: block;
 		    width: 100%;
-		    border: none !important;
+		    border: none;
 		    background: none !important;
 		    box-shadow: none !important;
 			outline: 0 !important;
@@ -2186,7 +2190,7 @@ a.skeleton-bold-button {
 		    padding: 0.5em !important;
 		    text-shadow: none !important;
 		    border-bottom: 1px solid #ddd !important;
-		    border-radius: 0 !important;
+		    border-radius: 0 !important;			
 		}
 		.wide-fat:first-of-type {
 			border-top-left-radius: 3px !important;
@@ -2196,7 +2200,7 @@ a.skeleton-bold-button {
 		.small-fat {
 			display: inline-block;
 		    width: 49%;
-		    border: none !important;
+		    border: none;
 		    border-bottom: 1px solid #ddd !important;
 		    border-radius: 0 !important;
 		    font-family: OpenSansLight;

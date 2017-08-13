@@ -1409,7 +1409,8 @@ a.skeleton-bold-button {
         letter-spacing: 1px;
         line-height: 125%;
         color: #fff;
-        margin: 0; }
+        margin: 0;
+        text-align: center; }
 
 .public-story #banner-container {
   display: block;
@@ -1467,6 +1468,8 @@ a.skeleton-bold-button {
     font-size: 2rem;
     text-align: center;
     position: relative; }
+    .public-story .text blockquote a {
+      font-size: 2.25rem; }
     .public-story .text blockquote:before {
       content: "\275d";
       display: inline-block;
@@ -1512,9 +1515,6 @@ a.skeleton-bold-button {
 
 .home .flex-container:nth-of-type(odd) .right-side {
   width: 40%; }
-
-#login-form input:focus {
-  border-color: #3498db !important; }
 
 .page-template-page-join {
   background: #e74c3c; }
@@ -1727,6 +1727,10 @@ a.skeleton-bold-button {
 .page-template-employee-company.mobile .site-content {
   padding: 0 1em !important; }
 
+.mobile.page-template-page-join #register input:nth-of-type(1),
+.mobile.page-template-page-join #register input:nth-of-type(2) {
+  width: 46.8% !important; }
+
 /* POPUP */
 .popup-holder {
   display: -webkit-flex;
@@ -1838,7 +1842,7 @@ a.skeleton-bold-button {
     .popup-holder .popup-inner .wide-fat {
       display: block;
       width: 100%;
-      border: none !important;
+      border: none;
       background: none !important;
       box-shadow: none !important;
       outline: 0 !important;
@@ -1857,7 +1861,7 @@ a.skeleton-bold-button {
     .popup-holder .popup-inner .small-fat {
       display: inline-block;
       width: 49%;
-      border: none !important;
+      border: none;
       border-bottom: 1px solid #ddd !important;
       border-radius: 0 !important;
       font-family: OpenSansLight;
