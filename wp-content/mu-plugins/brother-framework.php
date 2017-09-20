@@ -2398,7 +2398,7 @@ class BROTHER {
 							)
 						);
 
-						$notification_id = $this->generate_notification( 233, $company_id, $user_id );
+						$notification_id = $this->generate_notification( 1101, $company_id, $user_id );
 						$result = "left";
 					}
 				} else {

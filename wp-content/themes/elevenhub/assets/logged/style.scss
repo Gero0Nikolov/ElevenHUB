@@ -2107,6 +2107,10 @@ blockquote {
 						&:focus,
 						&:active { color: $belize_hole; }
 					}
+
+					blockquote {
+						a { font-size: 2.25rem; }
+					}
 				}
 			}
 		}
@@ -2878,6 +2882,16 @@ blockquote {
 
 			p {
 				margin-top: 0;
+			}
+
+			a {
+				color: $peter_river;
+				text-decoration: none;
+				font-size: 1.5rem;
+			}
+
+			blockquote {
+				a { font-size: 2.25rem; }
 			}
 		}
 

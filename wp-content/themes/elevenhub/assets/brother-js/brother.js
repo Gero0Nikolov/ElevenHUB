@@ -501,8 +501,7 @@ var UserNotifications = function( userID = "" ) {
 	*	Function purpose: This function returns and JSON object of the all last 100 notifications ordered by Notifications_ID
 	*/
 	this.getUserNotifications = function( userID = "", onSuccess ) {
-		generateAJAX( { functionName : "get_user_notifications", arguments : userID }, function( response ) {
-			console.log( response );
+		generateAJAX( { functionName : "get_user_notifications", arguments : userID }, function( response ) {			
 			onSuccess( JSON.parse( JSON.parse( response ) ) ); } );
 	}
 

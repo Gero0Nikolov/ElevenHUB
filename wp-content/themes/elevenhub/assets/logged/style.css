@@ -1755,6 +1755,8 @@ blockquote {
           text-decoration: none; }
           .reader-popup .reader-inline-popup .story-container .story .story-content a:hover, .reader-popup .reader-inline-popup .story-container .story .story-content a:focus, .reader-popup .reader-inline-popup .story-container .story .story-content a:active {
             color: #2980b9; }
+        .reader-popup .reader-inline-popup .story-container .story .story-content blockquote a {
+          font-size: 2.25rem; }
     .reader-popup .reader-inline-popup .story-meta {
       padding: 0 1em;
       border-top: 1px dashed #ddd;
@@ -2421,6 +2423,12 @@ blockquote {
       text-align: justify; }
       .single-story-view .story-container .post-content p {
         margin-top: 0; }
+      .single-story-view .story-container .post-content a {
+        color: #3498db;
+        text-decoration: none;
+        font-size: 1.5rem; }
+      .single-story-view .story-container .post-content blockquote a {
+        font-size: 2.25rem; }
     .single-story-view .story-container .post-meta {
       display: block;
       border-top: 1px solid #ddd;

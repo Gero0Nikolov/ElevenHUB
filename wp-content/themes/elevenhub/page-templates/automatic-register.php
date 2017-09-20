@@ -6,14 +6,15 @@
 *	@package eleven hub
 
 */
-
 $page_id = get_the_ID();
 $automatic_registrations = get_field( "allow_automatic_registrations", $page_id );
 
 if ( $automatic_registrations == "true" ) {
-	$email = isset( $_GET[ "email" ] ) && !empty( $_GET[ "email" ] ) ? sanitize_text_field( urldecode( $_GET[ "email" ] ) ) : "";
-	$first_name = isset( $_GET[ "fname" ] ) && !empty( $_GET[ "fname" ] ) ? sanitize_text_field( urldecode( $_GET[ "fname" ] ) ) : "";
-	$last_name = isset( $_GET[ "lname" ] ) && !empty( $_GET[ "lname" ] ) ? sanitize_text_field( urldecode( $_GET[ "lname" ] ) ) : "";
+	$query_string = explode( "&", $_GET[ "email" ] );
+
+	$email = isset( $query_string[ 0 ] ) && !empty( $query_string[ 0 ] ) ? sanitize_text_field( urldecode( $query_string[ 0 ] ) ) : "";
+	$first_name = isset( $query_string[ 1 ] ) && !empty( $query_string[ 1 ] ) ? sanitize_text_field( explode( "=", urldecode( $query_string[ 1 ] ) )[ 1 ] ) : "";
+	$last_name = isset( $query_string[ 2 ] ) && !empty( $query_string[ 2 ] ) ? sanitize_text_field( explode( "=", urldecode( $query_string[ 2 ] ) )[ 1 ] ) : "";
 
 	if ( !empty( $email ) && is_email( $email ) && !email_exists( $email ) && !empty( $first_name ) && !empty( $last_name ) && is_alphabetical( array( $first_name, $last_name ) ) ) {
 		$wp_username = strtolower( $first_name ."_". $last_name );
