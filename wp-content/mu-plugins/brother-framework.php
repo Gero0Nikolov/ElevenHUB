@@ -2339,7 +2339,7 @@ class BROTHER {
 					}
 				}
 			} else {
-				if ( !isset( $data->is_ajax ) && !$data->is_ajax ) { ?> <h1 class="no-information-message">No requests / invitations yet...</h1> <?php }
+				if ( !isset( $data->is_ajax ) && !$data->is_ajax ) { ?> <h1 class="no-information-message">No <?php echo $this->is_company( $company_id ) ? "request" : "invitations"; ?> yet...</h1> <?php }
 			}
 
 			if ( isset( $data->is_ajax ) && $data->is_ajax ) { return json_encode( $requests_holder ); }
