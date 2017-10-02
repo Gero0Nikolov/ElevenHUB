@@ -239,7 +239,7 @@ blockquote {
 			background-position: center;
 			background-color: $wet_asphalt;
 			width: 100%;
-			height: 4em;
+			height: 15vw;
 			font-size: 3rem;
 			position: relative;
 			text-align: center;
@@ -271,8 +271,10 @@ blockquote {
 
 			.user-information {
 				display: inline-block;
-				position: relative;
-				transform: translateY(50%);
+				position: absolute;
+				transform: translate(-50%, 20%);
+				bottom: 0;
+				left: 50%;
 
 				.avatar {
 					width: 3em;
@@ -410,7 +412,7 @@ blockquote {
 			.story-banner {
 				display: block;
 				width: 100%;
-				height: 6.25em;
+				height: 25vw;
 				font-size: 3.5rem;
 				background-size: cover;
 				background-position: center;
@@ -1671,7 +1673,7 @@ blockquote {
 	.story-banner {
 		display: block;
 		width: 100%;
-		height: 6em;
+		height: 25vw;
 		font-size: 4rem;
 		background-color: $wet_asphalt;
         background-size: cover;
@@ -1856,7 +1858,7 @@ blockquote {
 			position: relative;
 			display: block;
 			width: 100%;
-			height: 5em;
+			height: 25vw;
 			font-size: 4em;
 			background-size: cover;
 			background-repeat: no-repeat;
@@ -2058,7 +2060,7 @@ blockquote {
 			.story-banner {
 				display: block;
 				width: 100%;
-				height: 5.25em;
+				height: 25vw;
 				font-size: 5rem;
 				background-size: cover;
 				background-repeat: no-repeat;
@@ -2754,7 +2756,7 @@ blockquote {
 			.author-banner {
 				display: block;
 				width: 100%;
-				height: 3em;
+				height: 15vw;
 				font-size: 4rem;
 				background-size: cover;
 				background-position: center;
@@ -2775,7 +2777,7 @@ blockquote {
 				    position: absolute;
 				    bottom: 0;
 				    left: 50%;
-				    transform: translate(-50%, 25%);
+				    transform: translate(-50%, 20%);
 				}
 			}
 
@@ -2853,7 +2855,7 @@ blockquote {
 		.story-banner {
 			display: block;
 			width: 100%;
-			height: 6em;
+			height: 25vw;
 			font-size: 4rem;
 			background-color: $wet_asphalt;
 			background-size: cover;
@@ -3174,7 +3176,7 @@ blockquote {
 		.story-banner {
 			display: block;
 			width: 100%;
-			height: 6em;
+			height: 25vw;
 			font-size: 3.5rem;
 			background-size: cover;
 			background-position: center;
