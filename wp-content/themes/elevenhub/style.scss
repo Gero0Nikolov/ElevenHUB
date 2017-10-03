@@ -1492,6 +1492,19 @@ a.skeleton-bold-button {
 	background: #1abc9c;
 	border-radius: 100%;
     margin: 1em auto;
+
+	&:after {
+		content: " ";
+		display: inline-block;
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: #1abc9c;
+		border-radius: 100%;
+		animation: infinite 5s color-changer ease-in-out;
+	}
 }
 
 /* CONTENT */
@@ -2261,6 +2274,43 @@ a.skeleton-bold-button {
 }
 
 /* ANIMATIONS */
+
+// KEYFRAMES
+@-webkit-keyframes color-changer {
+    0% {
+        background: #1abc9c;
+    }
+    25% {
+        background: #06AEED;
+    }
+    50% {
+        background: #1ABC9C;
+    }
+    75% {
+        background: #F1C40F;
+    }
+    100% {
+        background: #1abc9c;
+    }
+}
+
+@keyframes color-changer {
+    0% {
+        background: #1abc9c;
+    }
+    25% {
+        background: #06AEED;
+    }
+    50% {
+        background: #1ABC9C;
+    }
+    75% {
+        background: #F1C40F;
+    }
+    100% {
+        background: #1abc9c;
+    }
+}
 
 /* Backward */
 .hvr-backward {

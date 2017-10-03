@@ -68,4 +68,6 @@ $user_id = get_current_user_id();
 	' ) ); ?></div>
 	<?php } ?>
 
+	<?php if ( !wp_is_mobile() ) { ?><button id="chat-controller" class="fa fa-commenting-o"></button><?php } ?>
+
 	<div id="content" class="site-content">

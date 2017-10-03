@@ -439,6 +439,38 @@ jQuery( document ).ready(function(){
 			});
 		} );
 	}
+
+	// Chat controller
+	jQuery( "#chat-controller" ).on( "click", function(){
+		if ( jQuery( "#chat-rooms-container" ).length ) {
+			jQuery( "#chat-rooms-container" ).removeClass( "fadeInUp" ).addClass( "fadeOutDown" );
+			setTimeout( function(){ jQuery( "#chat-rooms-container" ).remove(); }, 750 );
+		} else {
+			view_ = "\
+			<div id='chat-rooms-container' class='animated fadeInUp'>\
+				<div class='header'>\
+					<span class='fa fa-commenting-o'></span>\
+					<button id='close-chat-rooms-container' class='fa fa-close'></button>\
+				</div>\
+				<div id='main-rooms'>\
+					<div id='companies' class='rooms-list'>\
+						<h1 class='rooms-title'>Companies</h1>\
+						<div id='list'>"+ loading +"</div>\
+					</div>\
+					<div id='hubbers' class='rooms-list'>\
+						<h1 class='rooms-title'>Hubbers</h1>\
+						<div id='list'>"+ loading +"</div>\
+					</div>\
+				</div>\
+			</div>\
+			";
+			jQuery( "body" ).append( view_ );
+
+			jQuery( "#chat-rooms-container .header #close-chat-rooms-container" ).on( "click", function(){
+				jQuery( "#chat-controller" ).trigger( "click" );
+			} );
+		}
+	} );
 });
 
 /*

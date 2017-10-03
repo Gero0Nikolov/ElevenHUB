@@ -2762,6 +2762,76 @@ blockquote {
 @media screen and (min-device-width: 1400px) and (max-device-width: 1980px) and (-webkit-min-device-pixel-ratio: 1) {
   .events-container .event .event-banner {
     height: 10em; } }
+/* CHAT CONTROLLER + BOXES */
+#chat-controller {
+  display: inline-block;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  font-size: 2.5rem;
+  font-weight: normal;
+  padding: 0.35em;
+  border-radius: 0;
+  border: none;
+  background: #3498db;
+  box-shadow: none;
+  text-shadow: none;
+  color: #fff;
+  transform: translateZ(0);
+  outline: 0;
+  webkit-transition: all 0.25s ease-in-out;
+  -moz-transition: all 0.25s ease-in-out;
+  -o-transition: all 0.25s ease-in-out;
+  transition: all 0.25s ease-in-out; }
+  #chat-controller:hover, #chat-controller:focus {
+    box-shadow: 0 0 10px 1px #2980b9; }
+  #chat-controller:active {
+    transform: translateZ(0) scale(0.85); }
+
+#chat-rooms-container {
+  display: inline-block;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 30vw;
+  height: 40vw;
+  background: #fff;
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);
+  border-radius: 0; }
+  #chat-rooms-container .header {
+    display: flex;
+    position: relative;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5em 0.75em;
+    background: #3498db; }
+    #chat-rooms-container .header span {
+      font-size: 1.25rem;
+      color: #fff; }
+    #chat-rooms-container .header button {
+      display: inline-block;
+      padding: 0;
+      background: none;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      color: #fff;
+      text-shadow: none;
+      outline: 0; }
+      #chat-rooms-container .header button:hover, #chat-rooms-container .header button:focus {
+        color: #ddd; }
+  #chat-rooms-container .rooms-title {
+    display: block;
+    font-family: OpenSansRegular;
+    font-size: 1.35rem;
+    font-weight: normal;
+    color: #333;
+    letter-spacing: 1px;
+    border-bottom: 1px solid #ddd;
+    margin: 0;
+    padding: 0.25em 0.35em; }
+
 /** MOBILE **/
 .mobile .main-navigation .left-aligned.width-20p {
   width: 50% !important; }

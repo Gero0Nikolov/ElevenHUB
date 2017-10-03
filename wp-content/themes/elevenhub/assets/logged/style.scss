@@ -3155,6 +3155,8 @@ blockquote {
 	transition-timing-function: cubic-bezier(0.47, 2.02, 0.31, -0.36);
 }
 
+// KEYFRAMES
+
 
 /*** PUBLIC STORIES ***/
 .public-stories-container {
@@ -3307,6 +3309,91 @@ blockquote {
   and (max-device-width: 1980px)
   and (-webkit-min-device-pixel-ratio: 2)
   and (min-resolution: 192dpi) {
+}
+
+/* CHAT CONTROLLER + BOXES */
+#chat-controller {
+	display: inline-block;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    font-size: 2.5rem;
+    font-weight: normal;
+    padding: 0.35em;
+    border-radius: 0;
+    border: none;
+    background: $peter_river;
+    box-shadow: none;
+    text-shadow: none;
+    color: #fff;
+	transform: translateZ(0);
+	outline: 0;
+
+	webkit-transition: all 0.25s ease-in-out;
+	-moz-transition: all 0.25s ease-in-out;
+	-o-transition: all 0.25s ease-in-out;
+	transition: all 0.25s ease-in-out;
+
+	&:hover,
+	&:focus {
+		box-shadow: 0 0 10px 1px $belize_hole;
+	}
+
+	&:active { transform: translateZ(0) scale(0.85); }
+}
+
+#chat-rooms-container {
+	display: inline-block;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 30vw;
+    height: 40vw;
+    background: #fff;
+	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);
+    border-radius: 0;
+
+	.header {
+		display: flex;
+	    position: relative;
+	    flex-direction: row;
+	    align-items: center;
+	    justify-content: space-between;
+	    padding: 0.5em 0.75em;
+	    background: #3498db;
+
+		span {
+			font-size: 1.25rem;
+		    color: #fff;
+		}
+
+		button {
+			display: inline-block;
+			padding: 0;
+			background: none;
+			border: none;
+			border-radius: 0;
+			box-shadow: none;
+			color: #fff;
+			text-shadow: none;
+			outline: 0;
+
+			&:hover,
+			&:focus { color: #ddd; }
+		}
+	}
+
+	.rooms-title {
+		display: block;
+	    font-family: OpenSansRegular;
+	    font-size: 1.35rem;
+	    font-weight: normal;
+	    color: #333;
+	    letter-spacing: 1px;
+	    border-bottom: 1px solid #ddd;
+	    margin: 0;
+	    padding: 0.25em 0.35em;
+	}
 }
 
 /** MOBILE **/
