@@ -455,7 +455,7 @@ class BROTHER {
 	/*
 	*	Function name: create_user_plugin_relations
 	*	Function arguments: NONE
-	* 	Function purpose: This function is used to create hte WP_user_plguin_relations table.
+	* 	Function purpose: This function is used to create the WP_user_plguin_relations table.
 	*/
 	function create_user_plugin_relations() {
 		global $wpdb;
@@ -482,6 +482,11 @@ class BROTHER {
 		}
 	}
 
+	/*
+	*	Function name: create_registered_plugins
+	*	Function arguments: NONE
+	*	Function purpose: This function is used to create the WP_create_registered_plugins table.
+	*/
 	function create_registered_plugins() {
 		global $wpdb;
 
@@ -497,6 +502,54 @@ class BROTHER {
 				plugin_id LONGTEXT,
 				status VARCHAR(255),
 				publish_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				PRIMARY KEY(id)
+			) $charset_collate;
+			";
+
+			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+
+			dbDelta( $sql_ );
+		}
+	}
+
+	/*
+	*	Function name: create_user_messages
+	*	Function arguments: NONE
+	*	Function purpose: This function is used to create the WP_user_messages && WP_user_message_relations tables.
+	*/
+	function create_user_messages() {
+		global $wpdb;
+
+		$user_messages = $wpdb->prefix ."user_messages";
+		$user_messages_relations = $wpdb->prefix ."user_messages_relations";
+
+		if ( $wpdb->get_var( "SHOW TABLES LIKE '$user_messages'" ) != $user_messages ) {
+			$charset_collate = $wpdb->get_charset_collate();
+
+			$sql_ = "
+			CREATE TABLE $user_messages (
+				id INT NOT NULL AUTO_INCREMENT,
+				message LONGTEXT,
+				date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				status VARCHAR(255),
+				PRIMARY KEY(id)
+			) $charset_collate;
+			";
+
+			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+
+			dbDelta( $sql_ );
+		}
+
+		if ( $wpdb->get_var( "SHOW TABLES LIKE '$user_messages_relations'" ) != $user_messages_relations ) {
+			$charset_collate = $wpdb->get_charset_collate();
+
+			$sql_ = "
+			CREATE TABLE $user_messages_relations (
+				id INT NOT NULL AUTO_INCREMENT,
+				sender_id LONGTEXT,
+				receiver_id LONGTEXT,
+				message_id INT,
 				PRIMARY KEY(id)
 			) $charset_collate;
 			";
@@ -676,14 +729,14 @@ class BROTHER {
 		$table_user_meta = $wpdb->prefix ."usermeta";
 
 		if ( ( !empty( $data->first_name ) && !empty( $data->last_name ) ) || !empty( $data->universal_name ) ) {
-			$sql_ = "";
-
-			$sql_extension = "OR ";
-			if ( !empty( $data->relations ) ) { $sql_extension = "AND "; }
-			if ( empty( $data->relations ) ) { $data->relations = array( "employees", "followers", "follows" ); }
+			$all_results = array();
 
 			foreach ( $data->relations as $relation ) {
-				if ( !empty( $data->universal_name ) ) { if ( $sql_extension != "OR " && $sql_extension != "AND " ) { $sql_extension .= " OR "; } }
+				$sql_ = "";
+				$sql_extension = "AND ";
+				if ( empty( $data->relations ) ) { $data->relations = array( "employees", "followers", "follows", "employers" ); }
+
+				if ( $sql_extension != "OR " && $sql_extension != "AND " ) { $sql_extension .= " OR "; }
 				switch ( $relation ) {
 					case "employees":
 						$sql_extension .= "usermeta.user_id IN ( SELECT user_followed_id FROM $table_user_relations WHERE user_employer_id = $data->user_id )";
@@ -704,32 +757,34 @@ class BROTHER {
 					default:
 						break;
 				}
+
+				if ( empty( $data->universal_name ) ) {
+					$sql_ = "
+					SELECT user_id FROM $table_user_meta as usermeta
+					WHERE
+					usermeta.meta_value LIKE '$data->first_name%'
+					$sql_extension
+					UNION
+					SELECT user_id FROM $table_user_meta as usermeta
+					WHERE
+					usermeta.meta_value LIKE '$data->last_name%'
+					$sql_extension
+					";
+				} else {
+					$sql_ = "
+					SELECT DISTINCT user_id FROM $table_user_meta as usermeta
+					WHERE
+					( usermeta.meta_value LIKE '$data->universal_name%' OR usermeta.meta_value LIKE '$data->universal_name%' )
+					$sql_extension";
+				}
+
+				$results_ = $wpdb->get_results( $sql_, OBJECT );
+				$all_results = array_merge( $all_results, $results_ );
 			}
 
-			if ( empty( $data->universal_name ) ) {
-				$sql_ = "
-				SELECT user_id FROM $table_user_meta as usermeta
-				WHERE
-				usermeta.meta_value LIKE '$data->first_name%'
-				$sql_extension
-				UNION
-				SELECT user_id FROM $table_user_meta as usermeta
-				WHERE
-				usermeta.meta_value LIKE '$data->last_name%'
-				$sql_extension
-				";
-			} else {
-				$sql_ = "
-				SELECT DISTINCT user_id FROM $table_user_meta as usermeta
-				WHERE
-				( usermeta.meta_value LIKE '$data->universal_name%' OR usermeta.meta_value LIKE '$data->universal_name%' )
-				$sql_extension";
-			}
-
-			$results_ = $wpdb->get_results( $sql_, OBJECT );
 			$users_container = array();
 
-			foreach ( $results_ as $result_ ) {
+			foreach ( $all_results as $result_ ) {
 				$user_container = array();
 				$user_container[ "user_id" ] = $result_->user_id;
 				$user_container[ "user_body" ][ "first_name" ] = get_user_meta( $result_->user_id, "first_name", true );
@@ -738,6 +793,7 @@ class BROTHER {
 				$user_container[ "user_body" ][ "avatar_url" ] = $this->get_user_avatar_url( $result_->user_id );
 				$user_container[ "user_body" ][ "banner_url" ] = $this->get_user_banner_url( $result_->user_id );
 				$user_container[ "user_body" ][ "profile_url" ] = get_author_posts_url( $result_->user_id );
+				$user_container[ "user_body" ][ "is_company" ] = $this->is_company( $result_->user_id );
 				array_push( $users_container, (object)$user_container );
 			}
 
@@ -2821,6 +2877,75 @@ class BROTHER {
 		}
 	}
 
+	function get_user_chat_options( $args_ ) {
+		$user_id = isset( $args_->user_id ) && !empty( $args_->user_id ) ? intval( $args_->user_id ) : get_current_user_id();
+		$is_ajax = isset( $args_->is_ajax ) && !empty( $args_->is_ajax ) ? $args_->is_ajax : false;
+
+		$response = false;
+
+		if ( $user_id > 0 ) {
+			global $wpdb;
+			$user_messages_relations = $wpdb->prefix ."user_messages_relations";
+			$user_relations = $wpdb->prefix ."user_relations";
+
+			$connections_id = array();
+
+			// Get opened chats
+			$sql_ = "SELECT DISTINCT sender_id, receiver_id FROM $user_messages_relations WHERE sender=$user_id OR receiver_id=$user_id ORDER BY id DESC";
+			$results_ = $wpdb->get_results( $sql_, OBJECT );
+
+			// Parse the opened chats result into an array
+			foreach ( $results_ as $result_ ) {
+				if ( $result_->sender_id != $user_id && !in_array( $result_->sender_id, $connections_id ) ) { array_push( $connections_id, $result_->sender_id ); }
+				elseif ( $result_->receiver_id != $user_id && !in_array( $result_->receiver_id, $connections_id ) ) { array_push( $connections_id, $result_->receiver_id ); }
+			}
+
+			// Pull user relations
+			$sql_ = "SELECT user_followed_id, user_employer_id FROM $user_relations WHERE (user_followed_id=$user_id AND user_employer_id IS NOT NULL) OR user_follower_id=$user_id OR user_employer_id=$user_id ORDER BY id DESC";
+			$results_ = $wpdb->get_results( $sql_, OBJECT );
+
+			// Parse the user relations results into an array
+			foreach ( $results_ as $result_ ) {
+				if ( $result_->user_followed_id != $user_id && !in_array( $result_->user_followed_id, $connections_id ) ) { array_push( $connections_id, $result_->user_followed_id ); }
+				elseif ( $result_->user_employer_id != $user_id && !in_array( $result_->user_employer_id, $connections_id ) && !in_array( $result_->user_employer_id ."_group", $connections_id ) ) {
+					array_push( $connections_id, $result_->user_employer_id );
+					array_push( $connections_id, $result_->user_employer_id ."_group" );
+				}
+			}
+
+			// Build useable objects
+			$users_ = array();
+			foreach ( $connections_id as $id_ ) {
+				if ( !strpos( $id_, "_group" ) ) { // Normal 1t1
+					$user_ = new stdClass;
+					$user_->user_id = $id_;
+					$user_->user_url = get_author_posts_url( $id_ );
+					$user_->user_avatar_url = $this->get_user_avatar_url( $id_ );
+					$user_->first_name = get_user_meta( $id_, "first_name", true );
+					$user_->last_name = get_user_meta( $id_, "last_name", true );
+					$user_->short_name = get_user_meta( $id_, "user_shortname", true );
+					$user_->is_group = false;
+					array_push( $users_, $user_ );
+				} else { // Groups
+					$user_id = explode( "_", $id_ )[ 0 ];
+					$user_ = new stdClass;
+					$user_->user_id = $user_id;
+					$user_->user_url = get_author_posts_url( $user_id );
+					$user_->user_avatar_url = $this->get_user_avatar_url( $user_id );
+					$user_->first_name = get_user_meta( $user_id, "first_name", true );
+					$user_->last_name = get_user_meta( $user_id, "last_name", true );
+					$user_->short_name = get_user_meta( $user_id, "user_shortname", true );
+					$user_->is_group = true;
+					array_push( $users_, $user_ );
+				}
+			}
+
+			$response = $users_;
+		}
+
+		return $response;
+	}
+
 	function get_user_badges( $user_id = "" ) {
 		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
 		else { $user_id = intval( $user_id ); }
@@ -2841,4 +2966,5 @@ if ( !$db_brother->is_table_exists( "user_likes" ) ) { $db_brother->create_user_
 if ( !$db_brother->is_table_exists( "story_views" ) ) { $db_brother->create_story_views(); }
 if ( !$db_brother->is_table_exists( "user_plugin_relations" ) ) { $db_brother->create_user_plugin_relations(); }
 if ( !$db_brother->is_table_exists( "registered_plugins" ) ) { $db_brother->create_registered_plugins(); }
+if ( !$db_brother->is_table_exists( "create_user_messages" ) ) { $db_brother->create_user_messages(); }
 ?>

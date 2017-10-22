@@ -34,6 +34,9 @@ $user_id = get_current_user_id();
 	var ajax_url = '<?php echo admin_url( 'admin-ajax.php' ); ?>';
 	var admin_post_url = '<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>';
 	var companyID = "<?php echo get_queried_object_id(); ?>";
+	var user_type = "company";
+	var template_url = '<?php echo get_template_directory_uri(); ?>';
+	var user_id = <?php echo $user_id; ?>;
 </script>
 <style>
 	html, body { margin: 0 !important; padding: 0 !important; }
@@ -71,6 +74,14 @@ $user_id = get_current_user_id();
 	</div>
 	<?php } ?>
 
-	<?php if ( !wp_is_mobile() ) { ?><button id="chat-controller" class="fa fa-commenting-o"></button><?php } ?>
+	<?php
+	if ( !wp_is_mobile() ) {
+		if ( !is_page_template( "page-templates/messenger.php" ) ) {
+		?>
+			<button id="chat-controller" class="fa fa-commenting-o"></button>
+		<?php
+		}
+	}
+	?>
 
 	<div id="content" class="site-content">

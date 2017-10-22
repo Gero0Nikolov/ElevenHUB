@@ -486,6 +486,17 @@ var UserRelations = function( vUserID, userID = "" ) {
 			}
 		);
 	}
+
+	this.getUserChatOptions = function( userID = "", onSuccess ) {
+		generateAJAX({
+				functionName : "get_user_chat_options",
+				arguments : {
+					user_id : userID,
+					is_ajax : true
+				}
+			}, function( response ) { onSuccess( JSON.parse( response ) ); }
+		);
+	}
 }
 
 /*
@@ -501,7 +512,7 @@ var UserNotifications = function( userID = "" ) {
 	*	Function purpose: This function returns and JSON object of the all last 100 notifications ordered by Notifications_ID
 	*/
 	this.getUserNotifications = function( userID = "", onSuccess ) {
-		generateAJAX( { functionName : "get_user_notifications", arguments : userID }, function( response ) {			
+		generateAJAX( { functionName : "get_user_notifications", arguments : userID }, function( response ) {
 			onSuccess( JSON.parse( JSON.parse( response ) ) ); } );
 	}
 

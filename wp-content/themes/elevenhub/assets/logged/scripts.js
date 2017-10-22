@@ -446,6 +446,31 @@ jQuery( document ).ready(function(){
 			jQuery( "#chat-rooms-container" ).removeClass( "fadeInUp" ).addClass( "fadeOutDown" );
 			setTimeout( function(){ jQuery( "#chat-rooms-container" ).remove(); }, 750 );
 		} else {
+			rooms_ = "";
+			if ( user_type == "employee" ) {
+				rooms_ = "\
+				<div id='companies' class='rooms-list'>\
+					<h1 class='rooms-title'>Companies</h1>\
+					<div id='list'>"+ loading +"</div>\
+				</div>\
+				<div id='hubbers' class='rooms-list'>\
+					<h1 class='rooms-title'>Hubbers</h1>\
+					<div id='list'>"+ loading +"</div>\
+				</div>\
+				";
+			} else {
+				rooms_ = "\
+				<div id='employees' class='rooms-list'>\
+					<h1 class='rooms-title'>Employees</h1>\
+					<div id='list'>"+ loading +"</div>\
+				</div>\
+				<div id='hubbers' class='rooms-list'>\
+					<h1 class='rooms-title'>Hubbers</h1>\
+					<div id='list'>"+ loading +"</div>\
+				</div>\
+				";
+			}
+
 			view_ = "\
 			<div id='chat-rooms-container' class='animated fadeInUp'>\
 				<div class='header'>\
@@ -453,14 +478,7 @@ jQuery( document ).ready(function(){
 					<button id='close-chat-rooms-container' class='fa fa-close'></button>\
 				</div>\
 				<div id='main-rooms'>\
-					<div id='companies' class='rooms-list'>\
-						<h1 class='rooms-title'>Companies</h1>\
-						<div id='list'>"+ loading +"</div>\
-					</div>\
-					<div id='hubbers' class='rooms-list'>\
-						<h1 class='rooms-title'>Hubbers</h1>\
-						<div id='list'>"+ loading +"</div>\
-					</div>\
+					"+ rooms_ +"\
 				</div>\
 			</div>\
 			";
@@ -469,8 +487,178 @@ jQuery( document ).ready(function(){
 			jQuery( "#chat-rooms-container .header #close-chat-rooms-container" ).on( "click", function(){
 				jQuery( "#chat-controller" ).trigger( "click" );
 			} );
+
+			user_relations = new UserRelations;
+
+			if ( user_type == "employee" ) {
+				// Pull Companies
+				user_relations.getUserEmployers( "", function( response ){
+					jQuery( "#chat-rooms-container #main-rooms #companies #list" ).empty();
+					for ( company_key in response ) {
+						company_ = response[ company_key ];
+
+						names_ = company_.employer.short_name !== undefined && company_.employer.short_name != "" && company_.employer.short_name != null ? company_.employer.short_name : company_.employer.first_name +" "+ company_.employer.last_name;
+						view_ = "\
+						<button id='company-"+ company_.employer.user_id +"' class='chat-room-preview'>\
+							<div class='avatar' style='background-image: url(\""+ company_.employer.avatar_url +"\");'></div>\
+							<span class='names'>"+ names_ +"</span>\
+						</button>\
+						<div id='company-list-"+ company_.employer.user_id +"' class='list'></div>\
+						";
+						jQuery( "#chat-rooms-container #main-rooms #companies #list" ).append( view_ );
+
+						jQuery( "#company-"+ company_.employer.user_id ).on( "click", function(){
+							company_id = company_.employer.user_id;
+							user_relations.getUserEmployees( company_id, function( response ){
+								jQuery( "#chat-rooms-container #main-rooms #companies #list" ).find( ".active-company-list" ).removeClass( "active-company-list" );
+								jQuery( "#company-list-"+ company_id ).empty();
+
+								view_ = "\
+								<a href='"+ site_url +"/messenger?u_id="+ company_id +"_group' class='chat-room-preview'>\
+									<div class='avatar' style='background-image: url(\""+ template_url +"/assets/images/alphabet/Group_Chat.png\");'></div>\
+									<span class='names'>Company group</span>\
+								</a>\
+								";
+								jQuery( "#company-list-"+ company_id ).append( view_ );
+
+								for ( employee_key in response ) {
+									employee_ = response[ employee_key ];
+									if ( employee_.user_employee_body.user_id != user_id ) {
+										names_ = employee_.user_employee_body.user_shortname !== undefined && employee_.user_employee_body.user_shortname != "" && employee_.user_employee_body.user_shortname != null ? employee_.user_employee_body.user_shortname : employee_.user_employee_body.user_first_name +" "+ employee_.user_employee_body.user_last_name;
+										view_ = "\
+										<a href='"+ site_url +"/messenger?u_id="+ employee_.user_employee_body.user_id +"' id='employee-"+ employee_.user_employee_body.user_id +"' class='chat-room-preview'>\
+											<div class='avatar' style='background-image: url(\""+ employee_.user_employee_body.user_avatar_url +"\");'></div>\
+											<span class='names'>"+ names_ +"</span>\
+										</a>\
+										";
+										jQuery( "#company-list-"+ company_id ).append( view_ );
+									}
+								}
+								jQuery( "#company-list-"+ company_id ).addClass( "active-company-list" );
+							} );
+						} );
+					}
+				} );
+
+				// Pull User Relations
+				user_relations.getUserRelations( "", function( response ) {
+					jQuery( "#chat-rooms-container #main-rooms #hubbers #list" ).empty();
+					for ( following_key in response.follows ) {
+						following_ = response.follows[ following_key ];
+
+						names_ = following_.user_followed_body.user_shortname !== undefined && following_.user_followed_body.user_shortname != "" && following_.user_followed_body.user_shortname != null ? following_.user_followed_body.user_shortname : following_.user_followed_body.user_first_name +" "+ following_.user_followed_body.user_last_name;
+						view_ = "\
+						<a href='"+ site_url +"/messenger?u_id="+ following_.user_followed_body.user_id +"' id='employee-"+ following_.user_followed_body.user_id +"' class='chat-room-preview'>\
+							<div class='avatar' style='background-image: url(\""+ following_.user_followed_body.user_avatar_url +"\");'></div>\
+							<span class='names'>"+ names_ +"</span>\
+						</a>\
+						";
+						jQuery( "#chat-rooms-container #main-rooms #hubbers #list" ).append( view_ );
+					}
+				} );
+			}
 		}
 	} );
+
+	if ( jQuery( "body" ).hasClass( "page-template-page-templates page-template-messenger" ) ) {
+		// Set loader to the chat options
+		jQuery( "#messenger-body #chat-history #default-container" ).append( loading );
+
+		// Pull the chat options
+		user_relations = new UserRelations();
+		user_relations.getUserChatOptions( "", function( response ){
+			jQuery( "#messenger-body #chat-history #default-container" ).empty();
+
+			if ( response != false ) {
+				for ( user_key in response ) {
+					user_ = response[ user_key ];
+
+					is_group = user_.is_group ? "_group" : "";
+					var names_ = user_.short_name !== undefined && user_.short_name != "" ? user_.short_name : user_.first_name +" "+ user_.last_name;
+
+					if ( user_.is_group ) { names_ += " group"; }
+
+					view_ = "\
+					<a href='"+ site_url +"/messenger?u_id="+ user_.user_id + is_group +"' class='chat-option'>\
+						<div class='avatar' style='background-image: url("+ user_.user_avatar_url +");'></div>\
+						"+ names_ +"\
+					</a>\
+					";
+					jQuery( "#messenger-body #chat-history #default-container" ).append( view_ );
+				}
+			}
+		} );
+
+		// Set the search option
+		jQuery( "#messenger-body #chat-history #search-controller" ).on( "keydown", function(){
+			clearTimeout( searchRequestInterval );
+		} );
+		jQuery( "#messenger-body #chat-history #search-controller" ).on( "keyup", function(){
+			var searchInput = jQuery( "#messenger-body #chat-history #search-controller" ).val().trim();
+
+			if ( searchInput != "" ) {
+				searchRequestInterval = setTimeout( function(){
+					jQuery( "#messenger-body #chat-history #default-container" ).hide();
+					jQuery( "#messenger-body #chat-history #search-container" ).empty().append( loading ).show();
+
+					var firstName = "";
+					var lastName = "";
+					var name = "";
+					var relations = user_type == "company" ? [ "employees", "follows" ] : ( user_type == "employee" ? [ "employers", "follows" ] : [ "follows" ] );
+
+					if ( searchInput.indexOf( " " ) > -1 ) {
+						firstName = searchInput.split( " " )[0];
+						lastName = searchInput.split( " " )[1];
+					} else {
+						name = searchInput;
+					}
+
+					generateAJAX({
+							functionName : "get_search_results",
+							arguments : {
+								first_name: firstName,
+								last_name: lastName,
+								universal_name: name,
+								relations: relations
+							}
+						}, function( response ) {
+							jQuery( "#messenger-body #chat-history #search-container" ).empty();
+							response = JSON.parse( response );
+
+							for ( user_key in response ) {
+								user_ = response[ user_key ];
+
+								if ( user_.user_body.is_company ) {
+									is_group = "_group";
+									var names_ = user_.user_body.short_name !== undefined && user_.user_body.short_name != "" ? user_.user_body.short_name : user_.user_body.first_name +" "+ user_.user_body.last_name;
+
+									if ( user_.user_body.is_company ) { names_ += " group"; }
+
+									view_ = "\
+									<a href='"+ site_url +"/messenger?u_id="+ user_.user_id + is_group +"' class='chat-option'>\
+										<div class='avatar' style='background-image: url("+ user_.user_body.avatar_url +");'></div>\
+										"+ names_ +"\
+									</a>\
+									";
+									jQuery( "#messenger-body #chat-history #search-container" ).append( view_ );
+								}
+
+								var names_ = user_.user_body.short_name !== undefined && user_.user_body.short_name != "" ? user_.user_body.short_name : user_.user_body.first_name +" "+ user_.user_body.last_name;
+
+								view_ = "\
+								<a href='"+ site_url +"/messenger?u_id="+ user_.user_id +"' class='chat-option'>\
+									<div class='avatar' style='background-image: url("+ user_.user_body.avatar_url +");'></div>\
+									"+ names_ +"\
+								</a>\
+								";
+								jQuery( "#messenger-body #chat-history #search-container" ).append( view_ );
+							}
+						}
+					);
+				}, 1000 );
+			}
+		} );
+	}
 });
 
 /*
