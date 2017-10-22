@@ -1,9 +1,22 @@
 <?php
 $receiver_id = isset( $_GET[ "u_id" ] ) && !empty( $_GET[ "u_id" ] ) ? sanitize_text_field( $_GET[ "u_id" ] ) : "";
 $real_id = strpos( $receiver_id, "_group" ) ? explode( "_", $receiver_id )[ 0 ] : $receiver_id;
+$user_id = get_current_user_id();
+$brother_ = new BROTHER;
+
+if ( strpos( $receiver_id, "_group" ) || $brother_->is_company( $real_id ) ) {
+	if ( !$brother_->is_employee( $real_id, $user_id ) ) {
+		?>
+		<script type="text/javascript">
+		window.location = "<?php echo get_site_url() ."/messenger"; ?>";
+		</script>
+		<?php
+	}
+}
 ?>
 <script type="text/javascript">
 var searchRequestInterval = setTimeout(function(){}, 1000);
+var receiver_id = "<?php echo $receiver_id; ?>";
 </script>
 <div id="messenger-body">
 	<div id="chat-history">
@@ -22,7 +35,6 @@ var searchRequestInterval = setTimeout(function(){}, 1000);
 		} else {
 			$user_info = get_userdata( $real_id  );
 			if ( $user_info != false ) {
-				$brother_ = new BROTHER;
 				$user_avatar_url = $brother_->get_user_avatar_url( $real_id );
 				$user_first_name = get_user_meta( $real_id, "first_name", true );
 				$user_last_name = get_user_meta( $real_id, "last_name", true );
@@ -41,7 +53,8 @@ var searchRequestInterval = setTimeout(function(){}, 1000);
 				<div id="messenger-controller-container">
 					<input type="text" id="message-container" placeholder="Hookah after work?">
 					<button id="emoji-controller" class="controller">
-						<img src="<?php echo get_template_directory_uri(); ?>/assets/fonts/emojies/1f60d.png" />
+						<div id="emoji-container"></div>
+						<img src="<?php echo get_template_directory_uri(); ?>/assets/fonts/emojies/1f60d.png" id="emoji-icon" />
 					</button>
 					<button id="media-controller" class="controller fa fa-paperclip"></button>
 					<button id="messenger-controller">Send</button>

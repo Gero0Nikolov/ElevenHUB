@@ -560,7 +560,7 @@ jQuery( document ).ready(function(){
 		}
 	} );
 
-	if ( jQuery( "body" ).hasClass( "page-template-page-templates page-template-messenger" ) ) {
+	if ( jQuery( "body" ).hasClass( "page-template-messenger" ) ) {
 		// Set loader to the chat options
 		jQuery( "#messenger-body #chat-history #default-container" ).append( loading );
 
@@ -656,6 +656,60 @@ jQuery( document ).ready(function(){
 						}
 					);
 				}, 1000 );
+			}
+		} );
+
+		// Load emojies
+		jQuery( "#emoji-container" ).append( loading );
+		user_messages = new UserMessages;
+		public_lists = new PublicLists;
+		public_lists.getPublishedEmojies( function( response ){
+			jQuery( "#emoji-container #loader" ).remove();
+			for ( emojie_key in response ) {
+				emojie_ = response[ emojie_key ];
+				button_ = "\
+				<button id='emojie-"+ emojie_.code +"' class='emojie-picker'>\
+					<img src='"+ emojie_.path +"' async />\
+				</dutton>\
+				";
+				jQuery( "#emoji-container" ).append( button_ );
+
+				jQuery( "#emoji-container #emojie-"+ emojie_.code ).on( "click", function(){
+					code_ = jQuery( this ).attr( "id" ).split( "emojie-" )[ 1 ];
+					user_messages.sendMessage( "[emojie]"+ code_ +"[/emojie]", receiver_id, function( response ){} );
+				} );
+			}
+		} );
+
+		jQuery( "#emoji-controller" ).on( "click", function( e ){
+			if ( e.target == this || jQuery( e.target ).attr( "id" ) == "emoji-icon" ) { jQuery( "#emoji-container" ).toggle(); }
+		} );
+
+		// Set send message controls
+		jQuery( "#messenger-controller" ).on( "click", function(){
+			user_messages.sendMessage( jQuery( "#message-container" ).val(), receiver_id, function( response ){
+				if ( response == true ) { jQuery( "#message-container" ).val( "" ); }
+			} );
+		} );
+
+		jQuery( "#message-container" ).on( "keyup", function( e ){
+			if ( e.keyCode == 13 ) {
+				jQuery( "#messenger-controller" ).trigger( "click" );
+			}
+		} );
+
+		// Pull chat history
+		user_messages.getUserMessages( 0, receiver_id, 0, 25, function( response ){
+			for ( message_key in response ) {
+				message_ = response[ message_key ];
+				console.log( message_ );
+				message_class = message_.sender_id == user_id ? "sender" : "receiver";
+				view_ = "\
+				<div id='message-"+ message_.id +"' class='message "+ message_class +"'>\
+					<div class='message-text'>"+ message_.message +"</div>\
+				</div>\
+				";
+				jQuery( "#chat-room" ).append( view_ );
 			}
 		} );
 	}

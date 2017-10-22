@@ -2877,6 +2877,11 @@ class BROTHER {
 		}
 	}
 
+	/*
+	*	Function name: get_user_chat_options
+	* 	Function arguments: $user_id [INT], $is_ajax [BOOL]
+	*	Function purpose: This function is used to get the user available chat partners.
+	*/
 	function get_user_chat_options( $args_ ) {
 		$user_id = isset( $args_->user_id ) && !empty( $args_->user_id ) ? intval( $args_->user_id ) : get_current_user_id();
 		$is_ajax = isset( $args_->is_ajax ) && !empty( $args_->is_ajax ) ? $args_->is_ajax : false;
@@ -2944,6 +2949,121 @@ class BROTHER {
 		}
 
 		return $response;
+	}
+
+	/*
+	*	Function name: get_published_emojies
+	*	Function arguments: NONE
+	*	Function purpose: This function is used to get all available emojies.
+	*/
+	function get_published_emojies() {
+		$folder_ = scandir( get_template_directory() ."/assets/fonts/emojies/", SCANDIR_SORT_DESCENDING );
+
+		$url_ = get_template_directory_uri();
+
+		$emojies_ = array();
+		foreach ( $folder_ as $item_ ) {
+			if ( $item_ != "." && $item_ != ".." ) {
+				$emojie_ = new stdClass;
+				$emojie_->path = $url_ ."/assets/fonts/emojies/". $item_;
+				$emojie_->code = explode( ".", $item_ )[ 0 ];
+				array_push( $emojies_, $emojie_ );
+			}
+		}
+
+		return $emojies_;
+	}
+
+	/*
+	*	Function name: send_message
+	*	Function arguments: message [STRING], receiver_id [INT]
+	*	Function purpose: This function is used to send a message.
+	*/
+	function send_message( $args_ ) {
+		$args_->message = sanitize_textarea_field( $args_->message );
+		$args_->receiver_id = sanitize_text_field( $args_->receiver_id );
+
+		$response = false;
+
+		if ( !empty( $args_->message ) && $args_->receiver_id > 0 ) {
+			global $wpdb;
+			$user_messages = $wpdb->prefix ."user_messages";
+			$user_messages_relations = $wpdb->prefix ."user_messages_relations";
+
+			$user_id = get_current_user_id();
+
+			// Create the message
+			$wpdb->insert(
+				$user_messages,
+				array(
+					"message" => $args_->message,
+					"status" => "delivered"
+				)
+			);
+
+			$message_id = $wpdb->insert_id;
+
+			// Create the relation
+			$wpdb->insert(
+				$user_messages_relations,
+				array(
+					"sender_id" => $user_id,
+					"receiver_id" => $args_->receiver_id,
+					"message_id" => $message_id
+				)
+			);
+
+			$response = true;
+		}
+
+		return $response;
+	}
+
+	function get_user_messages( $args_ ) {
+		$args_->user_id = intval( $args_->user_id );
+		if ( $args_->user_id == 0 ) { $args_->user_id = get_current_user_id(); }
+		$args_->receiver_id = sanitize_text_field( $args_->receiver_id );
+		$args_->offset = intval( $args_->offset );
+		$args_->limit = intval( $args_->limit );
+
+		$messages_ = array();
+
+		if ( $args_->user_id > 0 && !empty( $args_->receiver_id ) ) {
+			global $wpdb;
+			$user_messages = $wpdb->prefix ."user_messages";
+			$user_messages_relations = $wpdb->prefix ."user_messages_relations";
+
+			$results_ = array();
+
+			if ( !strpos( $args_->receiver_id, "_group" ) && !$this->is_company( $args_->receiver_id ) ) {
+				$sql_ = "SELECT sender_id, receiver_id, message_id FROM $user_messages_relations WHERE (sender_id='$args_->user_id' AND receiver_id='$args_->receiver_id') OR (sender_id='$args_->receiver_id' AND receiver_id='$args_->user_id') ORDER BY id DESC LIMIT $args_->limit OFFSET $args_->offset";
+				$results_ = $wpdb->get_results( $sql_, OBJECT );
+			} else {
+				$receiver_id = strpos( $args_->receiver_id, "_group" ) ? explode( "_", $args_->receiver_id )[ 0 ] : $args_->receiver_id;
+				if ( $this->is_employee( $receiver_id, $args_->user_id ) ) {
+					$sql_ = "SELECT sender_id, receiver_id, message_id FROM $user_messages_relations WHERE receiver_id='$args_->receiver_id' ORDER BY id DESC LIMIT $args_->limit OFFSET $args_->offset";
+					$results_ = $wpdb->get_results( $sql_, OBJECT );
+				}
+			}
+
+			foreach ( $results_ as $result_ ) {
+				$message_ = new stdClass;
+				$message_->sender_id = $result_->sender_id;
+				$message_->receiver_id = $result_->receiver_id;
+				$message_->id = $result_->message_id;
+
+				$sql_ = "SELECT message, date, status FROM $user_messages WHERE id=$result_->message_id";
+				$results_ = $wpdb->get_results( $sql_, OBJECT );
+
+				$message_->message = $results_[ 0 ]->message;
+				$message_->data = date( "d M Y H:i", strtotime( $results_[ 0 ]->date ) );
+				$message_->status = $results_[ 0 ]->status;
+
+				array_push( $messages_, $message_ );
+			}
+		}
+
+		return $messages_;
 	}
 
 	function get_user_badges( $user_id = "" ) {

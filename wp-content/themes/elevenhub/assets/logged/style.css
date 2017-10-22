@@ -2885,9 +2885,12 @@ blockquote {
   #messenger-body #chat-history {
     display: inline-block;
     width: 30%;
-    min-height: 85vh;
+    height: 85vh;
     border-right: 1px dashed #ddd;
-    padding-right: 1em; }
+    padding-right: 1em;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; }
     #messenger-body #chat-history #search-controller {
       display: block;
       position: relative;
@@ -3022,7 +3025,35 @@ blockquote {
       height: calc(100% - 5.5em);
       width: 100%;
       overflow-x: hidden;
-      overflow-y: auto; }
+      overflow-y: auto;
+      padding-bottom: 0.85em; }
+      #messenger-body .chat-holder .chat-room .message {
+        display: block;
+        position: relative;
+        width: 100%;
+        margin: 0.85em 0 0 0; }
+        #messenger-body .chat-holder .chat-room .message.sender {
+          text-align: right; }
+          #messenger-body .chat-holder .chat-room .message.sender .message-text {
+            background: #3498db;
+            color: #fff; }
+        #messenger-body .chat-holder .chat-room .message.receiver {
+          text-align: left; }
+          #messenger-body .chat-holder .chat-room .message.receiver .message-text {
+            background: #ecf0f1;
+            color: #333; }
+        #messenger-body .chat-holder .chat-room .message .message-text {
+          display: inline-block;
+          position: relative;
+          font-family: OpenSansRegular;
+          font-size: 1rem;
+          font-weight: normal;
+          letter-spacing: 1px;
+          line-height: 150%;
+          width: 60%;
+          text-align: left;
+          padding: 0.5em 0.75em;
+          border-radius: 20px; }
     #messenger-body .chat-holder #messenger-controller-container {
       display: flex;
       position: relative;
@@ -3058,7 +3089,8 @@ blockquote {
         align-items: center;
         justify-content: center;
         margin: 0 0 0 0.25em;
-        outline: 0; }
+        outline: 0;
+        position: relative; }
         #messenger-body .chat-holder #messenger-controller-container .controller:nth-of-type(1):hover, #messenger-body .chat-holder #messenger-controller-container .controller:nth-of-type(1):focus {
           border-color: #e74c3c; }
         #messenger-body .chat-holder #messenger-controller-container .controller:nth-of-type(2):hover, #messenger-body .chat-holder #messenger-controller-container .controller:nth-of-type(2):focus {
@@ -3081,6 +3113,40 @@ blockquote {
         outline: 0; }
         #messenger-body .chat-holder #messenger-controller-container #messenger-controller:hover, #messenger-body .chat-holder #messenger-controller-container #messenger-controller:focus {
           color: #2980b9; }
+      #messenger-body .chat-holder #messenger-controller-container #emoji-container {
+        display: none;
+        position: absolute;
+        background: rgba(255, 255, 255, 0.8);
+        width: 30vw;
+        height: 20vw;
+        top: 0;
+        left: 50%;
+        transform: translate(-50%, calc(-100% - 10px));
+        border-radius: 10px;
+        cursor: default;
+        border: 1px solid #e74c3c;
+        overflow-x: hidden;
+        overflow-y: auto;
+        padding: 0.75vw 0; }
+        #messenger-body .chat-holder #messenger-controller-container #emoji-container .emojie-picker {
+          display: inline-block;
+          width: 3vw;
+          max-width: 26px;
+          background: none;
+          border-radius: 0;
+          border: none;
+          box-shadow: none;
+          padding: 0.25em;
+          margin: 0.25vw;
+          outline: 0;
+          webkit-transition: all 0.25s ease-in-out;
+          -moz-transition: all 0.25s ease-in-out;
+          -o-transition: all 0.25s ease-in-out;
+          transition: all 0.25s ease-in-out; }
+          #messenger-body .chat-holder #messenger-controller-container #emoji-container .emojie-picker:hover, #messenger-body .chat-holder #messenger-controller-container #emoji-container .emojie-picker:focus {
+            background: #eee; }
+          #messenger-body .chat-holder #messenger-controller-container #emoji-container .emojie-picker:active {
+            transform: scale(0.9); }
 
 /** MOBILE **/
 .mobile .main-navigation .left-aligned.width-20p {

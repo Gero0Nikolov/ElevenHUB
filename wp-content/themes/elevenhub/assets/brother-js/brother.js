@@ -1332,6 +1332,15 @@ var PublicLists = function() {
 			}, function ( response ) { onSuccess( JSON.parse( JSON.parse( response ) ) ); }
 		);
 	}
+
+	/*
+	*	Function name: getPublishedEmojies
+	*	Function arguments: onSuccess [FUNCTION]
+	*	Function purpose: This function is used to pull all available emojies.
+	*/
+	this.getPublishedEmojies = function( onSuccess ) {
+		generateAJAX( { functionName : "get_published_emojies" }, function ( response ) { onSuccess( JSON.parse( response ) ); } );
+	}
 }
 
 /*
@@ -1355,6 +1364,34 @@ var Phubber = function() {
 					payment_id : paymentID
 				}
 			}, function ( response ) { onSuccess( JSON.parse( JSON.parse( response ) ) ); }
+		);
+	}
+}
+
+var UserMessages = function() {
+	var classHolder = this;
+
+	this.sendMessage = function( message, receiverID, onSuccess ) {
+		generateAJAX({
+				functionName : "send_message",
+				arguments : {
+					message : message,
+					receiver_id : receiverID
+				}
+			}, function( response ) { onSuccess( JSON.parse( response ) ); }
+		);
+	}
+
+	this.getUserMessages = function( userID, receiverID, offset, limit, onSuccess ) {
+		generateAJAX({
+				functionName : "get_user_messages",
+				arguments : {
+					user_id : userID,
+					receiver_id : receiverID,
+					offset : offset,
+					limit : limit
+				}
+			}, function( response ) { onSuccess( JSON.parse( response ) ); }
 		);
 	}
 }
