@@ -3080,7 +3080,7 @@ class BROTHER {
 				$sql_ = "SELECT message, date FROM $user_messages WHERE id=$result_->message_id";
 				$results_ = $wpdb->get_results( $sql_, OBJECT );
 
-				$message_->message = $results_[ 0 ]->message;
+				$message_->message = $this->parse_message( $results_[ 0 ]->message );
 				$message_->data = date( "d M Y H:i", strtotime( $results_[ 0 ]->date ) );
 
 				array_push( $messages_, $message_ );
@@ -3145,7 +3145,7 @@ class BROTHER {
 				$sql_ = "SELECT message, date FROM $user_messages WHERE id=$result_->message_id";
 				$results_ = $wpdb->get_results( $sql_, OBJECT );
 
-				$message_->message = $results_[ 0 ]->message;
+				$message_->message = $this->parse_message( $results_[ 0 ]->message );
 				$message_->data = date( "d M Y H:i", strtotime( $results_[ 0 ]->date ) );
 
 				array_push( $messages_, $message_ );
@@ -3190,6 +3190,37 @@ class BROTHER {
 		}
 
 		return $response;
+	}
+
+	function parse_message( $message ) {
+		// Convert links into clickable objects
+		$pattern = '@(http(s)?://)?(([a-zA-Z0-9])([-\w]+\.)+([^\s\.]+[^\s]*)+[^,.\s])@';
+		$message = preg_replace( $pattern, '<a href="http$2://$3" class="message-anchor" target="_blank">$0</a>', $message );
+
+		// Parse emojies
+		$message = str_replace( "[emojie]", "<img src='". get_template_directory_uri() ."/assets/fonts/emojies/", str_replace( "[/emojie]", ".png' class='message-emojie' />", $message ) );
+
+		// Parse symbols to emojies
+		$symbols = array(
+			"<3" => "2764",
+			":D" => "1f600",
+			":)" => "1f642",
+			";)" => "1f609",
+			":(" => "1f625",
+			":'(" => "1f62d",
+			":O" => "1f632",
+			":|" => "1f610",
+			":P" => "1f60b",
+			":\\" => "1f615",
+			"-_-" => "1f611",
+			"_|_" => "1f595",
+			"_)_" => "1f595-1f3ff"
+		);
+		foreach ( $symbols as $key => $value ) {
+			$message = str_replace( $key, "<img src='". get_template_directory_uri() ."/assets/fonts/emojies/". $value .".png' class='message-emojie' />", $message );
+		}
+
+		return $message;
 	}
 
 	function get_user_badges( $user_id = "" ) {

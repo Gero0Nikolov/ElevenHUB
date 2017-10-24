@@ -3681,6 +3681,7 @@ blockquote {
 			width: 100%;
 			overflow-x: hidden;
 			overflow-y: auto;
+			-webkit-overflow-scrolling: touch;
 			padding-bottom: 0.85em;
 
 			.message {
@@ -3695,6 +3696,8 @@ blockquote {
 					.message-text {
 						background: $peter_river;
 						color: #fff;
+
+						a { color: #fff; }
 					}
 				}
 				&.receiver {
@@ -3703,6 +3706,8 @@ blockquote {
 					.message-text {
 						background: $clouds;
 						color: #333;
+
+						a { color: $peter_river; }
 					}
 				}
 
@@ -3720,6 +3725,20 @@ blockquote {
 					border-radius: 20px;
 					word-wrap: break-word;
 					word-break: break-word;
+
+					.message-emojie {
+						display: inline-block;
+						width: 1.5em;
+						font-size: 1rem;
+						vertical-align: middle;
+					}
+
+					.message-anchor {
+						display: inline-block;
+						outline: 0;
+						text-decoration: underline;
+						vertical-align: base-line;
+					}
 				}
 			}
 		}

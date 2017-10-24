@@ -443,7 +443,7 @@ jQuery( document ).ready(function(){
 	// Set chat controller notifications
 	user_messages = new UserMessages();
 	setInterval( function(){
-		user_messages.getUserMessageNotifications( "", function( response ){			
+		user_messages.getUserMessageNotifications( "", function( response ){
 			if ( response > 0 && jQuery( "#chat-controller #missed-messages" ).length > 0 && response != jQuery( "#chat-controller #missed-messages" ).html() ) {
 				jQuery( "#chat-controller #missed-messages" ).html( response ).addClass( "animated fadeInRight" ).show();
 			}
@@ -659,7 +659,7 @@ jQuery( document ).ready(function(){
 					var firstName = "";
 					var lastName = "";
 					var name = "";
-					var relations = user_type == "company" ? [ "employees", "follows" ] : ( user_type == "employee" ? [ "employers", "follows" ] : [ "follows" ] );
+					var relations = user_type == "company" ? [ "employees", "follows", "followers" ] : ( user_type == "employee" ? [ "employers", "follows", "followers" ] : [ "follows" ] );
 
 					if ( searchInput.indexOf( " " ) > -1 ) {
 						firstName = searchInput.split( " " )[0];
@@ -711,6 +711,9 @@ jQuery( document ).ready(function(){
 						}
 					);
 				}, 1000 );
+			} else {
+				jQuery( "#messenger-body #chat-history #default-container" ).show();
+				jQuery( "#messenger-body #chat-history #search-container" ).hide();
 			}
 		} );
 
@@ -778,7 +781,7 @@ jQuery( document ).ready(function(){
 
 		// Set load more messages on scroll
 		jQuery( "#chat-room" ).scroll( function() {
-		   if( jQuery( "#chat-room" ).scrollTop() + jQuery( "#chat-room" ).innerHeight() >= jQuery( "#chat-room" )[ 0 ].scrollHeight - 100 && lock_requests == false ) {
+		   if( jQuery( "#chat-room" ).scrollTop() + jQuery( "#chat-room" ).innerHeight() >= jQuery( "#chat-room" )[ 0 ].scrollHeight - 200 && lock_requests == false ) {
 			   lock_requests = true;
 
 			   user_messages.getUserMessages( 0, receiver_id, message_offset, message_limit, function( response ){

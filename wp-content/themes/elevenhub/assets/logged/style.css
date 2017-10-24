@@ -3065,6 +3065,7 @@ blockquote {
       width: 100%;
       overflow-x: hidden;
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
       padding-bottom: 0.85em; }
       #messenger-body .chat-holder .chat-room .message {
         display: block;
@@ -3076,11 +3077,15 @@ blockquote {
           #messenger-body .chat-holder .chat-room .message.sender .message-text {
             background: #3498db;
             color: #fff; }
+            #messenger-body .chat-holder .chat-room .message.sender .message-text a {
+              color: #fff; }
         #messenger-body .chat-holder .chat-room .message.receiver {
           text-align: left; }
           #messenger-body .chat-holder .chat-room .message.receiver .message-text {
             background: #ecf0f1;
             color: #333; }
+            #messenger-body .chat-holder .chat-room .message.receiver .message-text a {
+              color: #3498db; }
         #messenger-body .chat-holder .chat-room .message .message-text {
           display: inline-block;
           position: relative;
@@ -3095,6 +3100,16 @@ blockquote {
           border-radius: 20px;
           word-wrap: break-word;
           word-break: break-word; }
+          #messenger-body .chat-holder .chat-room .message .message-text .message-emojie {
+            display: inline-block;
+            width: 1.5em;
+            font-size: 1rem;
+            vertical-align: middle; }
+          #messenger-body .chat-holder .chat-room .message .message-text .message-anchor {
+            display: inline-block;
+            outline: 0;
+            text-decoration: underline;
+            vertical-align: base-line; }
     #messenger-body .chat-holder #messenger-controller-container {
       display: flex;
       position: relative;
