@@ -75,7 +75,9 @@ $user_id = get_current_user_id();
 	if ( !wp_is_mobile() ) {
 		if ( !is_page_template( "page-templates/messenger.php" ) ) {
 		?>
-			<button id="chat-controller" class="fa fa-commenting-o"></button>
+			<button id="chat-controller" class="fa fa-commenting-o">
+				<span id="missed-messages"></span>
+			</button>
 		<?php
 		}
 	}

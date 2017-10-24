@@ -440,6 +440,18 @@ jQuery( document ).ready(function(){
 		} );
 	}
 
+	// Set chat controller notifications
+	user_messages = new UserMessages();
+	setInterval( function(){
+		user_messages.getUserMessageNotifications( "", function( response ){			
+			if ( response > 0 && jQuery( "#chat-controller #missed-messages" ).length > 0 && response != jQuery( "#chat-controller #missed-messages" ).html() ) {
+				jQuery( "#chat-controller #missed-messages" ).html( response ).addClass( "animated fadeInRight" ).show();
+			}
+
+			if ( response == 0 ) { jQuery( "#chat-controller #missed-messages" ).hide(); }
+		} );
+	}, 5000 );
+
 	// Chat controller
 	jQuery( "#chat-controller" ).on( "click", function(){
 		if ( jQuery( "#chat-rooms-container" ).length ) {
@@ -464,8 +476,8 @@ jQuery( document ).ready(function(){
 					<h1 class='rooms-title'>Employees</h1>\
 					<div id='list'>"+ loading +"</div>\
 				</div>\
-				<div id='hubbers' class='rooms-list'>\
-					<h1 class='rooms-title'>Hubbers</h1>\
+				<div id='followers' class='rooms-list'>\
+					<h1 class='rooms-title'>Followers</h1>\
 					<div id='list'>"+ loading +"</div>\
 				</div>\
 				";
@@ -474,7 +486,10 @@ jQuery( document ).ready(function(){
 			view_ = "\
 			<div id='chat-rooms-container' class='animated fadeInUp'>\
 				<div class='header'>\
-					<span class='fa fa-commenting-o'></span>\
+					<a href='"+ site_url +"/messenger' class='header-link'>\
+						<span class='fa fa-commenting-o'></span>\
+						Open messenger\
+					</a>\
 					<button id='close-chat-rooms-container' class='fa fa-close'></button>\
 				</div>\
 				<div id='main-rooms'>\
@@ -556,6 +571,40 @@ jQuery( document ).ready(function(){
 						jQuery( "#chat-rooms-container #main-rooms #hubbers #list" ).append( view_ );
 					}
 				} );
+			} else if ( user_type == "company" ) {
+				// Pull user employees
+				user_relations.getUserEmployees( "", function( response ) {
+					jQuery( "#chat-rooms-container #main-rooms #employees #list" ).empty();
+					for ( employee_key in response ) {
+						employee_ = response[ employee_key ];
+
+						names_ = employee_.user_employee_body.user_shortname !== undefined && employee_.user_employee_body.user_shortname != "" && employee_.user_employee_body.user_shortname != null ? employee_.user_employee_body.user_shortname : employee_.user_employee_body.user_first_name +" "+ employee_.user_employee_body.user_last_name;
+						view_ = "\
+						<a href='"+ site_url +"/messenger?u_id="+ employee_.user_employee_body.user_id +"' id='employee-"+ employee_.user_employee_body.user_id +"' class='chat-room-preview'>\
+							<div class='avatar' style='background-image: url(\""+ employee_.user_employee_body.user_avatar_url +"\");'></div>\
+							<span class='names'>"+ names_ +"</span>\
+						</a>\
+						";
+						jQuery( "#chat-rooms-container #main-rooms #employees #list" ).append( view_ );
+					}
+				} );
+
+				// Pull User Relations
+				user_relations.getUserRelations( "", function( response ) {
+					jQuery( "#chat-rooms-container #main-rooms #followers #list" ).empty();
+					for ( follower_key in response.followers ) {
+						follower_ = response.followers[ follower_key ];
+
+						names_ = follower_.user_follower_body.user_shortname !== undefined && follower_.user_follower_body.user_shortname != "" && follower_.user_follower_body.user_shortname != null ? follower_.user_follower_body.user_shortname : follower_.user_follower_body.user_first_name +" "+ follower_.user_follower_body.user_last_name;
+						view_ = "\
+						<a href='"+ site_url +"/messenger?u_id="+ follower_.user_follower_body.user_id +"' id='employee-"+ follower_.user_follower_body.user_id +"' class='chat-room-preview'>\
+							<div class='avatar' style='background-image: url(\""+ follower_.user_follower_body.user_avatar_url +"\");'></div>\
+							<span class='names'>"+ names_ +"</span>\
+						</a>\
+						";
+						jQuery( "#chat-rooms-container #main-rooms #followers #list" ).append( view_ );
+					}
+				} );
 			}
 		}
 	} );
@@ -578,8 +627,14 @@ jQuery( document ).ready(function(){
 
 					if ( user_.is_group ) { names_ += " group"; }
 
+					new_messages = "";
+					if ( user_.new_messages > 0 ) {
+						new_messages = "<span class='unopened-messages'>"+ user_.new_messages +"</span>";
+					}
+
 					view_ = "\
 					<a href='"+ site_url +"/messenger?u_id="+ user_.user_id + is_group +"' class='chat-option'>\
+						"+ new_messages +"\
 						<div class='avatar' style='background-image: url("+ user_.user_avatar_url +");'></div>\
 						"+ names_ +"\
 					</a>\
@@ -687,9 +742,9 @@ jQuery( document ).ready(function(){
 
 		// Set send message controls
 		jQuery( "#messenger-controller" ).on( "click", function(){
-			user_messages.sendMessage( jQuery( "#message-container" ).val(), receiver_id, function( response ){
-				if ( response == true ) { jQuery( "#message-container" ).val( "" ); }
-			} );
+			message = jQuery( "#message-container" ).val();
+			jQuery( "#message-container" ).val( "" );
+			user_messages.sendMessage( message, receiver_id, function( response ){} );
 		} );
 
 		jQuery( "#message-container" ).on( "keyup", function( e ){
@@ -699,19 +754,83 @@ jQuery( document ).ready(function(){
 		} );
 
 		// Pull chat history
-		user_messages.getUserMessages( 0, receiver_id, 0, 25, function( response ){
-			for ( message_key in response ) {
-				message_ = response[ message_key ];
-				console.log( message_ );
-				message_class = message_.sender_id == user_id ? "sender" : "receiver";
-				view_ = "\
-				<div id='message-"+ message_.id +"' class='message "+ message_class +"'>\
-					<div class='message-text'>"+ message_.message +"</div>\
-				</div>\
-				";
-				jQuery( "#chat-room" ).append( view_ );
+		jQuery( "#chat-room" ).append( loading );
+		user_messages.getUserMessages( 0, receiver_id, 0, message_limit, function( response ){
+			jQuery( "#chat-room #loader" ).remove();
+
+			if ( response.length > 0 ) {
+				for ( message_key in response ) {
+					message_ = response[ message_key ];
+					message_class = message_.sender_id == user_id ? "sender" : "receiver";
+					view_ = "\
+					<div id='message-"+ message_.id +"' class='message animated bounceInDown "+ message_class +"'>\
+						<div class='message-text'>"+ message_.message +"</div>\
+					</div>\
+					";
+					jQuery( "#chat-room" ).append( view_ );
+				}
+
+				last_message_id = response[ 0 ].id;
 			}
+
+			lock_requests = false;
 		} );
+
+		// Set load more messages on scroll
+		jQuery( "#chat-room" ).scroll( function() {
+		   if( jQuery( "#chat-room" ).scrollTop() + jQuery( "#chat-room" ).innerHeight() >= jQuery( "#chat-room" )[ 0 ].scrollHeight - 100 && lock_requests == false ) {
+			   lock_requests = true;
+
+			   user_messages.getUserMessages( 0, receiver_id, message_offset, message_limit, function( response ){
+				   jQuery( "#chat-room #loader" ).remove();
+
+		   			if ( response.length > 0 ) {
+						console.log( response );
+		   				for ( message_key in response ) {
+		   					message_ = response[ message_key ];
+		   					message_class = message_.sender_id == user_id ? "sender" : "receiver";
+		   					view_ = "\
+		   					<div id='message-"+ message_.id +"' class='message animated bounceInUp "+ message_class +"'>\
+		   						<div class='message-text'>"+ message_.message +"</div>\
+		   					</div>\
+		   					";
+		   					jQuery( "#chat-room" ).append( view_ );
+		   				}
+
+						message_offset += message_limit;
+		   			}
+
+		   			lock_requests = false;
+	   			} );
+		   }
+		});
+
+		// Set new messages interval
+		setInterval( function(){
+			if ( lock_requests == false ) {
+				lock_requests = true;
+				user_messages.getUserNewMessages( 0, receiver_id, last_message_id, function( response ){
+					if ( response.length > 0 ) {
+						messages_counter = 0;
+						for ( message_key in response ) {
+							message_ = response[ message_key ];
+							message_class = message_.sender_id == user_id ? "sender" : "receiver";
+							view_ = "\
+							<div id='message-"+ message_.id +"' class='message animated bounceInDown "+ message_class +"'>\
+								<div class='message-text'>"+ message_.message +"</div>\
+							</div>\
+							";
+							jQuery( "#chat-room" ).prepend( view_ );
+							messages_counter += 1;
+						}
+
+						last_message_id = response[ messages_counter - 1 ].id;
+					}
+
+					lock_requests = false;
+				} );
+			}
+		}, 1000 );
 	}
 });
 

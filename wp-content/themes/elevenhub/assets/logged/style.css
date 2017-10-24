@@ -2786,6 +2786,20 @@ blockquote {
   transition: all 0.25s ease-in-out; }
   #chat-controller:hover, #chat-controller:focus {
     box-shadow: 0 0 10px 1px #2980b9; }
+  #chat-controller #missed-messages {
+    display: none;
+    font-family: OpenSansRegular;
+    font-size: 0.85rem;
+    font-weight: normal;
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-top: -0.5em;
+    padding: 0.35em 0.5em;
+    border-radius: 100px;
+    border-top-right-radius: 0;
+    background: #2c3e50;
+    border-bottom-right-radius: 0; }
 
 #chat-rooms-container {
   display: inline-block;
@@ -2811,6 +2825,17 @@ blockquote {
     border-top-left-radius: 5px; }
     #chat-rooms-container .header span {
       font-size: 1.25rem;
+      color: #fff;
+      display: inline-block;
+      vertical-align: baseline;
+      margin-right: 0.15em; }
+    #chat-rooms-container .header .header-link {
+      display: inline-block;
+      position: relative;
+      text-decoration: none;
+      font-family: OpenSansRegular;
+      font-size: 0.85rem;
+      font-weight: normal;
       color: #fff; }
     #chat-rooms-container .header button {
       display: inline-block;
@@ -2932,6 +2957,20 @@ blockquote {
         padding: 0.5em 0;
         border-bottom: 1px solid #ddd;
         outline: 0; }
+        #messenger-body #chat-history .list .chat-option .unopened-messages {
+          display: inline-block;
+          position: absolute;
+          z-index: 2;
+          font-family: OpenSansRegular;
+          font-size: 0.5rem;
+          font-weight: normal;
+          color: #fff;
+          background: #e67e22;
+          padding: 0.25em 0.5em;
+          border-radius: 100px;
+          top: 0;
+          left: 0;
+          transform: translate(0, 15%); }
         #messenger-body #chat-history .list .chat-option:after {
           content: " ";
           display: inline-block;
@@ -3050,10 +3089,12 @@ blockquote {
           font-weight: normal;
           letter-spacing: 1px;
           line-height: 150%;
-          width: 60%;
+          max-width: 60%;
           text-align: left;
           padding: 0.5em 0.75em;
-          border-radius: 20px; }
+          border-radius: 20px;
+          word-wrap: break-word;
+          word-break: break-word; }
     #messenger-body .chat-holder #messenger-controller-container {
       display: flex;
       position: relative;

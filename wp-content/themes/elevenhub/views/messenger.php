@@ -4,7 +4,7 @@ $real_id = strpos( $receiver_id, "_group" ) ? explode( "_", $receiver_id )[ 0 ] 
 $user_id = get_current_user_id();
 $brother_ = new BROTHER;
 
-if ( strpos( $receiver_id, "_group" ) || $brother_->is_company( $real_id ) ) {
+if ( !empty( $receiver_id ) && ( strpos( $receiver_id, "_group" ) || $brother_->is_company( $real_id ) ) ) {
 	if ( !$brother_->is_employee( $real_id, $user_id ) ) {
 		?>
 		<script type="text/javascript">
@@ -17,6 +17,10 @@ if ( strpos( $receiver_id, "_group" ) || $brother_->is_company( $real_id ) ) {
 <script type="text/javascript">
 var searchRequestInterval = setTimeout(function(){}, 1000);
 var receiver_id = "<?php echo $receiver_id; ?>";
+var last_message_id = 0;
+var lock_requests = true;
+var message_limit = 15;
+var message_offset = message_limit;
 </script>
 <div id="messenger-body">
 	<div id="chat-history">

@@ -531,7 +531,6 @@ class BROTHER {
 				id INT NOT NULL AUTO_INCREMENT,
 				message LONGTEXT,
 				date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-				status VARCHAR(255),
 				PRIMARY KEY(id)
 			) $charset_collate;
 			";
@@ -550,6 +549,7 @@ class BROTHER {
 				sender_id LONGTEXT,
 				receiver_id LONGTEXT,
 				message_id INT,
+				status VARCHAR(255),
 				PRIMARY KEY(id)
 			) $charset_collate;
 			";
@@ -2783,7 +2783,7 @@ class BROTHER {
 
 	/*
 	*	Function name: get_notification_template
-	*	Function arguments: $notification_slug [ STRING ] (reuqired)
+	*	Function arguments: $notification_slug [ STRING ] (required)
 	*	Function purpose: This function is used to return custom notificaiton template.
 	*/
 	function get_notification_template( $notification_slug ) {
@@ -2879,7 +2879,7 @@ class BROTHER {
 
 	/*
 	*	Function name: get_user_chat_options
-	* 	Function arguments: $user_id [INT], $is_ajax [BOOL]
+	* 	Function arguments: $user_id [INT] (optional), $is_ajax [BOOL] (required)
 	*	Function purpose: This function is used to get the user available chat partners.
 	*/
 	function get_user_chat_options( $args_ ) {
@@ -2896,23 +2896,26 @@ class BROTHER {
 			$connections_id = array();
 
 			// Get opened chats
-			$sql_ = "SELECT DISTINCT sender_id, receiver_id FROM $user_messages_relations WHERE sender=$user_id OR receiver_id=$user_id ORDER BY id DESC";
+			$sql_ = "SELECT sender_id, receiver_id FROM $user_messages_relations WHERE sender_id='$user_id' OR receiver_id='$user_id' ORDER BY id DESC";
 			$results_ = $wpdb->get_results( $sql_, OBJECT );
 
 			// Parse the opened chats result into an array
 			foreach ( $results_ as $result_ ) {
-				if ( $result_->sender_id != $user_id && !in_array( $result_->sender_id, $connections_id ) ) { array_push( $connections_id, $result_->sender_id ); }
-				elseif ( $result_->receiver_id != $user_id && !in_array( $result_->receiver_id, $connections_id ) ) { array_push( $connections_id, $result_->receiver_id ); }
+				if ( !empty( $result_->sender_id ) && $result_->sender_id != $user_id && !in_array( $result_->sender_id, $connections_id ) ) { array_push( $connections_id, $result_->sender_id ); }
+				elseif ( !empty( $result_->receiver_id ) && $result_->receiver_id != $user_id && !in_array( $result_->receiver_id, $connections_id ) ) { array_push( $connections_id, $result_->receiver_id ); }
 			}
 
 			// Pull user relations
-			$sql_ = "SELECT user_followed_id, user_employer_id FROM $user_relations WHERE (user_followed_id=$user_id AND user_employer_id IS NOT NULL) OR user_follower_id=$user_id OR user_employer_id=$user_id ORDER BY id DESC";
+			$sql_ = "SELECT user_followed_id, user_follower_id, user_employer_id FROM $user_relations WHERE (user_followed_id=$user_id AND user_employer_id IS NOT NULL) OR user_follower_id=$user_id OR user_followed_id=$user_id OR user_employer_id=$user_id ORDER BY id DESC";
 			$results_ = $wpdb->get_results( $sql_, OBJECT );
 
 			// Parse the user relations results into an array
 			foreach ( $results_ as $result_ ) {
-				if ( $result_->user_followed_id != $user_id && !in_array( $result_->user_followed_id, $connections_id ) ) { array_push( $connections_id, $result_->user_followed_id ); }
-				elseif ( $result_->user_employer_id != $user_id && !in_array( $result_->user_employer_id, $connections_id ) && !in_array( $result_->user_employer_id ."_group", $connections_id ) ) {
+				if ( !empty( $result_->user_followed_id ) && $result_->user_followed_id != $user_id && !in_array( $result_->user_followed_id, $connections_id ) ) { array_push( $connections_id, $result_->user_followed_id ); }
+
+				if ( !empty( $result_->user_follower_id ) && $result_->user_follower_id != $user_id && !in_array( $result_->user_follower_id, $connections_id ) ) { array_push( $connections_id, $result_->user_follower_id ); }
+
+				if ( !empty( $result_->user_employer_id ) && $result_->user_employer_id != $user_id && !in_array( $result_->user_employer_id, $connections_id ) && !in_array( $result_->user_employer_id ."_group", $connections_id ) ) {
 					array_push( $connections_id, $result_->user_employer_id );
 					array_push( $connections_id, $result_->user_employer_id ."_group" );
 				}
@@ -2930,6 +2933,13 @@ class BROTHER {
 					$user_->last_name = get_user_meta( $id_, "last_name", true );
 					$user_->short_name = get_user_meta( $id_, "user_shortname", true );
 					$user_->is_group = false;
+
+					// Get unopened messages
+					$sql_ = "SELECT COUNT(status) as new_messages FROM $user_messages_relations WHERE sender_id='$id_' AND receiver_id='$user_id' AND status='delivered'";
+					$results_ = $wpdb->get_results( $sql_, OBJECT );
+
+					$user_->new_messages = $results_[ 0 ]->new_messages;
+
 					array_push( $users_, $user_ );
 				} else { // Groups
 					$user_id = explode( "_", $id_ )[ 0 ];
@@ -2941,6 +2951,15 @@ class BROTHER {
 					$user_->last_name = get_user_meta( $user_id, "last_name", true );
 					$user_->short_name = get_user_meta( $user_id, "user_shortname", true );
 					$user_->is_group = true;
+
+					// Get unopened messages
+					// $sql_ = "SELECT COUNT(status) as new_messages FROM $user_messages_relations WHERE sender_id!='$user_id' AND receiver_id='$id_' AND status='delivered'";
+					// $results_ = $wpdb->get_results( $sql_, OBJECT );
+					//
+					// $user_->new_messages = $results_[ 0 ]->new_messages;
+
+					$User_->new_messages = 0;
+
 					array_push( $users_, $user_ );
 				}
 			}
@@ -2976,11 +2995,11 @@ class BROTHER {
 
 	/*
 	*	Function name: send_message
-	*	Function arguments: message [STRING], receiver_id [INT]
+	*	Function arguments: message [STRING] (required), receiver_id [INT] (required)
 	*	Function purpose: This function is used to send a message.
 	*/
 	function send_message( $args_ ) {
-		$args_->message = sanitize_textarea_field( $args_->message );
+		$args_->message = sanitize_text_field( $args_->message );
 		$args_->receiver_id = sanitize_text_field( $args_->receiver_id );
 
 		$response = false;
@@ -2996,8 +3015,7 @@ class BROTHER {
 			$wpdb->insert(
 				$user_messages,
 				array(
-					"message" => $args_->message,
-					"status" => "delivered"
+					"message" => $args_->message
 				)
 			);
 
@@ -3009,7 +3027,8 @@ class BROTHER {
 				array(
 					"sender_id" => $user_id,
 					"receiver_id" => $args_->receiver_id,
-					"message_id" => $message_id
+					"message_id" => $message_id,
+					"status" => "delivered"
 				)
 			);
 
@@ -3019,6 +3038,10 @@ class BROTHER {
 		return $response;
 	}
 
+	/*
+	*	Function name: get_user_messages
+	*	function arguments: $user_id [INT] (optional), $receiver_id [INT] (required), $offset (required), $limit (required)
+	*/
 	function get_user_messages( $args_ ) {
 		$args_->user_id = intval( $args_->user_id );
 		if ( $args_->user_id == 0 ) { $args_->user_id = get_current_user_id(); }
@@ -3036,12 +3059,13 @@ class BROTHER {
 			$results_ = array();
 
 			if ( !strpos( $args_->receiver_id, "_group" ) && !$this->is_company( $args_->receiver_id ) ) {
-				$sql_ = "SELECT sender_id, receiver_id, message_id FROM $user_messages_relations WHERE (sender_id='$args_->user_id' AND receiver_id='$args_->receiver_id') OR (sender_id='$args_->receiver_id' AND receiver_id='$args_->user_id') ORDER BY id DESC LIMIT $args_->limit OFFSET $args_->offset";
+				$sql_ = "SELECT sender_id, receiver_id, message_id, status FROM $user_messages_relations WHERE (sender_id='$args_->user_id' AND receiver_id='$args_->receiver_id') OR (sender_id='$args_->receiver_id' AND receiver_id='$args_->user_id') ORDER BY id DESC LIMIT $args_->limit OFFSET $args_->offset";
 				$results_ = $wpdb->get_results( $sql_, OBJECT );
 			} else {
 				$receiver_id = strpos( $args_->receiver_id, "_group" ) ? explode( "_", $args_->receiver_id )[ 0 ] : $args_->receiver_id;
 				if ( $this->is_employee( $receiver_id, $args_->user_id ) ) {
-					$sql_ = "SELECT sender_id, receiver_id, message_id FROM $user_messages_relations WHERE receiver_id='$args_->receiver_id' ORDER BY id DESC LIMIT $args_->limit OFFSET $args_->offset";
+					if ( strpos( $args_->receiver_id, "_group" ) ) { $sql_ = "SELECT sender_id, receiver_id, message_id, status FROM $user_messages_relations WHERE receiver_id='$args_->receiver_id' ORDER BY id DESC LIMIT $args_->limit OFFSET $args_->offset"; }
+					else { $sql_ = "SELECT sender_id, receiver_id, message_id, status FROM $user_messages_relations WHERE (sender_id='$args_->user_id' AND receiver_id='$args_->receiver_id') OR (sender_id='$args_->receiver_id' AND receiver_id='$args_->user_id') ORDER BY id DESC LIMIT $args_->limit OFFSET $args_->offset"; }
 					$results_ = $wpdb->get_results( $sql_, OBJECT );
 				}
 			}
@@ -3051,19 +3075,121 @@ class BROTHER {
 				$message_->sender_id = $result_->sender_id;
 				$message_->receiver_id = $result_->receiver_id;
 				$message_->id = $result_->message_id;
+				$message_->status = $result_->status;
 
-				$sql_ = "SELECT message, date, status FROM $user_messages WHERE id=$result_->message_id";
+				$sql_ = "SELECT message, date FROM $user_messages WHERE id=$result_->message_id";
 				$results_ = $wpdb->get_results( $sql_, OBJECT );
 
 				$message_->message = $results_[ 0 ]->message;
 				$message_->data = date( "d M Y H:i", strtotime( $results_[ 0 ]->date ) );
-				$message_->status = $results_[ 0 ]->status;
 
 				array_push( $messages_, $message_ );
+
+				// Set the message status as seen if needed
+				if ( $result_->receiver_id == $args_->user_id || strpos( $result_->receiver_id, "_group" ) ) {
+					$wpdb->update(
+						$user_messages_relations,
+						array(
+							"status" => "seen"
+						),
+						array(
+							"message_id" => $message_->id
+						)
+					);
+				}
 			}
 		}
 
 		return $messages_;
+	}
+
+	/*
+	*	Function name: get_user_new_messages
+	*	Function arguments: $user_id [INT] (optional), $receiver_id [STRING] (required), $last_message_id [INT] (required)
+	*	Function purpose: This function is used to get the new user messages in a chat.
+	*/
+	function get_user_new_messages( $args_ ) {
+		$args_->user_id = intval( $args_->user_id );
+		if ( $args_->user_id == 0 ) { $args_->user_id = get_current_user_id(); }
+		$args_->receiver_id = sanitize_text_field( $args_->receiver_id );
+		$args_->last_message_id = intval( $args_->last_message_id );
+
+		$messages_ = array();
+
+		if ( $args_->user_id > 0 && !empty( $args_->receiver_id ) ) {
+			global $wpdb;
+			$user_messages = $wpdb->prefix ."user_messages";
+			$user_messages_relations = $wpdb->prefix ."user_messages_relations";
+
+			$results_ = array();
+
+			if ( !strpos( $args_->receiver_id, "_group" ) && !$this->is_company( $args_->receiver_id ) ) {
+				$sql_ = "SELECT sender_id, receiver_id, message_id, status FROM $user_messages_relations WHERE ( (sender_id='$args_->user_id' AND receiver_id='$args_->receiver_id') OR (sender_id='$args_->receiver_id' AND receiver_id='$args_->user_id') ) AND message_id>$args_->last_message_id ORDER BY id ASC";
+				$results_ = $wpdb->get_results( $sql_, OBJECT );
+			} else {
+				$receiver_id = strpos( $args_->receiver_id, "_group" ) ? explode( "_", $args_->receiver_id )[ 0 ] : $args_->receiver_id;
+				if ( $this->is_employee( $receiver_id, $args_->user_id ) ) {
+					if ( strpos( $args_->receiver_id, "_group" ) ) { $sql_ = "SELECT sender_id, receiver_id, message_id, status FROM $user_messages_relations WHERE receiver_id='$args_->receiver_id' ORDER BY id DESC LIMIT $args_->limit OFFSET $args_->offset"; }
+					else { $sql_ = "SELECT sender_id, receiver_id, message_id, status FROM $user_messages_relations WHERE ( (sender_id='$args_->user_id' AND receiver_id='$args_->receiver_id') OR (sender_id='$args_->receiver_id' AND receiver_id='$args_->user_id') ) AND message_id>$args_->last_message_id ORDER BY id ASC"; }
+					$results_ = $wpdb->get_results( $sql_, OBJECT );
+				}
+			}
+
+			foreach ( $results_ as $result_ ) {
+				$message_ = new stdClass;
+				$message_->sender_id = $result_->sender_id;
+				$message_->receiver_id = $result_->receiver_id;
+				$message_->id = $result_->message_id;
+				$message_->status = $result_->status;
+
+				$sql_ = "SELECT message, date FROM $user_messages WHERE id=$result_->message_id";
+				$results_ = $wpdb->get_results( $sql_, OBJECT );
+
+				$message_->message = $results_[ 0 ]->message;
+				$message_->data = date( "d M Y H:i", strtotime( $results_[ 0 ]->date ) );
+
+				array_push( $messages_, $message_ );
+
+				// Set the message status as seen if needed
+				if ( $result_->receiver_id == $args_->user_id || strpos( $result_->receiver_id, "_group" ) ) {
+					$wpdb->update(
+						$user_messages_relations,
+						array(
+							"status" => "seen"
+						),
+						array(
+							"message_id" => $message_->id
+						)
+					);
+				}
+			}
+		}
+
+		return $messages_;
+	}
+
+	/*
+	*	Function name: get_user_message_notifications
+	*	Function arguments: $user_id [INT] (optional)
+	*	Function purpose: This function will return the number of NEW messages sent to the user.
+	*/
+	function get_user_message_notifications( $user_id ) {
+		$user_id = intval( $user_id );
+		if ( $user_id == 0 ) { $user_id = get_current_user_id(); }
+
+		$response = 0;
+
+		if ( $user_id > 0 ) {
+			global $wpdb;
+			$user_messages_relations = $wpdb->prefix ."user_messages_relations";
+
+			$sql_ = "SELECT COUNT(status) as message_notifications FROM $user_messages_relations WHERE receiver_id='$user_id' AND status='delivered'";
+			$results_ = $wpdb->get_results( $sql_, OBJECT );
+
+			$response = $results_[ 0 ]->message_notifications;
+		}
+
+		return $response;
 	}
 
 	function get_user_badges( $user_id = "" ) {

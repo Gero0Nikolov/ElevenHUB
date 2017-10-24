@@ -1368,9 +1368,19 @@ var Phubber = function() {
 	}
 }
 
+/*
+*	Class name: UserMessages
+*	Class arguments: NONE
+*	Class purpose: This class is used to handle all message related tasks.
+*/
 var UserMessages = function() {
 	var classHolder = this;
 
+	/*
+	*	Function name: sendMessage
+	*	Function arguments: message [STRING] (required), receiverID [INT/STRING] (required), onSuccess [FUNCTION] (required)
+	*	Function purpose: This function is used to send a message between users.
+	*/
 	this.sendMessage = function( message, receiverID, onSuccess ) {
 		generateAJAX({
 				functionName : "send_message",
@@ -1382,6 +1392,11 @@ var UserMessages = function() {
 		);
 	}
 
+	/*
+	*	Function name: getUserMessages
+	*	Function arguments: userID [INT] (optional), receiverID [INT/STRING] (required), offset [INT] (required), limit [INT] (required), onSuccess [FUNCTION] (required)
+	*	Function purpose: This function is used to pull messages between two users or between an user and a group.
+	*/
 	this.getUserMessages = function( userID, receiverID, offset, limit, onSuccess ) {
 		generateAJAX({
 				functionName : "get_user_messages",
@@ -1391,6 +1406,36 @@ var UserMessages = function() {
 					offset : offset,
 					limit : limit
 				}
+			}, function( response ) { onSuccess( JSON.parse( response ) ); }
+		);
+	}
+
+	/*
+	*	Function name: getUserNewMessages
+	*	Function arguments: userID [INT] (optional), receiverID [INT/STRING] (required), lastMessageID [INT] (required), onSuccess [FUNCTION] (required)
+	*	Function purpose: This function is used to get only the new (DELIVERED) messages to between to users.
+	*/
+	this.getUserNewMessages = function( userID, receiverID, lastMessageID, onSuccess ) {
+		generateAJAX({
+				functionName : "get_user_new_messages",
+				arguments : {
+					user_id : userID,
+					receiver_id : receiverID,
+					last_message_id : lastMessageID
+				}
+			}, function( response ) { onSuccess( JSON.parse( response ) ); }
+		);
+	}
+
+	/*
+	*	Function name: getUserMessageNotifications
+	*	Function arguments: userID [INT] (optional), onSuccess [FUNCTION] (required)
+	*	Function purpose: This function is used to pull the new messages amount of the user, it'll return them as an integer.
+	*/
+	this.getUserMessageNotifications = function( userID, onSuccess ) {
+		generateAJAX({
+				functionName : "get_user_message_notifications",
+				arguments : userID
 			}, function( response ) { onSuccess( JSON.parse( response ) ); }
 		);
 	}

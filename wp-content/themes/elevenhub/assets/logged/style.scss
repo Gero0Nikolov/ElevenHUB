@@ -3339,6 +3339,22 @@ blockquote {
 	&:focus {
 		box-shadow: 0 0 10px 1px $belize_hole;
 	}
+
+	#missed-messages {
+		display: none;
+	    font-family: OpenSansRegular;
+	    font-size: 0.85rem;
+	    font-weight: normal;
+	    position: absolute;
+	    top: 0;
+	    right: 0;
+	    margin-top: -0.5em;
+	    padding: 0.35em 0.5em;
+	    border-radius: 100px;
+	    border-top-right-radius: 0;
+	    background: #2c3e50;
+	    border-bottom-right-radius: 0;
+	}
 }
 
 #chat-rooms-container {
@@ -3368,6 +3384,19 @@ blockquote {
 		span {
 			font-size: 1.25rem;
 		    color: #fff;
+			display: inline-block;
+			vertical-align: baseline;
+			margin-right: 0.15em;
+		}
+
+		.header-link {
+			display: inline-block;
+			position: relative;
+			text-decoration: none;
+			font-family: OpenSansRegular;
+			font-size: 0.85rem;
+			font-weight: normal;
+			color: #fff;
 		}
 
 		button {
@@ -3513,6 +3542,22 @@ blockquote {
 				padding: 0.5em 0;
 				border-bottom: 1px solid #ddd;
 				outline: 0;
+
+				.unopened-messages {
+					display: inline-block;
+					position: absolute;
+					z-index: 2;
+					font-family: OpenSansRegular;
+					font-size: 0.5rem;
+					font-weight: normal;
+					color: #fff;
+					background: #e67e22;
+					padding: 0.25em 0.5em;
+					border-radius: 100px;
+					top: 0;
+					left: 0;
+					transform: translate(0, 15%);
+				}
 
 				&:after {
 					content: " ";
@@ -3669,10 +3714,12 @@ blockquote {
 				    font-weight: normal;
 				    letter-spacing: 1px;
 				    line-height: 150%;
-				    width: 60%;
+				    max-width: 60%;
 				    text-align: left;
 					padding: 0.5em 0.75em;
 					border-radius: 20px;
+					word-wrap: break-word;
+					word-break: break-word;
 				}
 			}
 		}
