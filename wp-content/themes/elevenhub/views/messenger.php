@@ -60,7 +60,6 @@ var message_offset = message_limit;
 						<div id="emoji-container"></div>
 						<img src="<?php echo get_template_directory_uri(); ?>/assets/fonts/emojies/1f60d.png" id="emoji-icon" />
 					</button>
-					<button id="media-controller" class="controller fa fa-paperclip"></button>
 					<button id="messenger-controller">Send</button>
 				</div>
 

@@ -732,7 +732,8 @@ jQuery( document ).ready(function(){
 				";
 				jQuery( "#emoji-container" ).append( button_ );
 
-				jQuery( "#emoji-container #emojie-"+ emojie_.code ).on( "click", function(){
+				jQuery( "#emoji-container #emojie-"+ emojie_.code ).on( "click", function( e ){
+					jQuery( "#emoji-container" ).show().focus();
 					code_ = jQuery( this ).attr( "id" ).split( "emojie-" )[ 1 ];
 					user_messages.sendMessage( "[emojie]"+ code_ +"[/emojie]", receiver_id, function( response ){} );
 				} );
@@ -740,8 +741,10 @@ jQuery( document ).ready(function(){
 		} );
 
 		jQuery( "#emoji-controller" ).on( "click", function( e ){
-			if ( e.target == this || jQuery( e.target ).attr( "id" ) == "emoji-icon" ) { jQuery( "#emoji-container" ).toggle(); }
-		} );
+			if ( e.target == this || jQuery( e.target ).attr( "id" ) == "emoji-icon" ) {
+				jQuery( "#emoji-container" ).toggle();
+			}
+		} );		
 
 		// Set send message controls
 		jQuery( "#messenger-controller" ).on( "click", function(){
@@ -765,12 +768,63 @@ jQuery( document ).ready(function(){
 				for ( message_key in response ) {
 					message_ = response[ message_key ];
 					message_class = message_.sender_id == user_id ? "sender" : "receiver";
-					view_ = "\
-					<div id='message-"+ message_.id +"' class='message animated bounceInDown "+ message_class +"'>\
-						<div class='message-text'>"+ message_.message +"</div>\
-					</div>\
-					";
+
+					view_ = "";
+
+					if ( message_class == "sender" ) {
+						names_ = message_.sender.short_name !== undefined && message_.sender.short_name != "" && message_.sender.short_name != null ? message_.sender.short_name : message_.sender.first_name +" "+ message_.sender.last_name;
+						view_ = "\
+						<div id='message-"+ message_.id +"' class='message animated bounceInUp "+ message_class +"'>\
+							<div class='message-text'>"+ message_.message +"</div>\
+							<div class='avatar' style='background-image: url("+ message_.sender.avatar_url +");' title='"+ names_ +"'></div>\
+							<div id='additional-content'></div>\
+							<div class='meta-info hidden'>\
+								<span class='meta'>"+ message_.date +"</span>\
+								<span class='meta meta-separator'>&bull;</span>\
+								<span class='meta'>"+ message_.status +"</span>\
+							</div>\
+						</div>\
+						";
+					} else {
+						names_ = message_.sender.short_name !== undefined && message_.sender.short_name != "" && message_.sender.short_name != null ? message_.sender.short_name : message_.sender.first_name +" "+ message_.sender.last_name;
+						view_ = "\
+						<div id='message-"+ message_.id +"' class='message animated bounceInUp "+ message_class +"'>\
+							<div class='avatar' style='background-image: url("+ message_.sender.avatar_url +");' title='"+ names_ +"'></div>\
+							<div class='message-text'>"+ message_.message +"</div>\
+							<div id='additional-content'></div>\
+							<div class='meta-info hidden'>\
+								<span class='meta'>"+ message_.date +"</span>\
+								<span class='meta meta-separator'>&bull;</span>\
+								<span class='meta'>"+ message_.status +"</span>\
+							</div>\
+						</div>\
+						";
+					}
+
 					jQuery( "#chat-room" ).append( view_ );
+
+					jQuery( "#message-"+ message_.id ).on( "click", function(){
+						jQuery( this ).find( ".meta-info" ).toggleClass( "hidden" )
+					} );
+
+					// Build images && videos
+					user_media = new UserMedia;
+					jQuery( "#message-"+ message_.id ).find( ".message-text" ).find( "a" ).each( function(){
+						src = jQuery( this ).attr( "href" );
+
+						frame_ = "";
+
+						// YouTube
+						if ( src.indexOf( "youtube.com" ) > -1 || src.indexOf( "youtu.be" ) > -1 ) {
+							video_id = src.indexOf( "youtube.com" ) > -1 ? src.split( "v=" )[ 1 ].split( "&" )[ 0 ] : src.split( "/" )[ src.split( "/" ).length - 1 ];
+							frame_ = "<iframe src='https://www.youtube.com/embed/"+ video_id +"' frameborder='0' gesture='media' allowfullscreen></iframe>";
+						} else if ( src.indexOf( "vimeo.com" ) > -1 ) { // Vimeo
+							video_id = src.split( "/" )[ src.split( "/" ).length - 1 ];
+							frame_ = "<iframe src='https://player.vimeo.com/video/"+ video_id +"' frameborder='0' gesture='media' allowfullscreen></iframe>";
+						}
+
+						jQuery( "#message-"+ message_.id ).find( "#additional-content" ).append( frame_ );
+					} );
 				}
 
 				last_message_id = response[ 0 ].id;
@@ -788,16 +842,66 @@ jQuery( document ).ready(function(){
 				   jQuery( "#chat-room #loader" ).remove();
 
 		   			if ( response.length > 0 ) {
-						console.log( response );
 		   				for ( message_key in response ) {
 		   					message_ = response[ message_key ];
 		   					message_class = message_.sender_id == user_id ? "sender" : "receiver";
-		   					view_ = "\
-		   					<div id='message-"+ message_.id +"' class='message animated bounceInUp "+ message_class +"'>\
-		   						<div class='message-text'>"+ message_.message +"</div>\
-		   					</div>\
-		   					";
-		   					jQuery( "#chat-room" ).append( view_ );
+
+							view_ = "";
+
+							if ( message_class == "sender" ) {
+								names_ = message_.sender.short_name !== undefined && message_.sender.short_name != "" && message_.sender.short_name != null ? message_.sender.short_name : message_.sender.first_name +" "+ message_.sender.last_name;
+								view_ = "\
+								<div id='message-"+ message_.id +"' class='message animated bounceInUp "+ message_class +"'>\
+									<div class='message-text'>"+ message_.message +"</div>\
+									<div class='avatar' style='background-image: url("+ message_.sender.avatar_url +");' title='"+ names_ +"'></div>\
+									<div id='additional-content'></div>\
+									<div class='meta-info hidden'>\
+										<span class='meta'>"+ message_.date +"</span>\
+										<span class='meta meta-separator'>&bull;</span>\
+										<span class='meta'>"+ message_.status +"</span>\
+									</div>\
+								</div>\
+								";
+							} else {
+								names_ = message_.sender.short_name !== undefined && message_.sender.short_name != "" && message_.sender.short_name != null ? message_.sender.short_name : message_.sender.first_name +" "+ message_.sender.last_name;
+								view_ = "\
+								<div id='message-"+ message_.id +"' class='message animated bounceInUp "+ message_class +"'>\
+									<div class='avatar' style='background-image: url("+ message_.sender.avatar_url +");' title='"+ names_ +"'></div>\
+									<div class='message-text'>"+ message_.message +"</div>\
+									<div id='additional-content'></div>\
+									<div class='meta-info hidden'>\
+										<span class='meta'>"+ message_.date +"</span>\
+										<span class='meta meta-separator'>&bull;</span>\
+										<span class='meta'>"+ message_.status +"</span>\
+									</div>\
+								</div>\
+								";
+							}
+
+							jQuery( "#chat-room" ).append( view_ );
+
+							jQuery( "#message-"+ message_.id ).on( "click", function(){
+								jQuery( this ).find( ".meta-info" ).toggleClass( "hidden" )
+							} );
+
+							// Build images && videos
+							user_media = new UserMedia;
+							jQuery( "#message-"+ message_.id ).find( ".message-text" ).find( "a" ).each( function(){
+								src = jQuery( this ).attr( "href" );
+
+								frame_ = "";
+
+								// YouTube
+								if ( src.indexOf( "youtube.com" ) > -1 || src.indexOf( "youtu.be" ) > -1 ) {
+									video_id = src.indexOf( "youtube.com" ) > -1 ? src.split( "v=" )[ 1 ].split( "&" )[ 0 ] : src.split( "/" )[ src.split( "/" ).length - 1 ];
+									frame_ = "<iframe src='https://www.youtube.com/embed/"+ video_id +"' frameborder='0' gesture='media' allowfullscreen></iframe>";
+								} else if ( src.indexOf( "vimeo.com" ) > -1 ) { // Vimeo
+									video_id = src.split( "/" )[ src.split( "/" ).length - 1 ];
+									frame_ = "<iframe src='https://player.vimeo.com/video/"+ video_id +"' frameborder='0' gesture='media' allowfullscreen></iframe>";
+								}
+
+								jQuery( "#message-"+ message_.id ).find( "#additional-content" ).append( frame_ );
+							} );
 		   				}
 
 						message_offset += message_limit;
@@ -818,12 +922,63 @@ jQuery( document ).ready(function(){
 						for ( message_key in response ) {
 							message_ = response[ message_key ];
 							message_class = message_.sender_id == user_id ? "sender" : "receiver";
-							view_ = "\
-							<div id='message-"+ message_.id +"' class='message animated bounceInDown "+ message_class +"'>\
-								<div class='message-text'>"+ message_.message +"</div>\
-							</div>\
-							";
+
+							view_ = "";
+
+							if ( message_class == "sender" ) {
+								names_ = message_.sender.short_name !== undefined && message_.sender.short_name != "" && message_.sender.short_name != null ? message_.sender.short_name : message_.sender.first_name +" "+ message_.sender.last_name;
+								view_ = "\
+								<div id='message-"+ message_.id +"' class='message animated bounceInUp "+ message_class +"'>\
+									<div class='message-text'>"+ message_.message +"</div>\
+									<div class='avatar' style='background-image: url("+ message_.sender.avatar_url +");' title='"+ names_ +"'></div>\
+									<div id='additional-content'></div>\
+									<div class='meta-info hidden'>\
+										<span class='meta'>"+ message_.date +"</span>\
+										<span class='meta meta-separator'>&bull;</span>\
+										<span class='meta'>"+ message_.status +"</span>\
+									</div>\
+								</div>\
+								";
+							} else {
+								names_ = message_.sender.short_name !== undefined && message_.sender.short_name != "" && message_.sender.short_name != null ? message_.sender.short_name : message_.sender.first_name +" "+ message_.sender.last_name;
+								view_ = "\
+								<div id='message-"+ message_.id +"' class='message animated bounceInUp "+ message_class +"'>\
+									<div class='avatar' style='background-image: url("+ message_.sender.avatar_url +");' title='"+ names_ +"'></div>\
+									<div class='message-text'>"+ message_.message +"</div>\
+									<div id='additional-content'></div>\
+									<div class='meta-info hidden'>\
+										<span class='meta'>"+ message_.date +"</span>\
+										<span class='meta meta-separator'>&bull;</span>\
+										<span class='meta'>"+ message_.status +"</span>\
+									</div>\
+								</div>\
+								";
+							}
+
 							jQuery( "#chat-room" ).prepend( view_ );
+
+							jQuery( "#message-"+ message_.id ).on( "click", function(){
+								jQuery( this ).find( ".meta-info" ).toggleClass( "hidden" )
+							} );
+
+							// Build images && videos
+							user_media = new UserMedia;
+							jQuery( "#message-"+ message_.id ).find( ".message-text" ).find( "a" ).each( function(){
+								src = jQuery( this ).attr( "href" );
+
+								frame_ = "";
+
+								// YouTube
+								if ( src.indexOf( "youtube.com" ) > -1 || src.indexOf( "youtu.be" ) > -1 ) {
+									video_id = src.indexOf( "youtube.com" ) > -1 ? src.split( "v=" )[ 1 ].split( "&" )[ 0 ] : src.split( "/" )[ src.split( "/" ).length - 1 ];
+									frame_ = "<iframe src='https://www.youtube.com/embed/"+ video_id +"' frameborder='0' gesture='media' allowfullscreen></iframe>";
+								} else if ( src.indexOf( "vimeo.com" ) > -1 ) { // Vimeo
+									video_id = src.split( "/" )[ src.split( "/" ).length - 1 ];
+									frame_ = "<iframe src='https://player.vimeo.com/video/"+ video_id +"' frameborder='0' gesture='media' allowfullscreen></iframe>";
+								}
+
+								jQuery( "#message-"+ message_.id ).find( "#additional-content" ).append( frame_ );
+							} );
 							messages_counter += 1;
 						}
 

@@ -46,6 +46,23 @@ $v_user_biography = get_user_meta( $v_user_id, "user_biography", true );
 				echo $v_user_followers_num == 1 ? $v_user_followers_num ." follower" : $v_user_followers_num ." followers";
 				?>
 			</div>
+			<?php
+			$mutual_company = $brother_->is_colleges( $v_user_id );
+			if ( !is_bool( $mutual_company ) ) {
+			?>
+			<div id="mutual-company" class="meta">
+				<i class="fa fa-hand-peace-o icon emerald"></i>
+				You are colleges at <div class="meta-avatar" style="background-image: url(<?php echo $mutual_company->employer->avatar_url; ?>);"></div>
+			</div>
+			<?php }
+
+			if ( $brother_->is_employee( get_current_user_id(), $v_user_id ) ) {
+			?>
+			<div id="employee" class="meta">
+				<i class="fa fa-star icon sun-flower"></i>
+				<?php echo !empty( $v_user_short_name ) ? $v_user_short_name : $v_user_first_name; ?> is your employee
+			</div>
+			<?php } ?>
 			<div class="user-text"><?php echo nl2br( $v_user_biography ); ?></div>
 		</div>
 	</div>

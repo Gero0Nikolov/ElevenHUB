@@ -844,6 +844,33 @@ class BROTHER {
 		} else { return false; }
 	}
 
+	function is_colleges( $v_user_id, $user_id = "" ) {
+		$v_user_id = intval( $v_user_id );
+		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
+		else { $user_id = intval( $user_id ); }
+
+		if ( $v_user_id > 0 && $user_id > 0 ) {
+			if ( $v_user_id == $user_id ) { return true; }
+			else {
+				$v_employers = $this->get_user_employers( $v_user_id );
+				$employers = $this->get_user_employers( $user_id );
+
+				$result = false;
+
+				foreach ( $employers as $employer ) {
+					foreach ( $v_employers as $v_employer ) {
+						if ( $employer->employer->user_id == $v_employer->employer->user_id ) {
+							$result = new stdClass;
+							$result = $employer;
+						}
+					}
+				}
+
+				return $result;
+			}
+		} else { return false; }
+	}
+
 	/*
 	*	Function name: is_company_public
 	*	Function arguments: $user_id [ INT ] (required) (the ID of the needed company)
@@ -2921,6 +2948,9 @@ class BROTHER {
 				}
 			}
 
+			// Add the group of the company if the user is company
+			if ( $this->is_company( $user_id ) ) { array_push( $connections_id, $user_id ."_group" ); }
+
 			// Build useable objects
 			$users_ = array();
 			foreach ( $connections_id as $id_ ) {
@@ -3073,7 +3103,19 @@ class BROTHER {
 			foreach ( $results_ as $result_ ) {
 				$message_ = new stdClass;
 				$message_->sender_id = $result_->sender_id;
+				$message_->sender = new stdClass;
+				$message_->sender->first_name = get_user_meta( $message_->sender_id, "first_name", true );
+				$message_->sender->last_name = get_user_meta( $message_->sender_id, "last_name", true );
+				$message_->sender->short_name = get_user_meta( $message_->sender_id, "user_shortname", true );
+				$message_->sender->banner_url = $this->get_user_banner_url( $message_->sender_id );
+				$message_->sender->avatar_url = $this->get_user_avatar_url( $message_->sender_id );
 				$message_->receiver_id = $result_->receiver_id;
+				$message_->receiver = new stdClass;
+				$message_->receiver->first_name = get_user_meta( $message_->receiver_id, "first_name", true );
+				$message_->receiver->last_name = get_user_meta( $message_->receiver_id, "last_name", true );
+				$message_->receiver->short_name = get_user_meta( $message_->receiver_id, "user_shortname", true );
+				$message_->receiver->banner_url = $this->get_user_banner_url( $message_->receiver_id );
+				$message_->receiver->avatar_url = $this->get_user_avatar_url( $message_->receiver_id );
 				$message_->id = $result_->message_id;
 				$message_->status = $result_->status;
 
@@ -3081,7 +3123,7 @@ class BROTHER {
 				$results_ = $wpdb->get_results( $sql_, OBJECT );
 
 				$message_->message = $this->parse_message( $results_[ 0 ]->message );
-				$message_->data = date( "d M Y H:i", strtotime( $results_[ 0 ]->date ) );
+				$message_->date = date( "d M Y H:i", strtotime( $results_[ 0 ]->date ) );
 
 				array_push( $messages_, $message_ );
 
@@ -3129,7 +3171,7 @@ class BROTHER {
 			} else {
 				$receiver_id = strpos( $args_->receiver_id, "_group" ) ? explode( "_", $args_->receiver_id )[ 0 ] : $args_->receiver_id;
 				if ( $this->is_employee( $receiver_id, $args_->user_id ) ) {
-					if ( strpos( $args_->receiver_id, "_group" ) ) { $sql_ = "SELECT sender_id, receiver_id, message_id, status FROM $user_messages_relations WHERE receiver_id='$args_->receiver_id' ORDER BY id DESC LIMIT $args_->limit OFFSET $args_->offset"; }
+					if ( strpos( $args_->receiver_id, "_group" ) ) { $sql_ = "SELECT sender_id, receiver_id, message_id, status FROM $user_messages_relations WHERE receiver_id='$args_->receiver_id' AND message_id>$args_->last_message_id ORDER BY id DESC"; }
 					else { $sql_ = "SELECT sender_id, receiver_id, message_id, status FROM $user_messages_relations WHERE ( (sender_id='$args_->user_id' AND receiver_id='$args_->receiver_id') OR (sender_id='$args_->receiver_id' AND receiver_id='$args_->user_id') ) AND message_id>$args_->last_message_id ORDER BY id ASC"; }
 					$results_ = $wpdb->get_results( $sql_, OBJECT );
 				}
@@ -3138,7 +3180,19 @@ class BROTHER {
 			foreach ( $results_ as $result_ ) {
 				$message_ = new stdClass;
 				$message_->sender_id = $result_->sender_id;
+				$message_->sender = new stdClass;
+				$message_->sender->first_name = get_user_meta( $message_->sender_id, "first_name", true );
+				$message_->sender->last_name = get_user_meta( $message_->sender_id, "last_name", true );
+				$message_->sender->short_name = get_user_meta( $message_->sender_id, "user_shortname", true );
+				$message_->sender->banner_url = $this->get_user_banner_url( $message_->sender_id );
+				$message_->sender->avatar_url = $this->get_user_avatar_url( $message_->sender_id );
 				$message_->receiver_id = $result_->receiver_id;
+				$message_->receiver = new stdClass;
+				$message_->receiver->first_name = get_user_meta( $message_->receiver_id, "first_name", true );
+				$message_->receiver->last_name = get_user_meta( $message_->receiver_id, "last_name", true );
+				$message_->receiver->short_name = get_user_meta( $message_->receiver_id, "user_shortname", true );
+				$message_->receiver->banner_url = $this->get_user_banner_url( $message_->receiver_id );
+				$message_->receiver->avatar_url = $this->get_user_avatar_url( $message_->receiver_id );
 				$message_->id = $result_->message_id;
 				$message_->status = $result_->status;
 
@@ -3146,7 +3200,7 @@ class BROTHER {
 				$results_ = $wpdb->get_results( $sql_, OBJECT );
 
 				$message_->message = $this->parse_message( $results_[ 0 ]->message );
-				$message_->data = date( "d M Y H:i", strtotime( $results_[ 0 ]->date ) );
+				$message_->date = date( "d M Y H:i", strtotime( $results_[ 0 ]->date ) );
 
 				array_push( $messages_, $message_ );
 
