@@ -844,6 +844,11 @@ class BROTHER {
 		} else { return false; }
 	}
 
+	/*
+	*	Function name: is_colleges
+	*	Function arguments: $v_user_id [ INT ] (required), $user_id [ INT ] (optional)
+	*	Function purpose: This function is used to check if both of the users are colleges in some company or not.
+	*/
 	function is_colleges( $v_user_id, $user_id = "" ) {
 		$v_user_id = intval( $v_user_id );
 		if ( empty( $user_id ) ) { $user_id = get_current_user_id(); }
