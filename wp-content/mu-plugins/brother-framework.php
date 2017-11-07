@@ -221,9 +221,9 @@ class BROTHER {
 			$user_avatar->avatar_url = get_user_meta( $user_id, "user_avatar_url", true );
 			$user_avatar->avatar_url = str_replace( "http:", "https:", $user_avatar->avatar_url );
 
-			if ( empty( $user_avatar[ "avatar_url" ] ) ) {
+			if ( empty( $user_avatar->avatar_url ) ) {
 				$user_first_name = str_split( get_user_meta( $user_id, "first_name", true ) );
-				$user_avatar[ "avatar_url" ] = get_template_directory_uri() ."/assets/images/alphabet/". strtoupper( $user_first_name[ 0 ] ) .".png";
+				$user_avatar->avatar_url = get_template_directory_uri() ."/assets/images/alphabet/". strtoupper( $user_first_name[ 0 ] ) .".png";
 			}
 		} else { $user_avatar = false; }
 
@@ -1577,7 +1577,7 @@ class BROTHER {
 				} else {
 					?>
 
-					<div id='story-<?php echo $post_->ID; ?>' class='story-container new-story animated fadeInUp'>
+					<div id='story-<?php echo $post_->ID; ?>' class='story-container new-story'>
 						<?php if ( ( $data->requester_id == $post_->post_author && $this->is_employee( $data->company_id, $data->requester_id ) ) || $data->requester_id == $data->company_id ) { ?>
 						<div id='story-controls' class='story-controls'>
 							<button id='edit-controller' class='fa fa-pencil control'></button>
@@ -2615,7 +2615,7 @@ class BROTHER {
 							?>
 
 							<a href="<?php echo $post_url; ?>" class="post-anchor">
-								<div id="story-<?php echo $post_->ID; ?>" class="story-container animated fadeInUp">
+								<div id="story-<?php echo $post_->ID; ?>" class="story-container">
 									<div class="story-banner" style="background-image: url(<?php echo $post_banner; ?>);"></div>
 									<h1 class="story-title"><?php echo $post_->post_title; ?></h1>
 									<div class="story-content"><?php echo $post_excerpt; ?></div>
@@ -2716,7 +2716,7 @@ class BROTHER {
 								?>
 
 								<a href="<?php echo $post_url ?>" class="post-anchor">
-									<div id="story-<?php echo $post_->ID; ?>" class="story-container animated fadeInUp">
+									<div id="story-<?php echo $post_->ID; ?>" class="story-container">
 										<div class="story-banner" style="background-image: url(<?php echo $post_banner; ?>);"></div>
 										<h1 class="story-title"><?php echo $post_->post_title; ?></h1>
 										<div class="story-content"><?php echo $post_excerpt; ?></div>

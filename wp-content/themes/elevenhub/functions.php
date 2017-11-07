@@ -360,7 +360,7 @@ function get_public_stories( $offset = 0 ) {
 				?>
 
 				<a href="<?php echo $story_url; ?>" class="post-anchor">
-					<div id="story-<?php $post_->ID ?>" class="story-container animated fadeInUp">
+					<div id="story-<?php $post_->ID ?>" class="story-container animated fadeIn">
 						<div class="story-banner" style="background-image: url(<?php echo $story_banner; ?>);"></div>
 						<h1 class="story-title"><?php echo $post_->post_title; ?></h1>
 						<div class="story-content"><?php echo $story_excerpt; ?></div>

@@ -2164,7 +2164,7 @@ a.skeleton-bold-button {
 		position: relative;
 	    top: 0;
 	    left: 0;
-	    width: 300px;
+	    width: 400px;
 	    max-width: 95%;
 	    height: auto;
 	    background: #fff;
@@ -2182,10 +2182,11 @@ a.skeleton-bold-button {
 
 		.g-recaptcha {
 			display: block;
-			width: 101%;
+			width: 304px;
+			max-width: 100%;
 			position: relative;
 			overflow: hidden;
-			margin: 1em 0 1em -0.5%;
+			margin: 1em auto;
 		}
 
 		.wide-fat {

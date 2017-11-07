@@ -310,7 +310,7 @@ jQuery( document ).ready(function(){
 							like_button = !story_.meta.is_liked ? "fa-heart-o" : "fa-heart";
 
 							view_ = "\
-							<div id='story-"+ story_.ID +"' class='story-container new-story animated fadeInUp'>\
+							<div id='story-"+ story_.ID +"' class='story-container new-story animated fadeIn'>\
 								"+ story_controls +"\
 								<div id='story-banner' class='story-banner' style='background-image: url("+ story_.banner.url +");'>\
 									<div class='overlay'><span class='message'>Read me!</span></div>\
@@ -744,7 +744,7 @@ jQuery( document ).ready(function(){
 			if ( e.target == this || jQuery( e.target ).attr( "id" ) == "emoji-icon" ) {
 				jQuery( "#emoji-container" ).toggle();
 			}
-		} );		
+		} );
 
 		// Set send message controls
 		jQuery( "#messenger-controller" ).on( "click", function(){
@@ -1710,7 +1710,7 @@ function pullUserStoriesBoard( storiesContainer, args ) {
 
 				view_ = "\
 				<a href='"+ story_.url +"' class='post-anchor'>\
-					<div id='story-"+ story_.ID +"' class='story-container animated fadeInUp'>\
+					<div id='story-"+ story_.ID +"' class='story-container'>\
 						<div class='story-banner' style='background-image: url("+ story_.banner +");'></div>\
 						<h1 class='story-title'>"+ story_.title +"</h1>\
 						<div class='story-content'>"+ story_.excerpt +"</div>\
