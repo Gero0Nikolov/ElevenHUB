@@ -8,8 +8,7 @@
 */
 
 $_PLAYER_ = function(){
-	$hello_hubby = new HELLO_HUBBY;
-	return $hello_hubby;
+	$hello_hubby = new HELLO_HUBBY;	
 }
 
 ?>

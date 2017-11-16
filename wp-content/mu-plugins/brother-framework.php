@@ -469,7 +469,7 @@ class BROTHER {
 			CREATE TABLE $user_plugin_relations_table (
 				id INT NOT NULL AUTO_INCREMENT,
 				user_id INT,
-				plugin_folder LONGTEXT,
+				plugin_id LONGTEXT,
 				activation_date TIMESTAMP,
 				status VARCHAR(255),
 				PRIMARY KEY(id)
@@ -3066,6 +3066,29 @@ class BROTHER {
 					"status" => "delivered"
 				)
 			);
+
+			// Check if the receive has more than 5 unread messages && send a notify mail
+			if ( !strpos( $args_->receiver_id, "_group" ) ) {
+				$sql_ = "SELECT sender_id, receiver_id, status FROM $user_messages_relations WHERE sender_id=$user_id AND receiver_id=$args_->receiver_id AND status='delivered'";
+				$results_ = $wpdb->get_results( $sql_, OBJECT );
+
+				$sender = new stdClass;
+				$sender->first_name = get_user_meta( $user_id, "first_name", true );
+				$sender->last_name = get_user_meta( $user_id, "last_name", true );
+				$sender->short_name = get_user_meta( $user_id, "user_shortname", true );
+
+				$names = isset( $sender->short_name ) && !empty( $sender->short_name ) ? $sender->short_name : $sender->first_name ." ". $sender->last_name;
+
+				if ( count( $results_ ) >= 5 ) {
+					$messages_count = count( $results_ );
+					$message = "Hey there,<br>
+					We just noticed that you have $messages_count missed messages from <span style='color: #3498db;'>$names</span>.<br>
+					<br>
+					<strong>Come and check them, it may be important!</strong>
+					";
+					$this->generate_email_notification( $args_->receiver_id, $message );
+				}
+			}
 
 			$response = true;
 		}

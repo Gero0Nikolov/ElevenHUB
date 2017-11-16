@@ -40,7 +40,7 @@ global $wpdb;
 								<div class="plugin-controls">
 								<?php
 								if ( $result_ != "declined" ) {
-									$result_ = $result_ == "approved" ? "" : $result_;							
+									$result_ = $result_ == "approved" ? "" : $result_;
 									?>
 
 									<button id="plugin-<?php echo $folder; ?>" author="<?php echo $plugin_author; ?>" class="plugin-<?php echo $result_ == "active" ? "deactivate" : ($result_ == "deactivated" || empty( $result_ ) ? "activate" : ""); ?> button button-primary button-large">

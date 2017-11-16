@@ -567,3 +567,29 @@ function controll_user_plugin() {
 
 	die( "" );
 }
+
+add_action( "init", "attach_user_plugins" );
+function attach_user_plugins() {
+	$user_id = get_current_user_id();
+
+	if ( $user_id > 0 ) {
+		global $wpdb;
+
+		$user_plugin_relations = $wpdb->prefix ."user_plugin_relations";
+
+		$plugins_dir = ABSPATH ."wp-content/plugins/";
+
+		// Get the active plugins of the user
+		$sql_ = "SELECT plugin_id FROM $user_plugin_relations WHERE user_id=$user_id AND status='active'";
+		$results_ = $wpdb->get_results( $sql_ );
+
+		foreach ( $results_ as $result_ ) {
+			$plugin_id = $result_->plugin_id;
+
+			if ( file_exists( $plugins_dir . $plugin_id ."/hub-player.php" ) ) {
+				include ( $plugins_dir . $plugin_id ."/hub-player.php" );
+				$_PLAYER_();
+			}
+		}
+	}
+}

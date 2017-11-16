@@ -518,9 +518,9 @@ a:active {
 @media screen and (min-width: 37.5em) {
   .menu-toggle {
     display: none; }
-
   .main-navigation ul {
     display: block; } }
+
 .site-main .comment-navigation,
 .site-main .posts-navigation,
 .site-main .post-navigation {
@@ -876,7 +876,8 @@ object {
 .right-aligned {
   display: inline-block;
   width: 50%;
-  vertical-align: middle; }
+  vertical-align: middle;
+  position: relative; }
 
 .left-aligned {
   text-align: left; }
@@ -1451,8 +1452,10 @@ a.skeleton-bold-button {
       letter-spacing: 1px;
       margin: 0;
       line-height: 125%; }
+
 .public-story p {
   margin: 0.5em 0; }
+
 .public-story .text {
   display: block;
   margin: 1em 0;
@@ -1498,6 +1501,7 @@ a.skeleton-bold-button {
   font-size: 10em !important;
   margin: 0.25em 0 0;
   line-height: 100%; }
+
 .error-404 .page-title,
 .error-404 .page-sign {
   text-align: center;
@@ -1512,9 +1516,9 @@ a.skeleton-bold-button {
   #homepage-banner .banner-text {
     font-size: 5rem;
     padding: 4em 0.5em; }
-
   .public-story #banner-container {
     height: 45em; } }
+
 .home .flex-container:nth-of-type(even) .left-side {
   width: 40%; }
 
@@ -1698,6 +1702,7 @@ a.skeleton-bold-button {
 /* MOBILE */
 .mobile .main-navigation {
   padding: 1em !important; }
+
 .mobile .site-content {
   padding: 0 !important;
   margin: 2em 0; }
@@ -1720,18 +1725,22 @@ a.skeleton-bold-button {
     padding: 0 0.25em; }
   .mobile .site-content .section-content {
     padding: 0 1em; }
+
 .mobile .mt-8em {
   margin-top: 4em; }
+
 .mobile .site-footer {
   padding: 1.5em 2.75em; }
   .mobile .site-footer .footer-link, .mobile .site-footer a {
     display: block; }
+
 .mobile .story-anchor {
   display: block;
   width: 100%;
   margin: 1em 0 0; }
   .mobile .story-anchor:first-of-type {
     margin: 3em 0 0; }
+
 .mobile .public-story .text {
   padding: 0 1em; }
 
@@ -1954,6 +1963,7 @@ a.skeleton-bold-button {
     background: #F1C40F; }
   100% {
     background: #1abc9c; } }
+
 @keyframes color-changer {
   0% {
     background: #1abc9c; }
@@ -1965,6 +1975,7 @@ a.skeleton-bold-button {
     background: #F1C40F; }
   100% {
     background: #1abc9c; } }
+
 /* Backward */
 .hvr-backward {
   display: inline-block;
@@ -1980,5 +1991,3 @@ a.skeleton-bold-button {
 .hvr-backward:hover, .hvr-backward:focus, .hvr-backward:active {
   -webkit-transform: translateX(-8px);
   transform: translateX(-8px); }
-
-/*# sourceMappingURL=style.css.map */

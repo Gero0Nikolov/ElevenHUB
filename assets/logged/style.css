@@ -1519,6 +1519,7 @@ blockquote {
 .story-content .content-image,
 .post-content .content-image {
   max-width: 90%; }
+
 .story-content .content-video,
 .post-content .content-video {
   width: 90%;
@@ -2679,6 +2680,7 @@ blockquote {
   text-decoration: none; }
   .public-stories-container .post-anchor:last-of-type {
     margin-bottom: 0 !important; }
+
 .public-stories-container .story-container {
   display: block;
   width: 100%; }
@@ -2781,6 +2783,7 @@ blockquote {
 @media screen and (min-device-width: 1400px) and (max-device-width: 1980px) and (-webkit-min-device-pixel-ratio: 1) {
   .events-container .event .event-banner {
     height: 10em; } }
+
 /* CHAT CONTROLLER + BOXES */
 #chat-controller {
   display: inline-block;
@@ -3280,23 +3283,30 @@ blockquote {
 /** MOBILE **/
 .mobile .main-navigation .left-aligned.width-20p {
   width: 50% !important; }
+
 .mobile .main-navigation .right-aligned.width-80p {
   width: 50% !important; }
+
 .mobile #notifications-holder {
   width: 80% !important;
   max-width: auto !important;
   left: 0 !important; }
+
 .mobile .white-box {
   width: 100%;
   border-radius: 0 !important; }
+
 .mobile .site-content {
   margin: calc(2em + 48px) 0; }
+
 .mobile #user-meta-container .user-meta-container button {
   width: 100% !important; }
+
 .mobile .story-banner,
 .mobile .author-banner,
 .mobile .user-container {
   height: 50vw !important; }
+
 .mobile .company-container .company-information-container {
   width: 100% !important;
   margin-left: 0 !important;
@@ -3309,6 +3319,7 @@ blockquote {
   .mobile .company-container .company-information-container .company-meta-container {
     text-align: center !important;
     margin-top: 1em; }
+
 .mobile .company-container .company-controls-container {
   width: 100% !important;
   margin-left: 0 !important; }
@@ -3320,6 +3331,7 @@ blockquote {
     width: 90%;
     margin: 0.75em auto;
     text-align: center; }
+
 .mobile #story-composer {
   padding: 0 !important; }
   .mobile #story-composer #story-controls button {
@@ -3332,6 +3344,7 @@ blockquote {
     padding: 0 0.25em; }
   .mobile #story-composer .story-content {
     padding: 0 0.75em; }
+
 .mobile .simple-controls {
   display: block;
   padding: 0 1em; }
@@ -3343,47 +3356,61 @@ blockquote {
     width: 100%;
     text-align: center;
     margin-top: 1em; }
+
 .mobile #medias-container {
   line-height: 0;
   text-align: center; }
+
 .mobile .popup-container .inline-media {
   width: 1.35em !important;
   height: 1.35em !important; }
+
 .mobile #companies-list .list-title,
 .mobile #hubbers-list .list-title {
   font-size: 1.85rem; }
+
 .mobile #companies-list .user-anchor,
 .mobile #companies-list .company-anchor,
 .mobile #hubbers-list .user-anchor,
 .mobile #hubbers-list .company-anchor {
   width: 10em; }
+
 .mobile #companies-list .list-item,
 .mobile #hubbers-list .list-item {
   max-width: 100%; }
+
 .mobile #requests-list #request-information .requester-information {
   display: block;
   width: 100%;
   text-align: center; }
+
 .mobile #requests-list #request-information .requester-links {
   display: block;
   width: 100%;
   padding: 2em; }
+
 .mobile #requests-list #request-information .request-meta {
   margin: 0;
   text-align: center; }
+
 .mobile .story-container .story-controls {
   text-align: center; }
   .mobile .story-container .story-controls .control {
     padding: 1em 0.5em 0.5em; }
+
 .mobile .story-container .overlay .message {
   font-size: 2em; }
+
 .mobile .story-container .story-author-avatar {
   width: 3em !important;
   height: 3em !important; }
+
 .mobile .story-container .story .story-title {
   padding: 0 0.25em; }
+
 .mobile .story-container .story .story-excerpt {
   padding: 0 1em; }
+
 .mobile .reader-popup .reader-inline-popup {
   width: 100% !important;
   height: 100% !important; }
@@ -3395,6 +3422,7 @@ blockquote {
       height: 4em; }
   .mobile .reader-popup .reader-inline-popup .story-meta {
     padding: 0 !important; }
+
 .mobile .single-story-view {
   flex-direction: column;
   justify-content: center;
@@ -3418,6 +3446,7 @@ blockquote {
       margin-bottom: 1em; }
     .mobile .single-story-view .story-container .comment-composer {
       padding: 0 1em; }
+
 .mobile .profile-board {
   flex-direction: column;
   align-items: center; }
@@ -3437,13 +3466,17 @@ blockquote {
       padding: 0 0.25em; }
     .mobile .profile-board .stories-board .story-container .story-content {
       padding: 0 0.75em; }
+
 .mobile .public-stories-container .story-container .story-title {
   padding: 0 0.25em; }
+
 .mobile .public-stories-container .story-container .story-content {
   padding: 0 0.75em; }
+
 .mobile .story-content .content-image,
 .mobile .post-content .content-image {
   max-width: 100%; }
+
 .mobile .story-content .content-video,
 .mobile .post-content .content-video {
   width: 100%;
@@ -3451,14 +3484,18 @@ blockquote {
   font-size: 6rem;
   display: block;
   margin: 0 auto; }
+
 .mobile .phubber-page .header {
   margin: 0.5em auto; }
+
 .mobile .phubber-page .content ul {
   font-size: 1.35rem; }
+
 .mobile .phubber-page button {
   margin: 2.5em auto;
   width: 95%;
   font-size: 1rem; }
+
 .mobile #messenger-body {
   flex-direction: column;
   align-items: center; }
@@ -3477,14 +3514,14 @@ blockquote {
       height: calc(66vh - 1em) !important; }
     .mobile #messenger-body .chat-holder .empty-message img {
       width: 25vw !important; }
+
 .mobile #chat-rooms-container {
   width: 80vw;
   height: 60vh; }
+
 .mobile #emoji-container {
   width: 60vw !important;
   height: 60vw !important; }
   .mobile #emoji-container .emojie-picker {
     width: 10vw !important;
     max-width: none !important; }
-
-/*# sourceMappingURL=style.css.map */
