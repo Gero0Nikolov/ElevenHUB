@@ -876,7 +876,8 @@ object {
 .right-aligned {
   display: inline-block;
   width: 50%;
-  vertical-align: middle; }
+  vertical-align: middle;
+  position: relative; }
 
 .left-aligned {
   text-align: left; }
