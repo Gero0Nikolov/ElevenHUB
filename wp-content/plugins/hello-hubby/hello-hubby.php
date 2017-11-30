@@ -7,8 +7,6 @@
 *	Author URI: https://geronikolov.com
 *	License: PS (CS)
 *	Visibility: Personal
-*	UserID: 1
-*	Call hooks: OPVe, OPVc
 */
 
 class HELLO_HUBBY {

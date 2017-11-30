@@ -8,7 +8,7 @@
 */
 
 $_PLAYER_ = function(){
-	$hello_hubby = new HELLO_HUBBY;	
+	$hello_hubby = new HELLO_HUBBY;
 }
 
 ?>
