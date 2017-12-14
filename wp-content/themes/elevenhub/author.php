@@ -12,6 +12,7 @@ $brother_ = new BROTHER;
 if ( is_user_logged_in() ) {
 	$user_id = get_current_user_id();
 	$association_type = get_user_meta( $user_id, "account_association", true );
+
 	if ( $association_type  == "employee" ) {
 		get_header( "employee" );
 		if ( is_author( $user_id ) ) { require_once get_template_directory() ."/views/employee-view-personal.php"; }
@@ -49,5 +50,4 @@ if ( is_user_logged_in() ) {
 	/* Load public view */
 	wp_redirect( get_site_url() );
 }
-
 ?>

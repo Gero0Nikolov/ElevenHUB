@@ -47,6 +47,7 @@ if ( wp_is_mobile() ) { $mobile_class = "mobile"; }
 			</a>
 		</div>
 		<div class="right-aligned">
+			<a href="https://11hub.net/developers" target="_blank" id="develop-form-controller" class="blue-bold-button inline-block">Develop</a>
 			<button id="login-form-controller" class="red-bold-button">Login</button>
 		</div>
 		<?php } else { ?>

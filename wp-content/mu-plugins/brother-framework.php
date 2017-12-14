@@ -3316,14 +3316,14 @@ class BROTHER {
 }
 
 //Initialize the DB into the framework
-$db_brother = new BROTHER;
-if ( !$db_brother->is_table_exists( "user_relations" ) ) { $db_brother->create_user_relations(); }
-if ( !$db_brother->is_table_exists( "user_notifications" ) ) { $db_brother->create_user_notifications(); }
-if ( !$db_brother->is_table_exists( "user_notificationsmeta" ) ) { $db_brother->create_user_notificationsmeta(); }
-if ( !$db_brother->is_table_exists( "user_requests" ) ) { $db_brother->create_user_requests(); }
-if ( !$db_brother->is_table_exists( "user_likes" ) ) { $db_brother->create_user_likes(); }
-if ( !$db_brother->is_table_exists( "story_views" ) ) { $db_brother->create_story_views(); }
-if ( !$db_brother->is_table_exists( "user_plugin_relations" ) ) { $db_brother->create_user_plugin_relations(); }
-if ( !$db_brother->is_table_exists( "registered_plugins" ) ) { $db_brother->create_registered_plugins(); }
-if ( !$db_brother->is_table_exists( "create_user_messages" ) ) { $db_brother->create_user_messages(); }
+// $db_brother = new BROTHER;
+// if ( !$db_brother->is_table_exists( "user_relations" ) ) { $db_brother->create_user_relations(); }
+// if ( !$db_brother->is_table_exists( "user_notifications" ) ) { $db_brother->create_user_notifications(); }
+// if ( !$db_brother->is_table_exists( "user_notificationsmeta" ) ) { $db_brother->create_user_notificationsmeta(); }
+// if ( !$db_brother->is_table_exists( "user_requests" ) ) { $db_brother->create_user_requests(); }
+// if ( !$db_brother->is_table_exists( "user_likes" ) ) { $db_brother->create_user_likes(); }
+// if ( !$db_brother->is_table_exists( "story_views" ) ) { $db_brother->create_story_views(); }
+// if ( !$db_brother->is_table_exists( "user_plugin_relations" ) ) { $db_brother->create_user_plugin_relations(); }
+// if ( !$db_brother->is_table_exists( "registered_plugins" ) ) { $db_brother->create_registered_plugins(); }
+// if ( !$db_brother->is_table_exists( "create_user_messages" ) ) { $db_brother->create_user_messages(); }
 ?>

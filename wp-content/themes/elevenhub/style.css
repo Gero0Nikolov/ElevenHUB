@@ -758,6 +758,12 @@ object {
 
 /* SCSS Variables set */
 /* CUSTOM PART */
+.block {
+  display: block !important; }
+
+.inline-block {
+  display: inline-block !important; }
+
 /* TOP MENU */
 .main-navigation {
   display: -webkit-flex;
