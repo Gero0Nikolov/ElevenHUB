@@ -46,8 +46,7 @@ if ( wp_is_mobile() ) { $mobile_class = "mobile"; }
 				<img src="<?php echo get_template_directory_uri(); ?>/assets/images/11hub-logo.png" class="logo hvr-backward" />
 			</a>
 		</div>
-		<div class="right-aligned">
-			<a href="https://11hub.net/developers" target="_blank" id="develop-form-controller" class="blue-bold-button inline-block">Develop</a>
+		<div class="right-aligned">			
 			<button id="login-form-controller" class="red-bold-button">Login</button>
 		</div>
 		<?php } else { ?>
