@@ -1727,6 +1727,8 @@ a.skeleton-bold-button {
     padding: 0 0.25em; }
   .mobile .site-content .section-content {
     padding: 0 1em; }
+  .mobile .site-content .full-size-banner {
+    height: 25vh !important; }
 .mobile .mt-8em {
   margin-top: 4em; }
 .mobile .site-footer {

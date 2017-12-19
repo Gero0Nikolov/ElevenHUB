@@ -13,6 +13,8 @@ jQuery( document ).ready(function(){
 	} );
 
 	if ( jQuery( "#login-form-controller" ).length > 0 && window.location.href.indexOf( "#login" ) > -1 ) { buildLoginForm(); }
+
+	if ( window.location.href.indexOf( "action=register" ) > -1 || window.location.href.indexOf( "action=login" ) > -1 ) { buildLoginForm(); }
 });
 
 function buildLoginForm() {

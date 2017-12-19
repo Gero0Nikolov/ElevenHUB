@@ -13,10 +13,21 @@
 $user_id = get_current_user_id();
 $user_association = get_user_meta( get_current_user_id(), "account_association", true );
 
-if ( is_user_logged_in() && !is_page( 11 ) && empty( $user_association ) ) { wp_redirect( get_permalink( 11 ), 301 ); }
-if ( !is_user_logged_in() && is_page( 11 ) ) { wp_redirect( get_site_url() ); }
+if ( is_user_logged_in() && !is_page( 11 ) && empty( $user_association ) ) { wp_redirect( get_permalink( 11 ), 301 ); exit; }
+if ( !is_user_logged_in() && is_page( 11 ) ) { wp_redirect( get_site_url() ); exit; }
 
-if ( !empty( $user_association ) && !is_author( $user_id ) ) { wp_redirect( get_author_posts_url( $user_id ) ); }
+if ( !empty( $user_association ) && !is_author( $user_id ) ) { wp_redirect( get_author_posts_url( $user_id ) ); exit; }
+
+$aff_id = isset( $_GET[ "aid" ] ) && !empty( $_GET[ "aid" ] ) ? intval( $_GET[ "aid" ] ) : 0;
+if ( $aff_id > 0 ) {
+	if ( !isset( $_COOKIE[ "elhub_aff_id" ] ) ) { setcookie( "elhub_aff_id", $aff_id, time() + 60 * 60 * 24 * 90 ); }
+	
+	if ( strpos( $_SERVER[ "REQUEST_URI" ], "action" ) ) {
+		$action = explode( "&", explode( "action=", $_SERVER[ "REQUEST_URI" ] )[ 1 ] )[ 0 ];
+		wp_redirect( get_site_url() ."?action=". $action );
+		exit;
+	}
+}
 
 $mobile_class = "";
 if ( wp_is_mobile() ) { $mobile_class = "mobile"; }
@@ -46,7 +57,7 @@ if ( wp_is_mobile() ) { $mobile_class = "mobile"; }
 				<img src="<?php echo get_template_directory_uri(); ?>/assets/images/11hub-logo.png" class="logo hvr-backward" />
 			</a>
 		</div>
-		<div class="right-aligned">			
+		<div class="right-aligned">
 			<button id="login-form-controller" class="red-bold-button">Login</button>
 		</div>
 		<?php } else { ?>

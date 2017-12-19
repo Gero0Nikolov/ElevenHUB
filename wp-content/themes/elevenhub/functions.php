@@ -238,6 +238,11 @@ function register_user() {
 
 			$user_id = $wp_registration_result;
 
+			if ( isset( $_COOKIE[ "elhub_aff_id" ] ) && !empty( $_COOKIE[ "elhub_aff_id" ] ) ) {
+				$aff_id = intval( $_COOKIE[ "elhub_aff_id" ] );
+				if ( $aff_id > 0 ) { update_user_meta( $user_id, "affiliate_id", $aff_id, false ); }
+			}
+
 			// Add needed user meta
 			add_user_meta( $user_id, "account_tutorial", "0", false );
 
